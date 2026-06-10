@@ -1,0 +1,89 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { Reveal } from "../../runtime/components/Reveal.tsx";
+import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
+
+function renderReveal({
+	at = 1,
+	as,
+	className = "",
+	children = "Revealed content",
+	stepIndex = 1,
+	stepCount = 1,
+	showFutureSteps = false,
+	futureStepOpacity,
+}: {
+	at?: number;
+	as?: "div" | "span";
+	className?: string;
+	children?: string;
+	stepIndex?: number;
+	stepCount?: number;
+	showFutureSteps?: boolean;
+	futureStepOpacity?: number;
+} = {}) {
+	const reveal = createElement(Reveal, { at, as, className }, children);
+
+	return renderToStaticMarkup(
+		createElement(
+			TimelineProvider,
+			{
+				stepIndex,
+				stepCount,
+				showFutureSteps,
+				...(futureStepOpacity === undefined ? {} : { futureStepOpacity }),
+			},
+			reveal,
+		),
+	);
+}
+
+describe("<Reveal>", () => {
+	it("keeps author classes and renders block reveals by default", () => {
+		const html = renderReveal({ className: "custom-fade" });
+
+		assert.match(html, /class="[^"]*\bhoneydeck-reveal\b[^"]*\bcustom-fade\b/);
+		assert.ok(html.includes("display:block"));
+	});
+
+	it("shows future reveals as muted previews when requested", () => {
+		const html = renderReveal({
+			at: 2,
+			children: "Future content",
+			stepIndex: 1,
+			stepCount: 2,
+			showFutureSteps: true,
+			futureStepOpacity: 0.4,
+		});
+
+		assert.ok(html.includes("visibility:visible"));
+		assert.ok(html.includes("opacity:0.4"));
+		assert.ok(html.includes("Future content"));
+	});
+
+	it("hides future reveals when previews are disabled", () => {
+		const html = renderReveal({
+			at: 2,
+			children: "Hidden content",
+			stepIndex: 1,
+			stepCount: 2,
+		});
+
+		assert.ok(html.includes("visibility:hidden"));
+		assert.ok(html.includes("opacity:0"));
+		assert.ok(html.includes("Hidden content"));
+	});
+
+	it("renders inline reveals as spans", () => {
+		const html = renderReveal({ as: "span", children: "Inline content" });
+
+		assert.match(html, /^<span\b/);
+		assert.ok(html.includes("honeydeck-reveal"));
+		assert.ok(html.includes("display:inline"));
+		assert.ok(html.includes("visibility:visible"));
+		assert.ok(html.includes("opacity:1"));
+		assert.ok(html.includes("Inline content"));
+	});
+});

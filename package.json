@@ -1,0 +1,28 @@
+{
+	"name": "honeydeck-monorepo",
+	"private": true,
+	"type": "module",
+	"workspaces": [
+		"packages/honeydeck",
+		"packages/marketing",
+		"packages/showcase"
+	],
+	"engines": {
+		"node": ">=22.18.0"
+	},
+	"scripts": {
+		"build": "npm --workspaces --if-present run build",
+		"deps:update": "npm update --workspaces --include-workspace-root",
+		"dev": "npm -w @honeydeck/showcase run dev & npm -w @honeydeck/marketing run dev & wait",
+		"format": "biome check --write .",
+		"lint": "biome check .",
+		"pack:dry-run": "npm --workspaces --if-present run pack:dry-run",
+		"pack:smoke": "npm -w @honeydeck/honeydeck run pack:smoke",
+		"release:plan": "node ./packages/honeydeck/scripts/release-plan.mjs",
+		"test": "npm --workspaces --if-present test",
+		"typecheck": "npm --workspaces --if-present run typecheck"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.15"
+	}
+}

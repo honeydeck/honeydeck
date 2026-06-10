@@ -1,0 +1,271 @@
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/themes/base.css";
+@import "@honeydeck/honeydeck/themes/bee.css";
+
+:root {
+	--honeydeck-font-size-base: 16px;
+	--honeydeck-font-heading: Inter, ui-sans-serif, system-ui, sans-serif;
+	--honeydeck-font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+	--honeydeck-color-background: var(--honeydeck-background, #fffdf8);
+	--honeydeck-color-foreground: var(--honeydeck-foreground, #191528);
+	--honeydeck-color-surface: var(--honeydeck-surface, #fbf5e8);
+	--honeydeck-color-border: var(--honeydeck-border, #ded7c5);
+	--honeydeck-color-primary: var(--honeydeck-primary, #f0b423);
+	--honeydeck-color-primary-foreground: var(
+		--honeydeck-primary-foreground,
+		#19120a
+	);
+	--honeydeck-color-muted-foreground: color-mix(
+		in oklab,
+		var(--honeydeck-foreground) 62%,
+		transparent
+	);
+}
+
+[data-honeydeck-color-mode="light"] {
+	--honeydeck-color-background: #fffdf8;
+	--honeydeck-color-foreground: #191528;
+	--honeydeck-color-surface: #fbf5e8;
+	--honeydeck-color-border: #ded7c5;
+	--honeydeck-color-primary: #f0b423;
+	--honeydeck-color-primary-foreground: #19120a;
+	--honeydeck-color-muted-foreground: #696475;
+	--marketing-panel: #fffaf0;
+	--marketing-panel-strong: #f3efff;
+	--marketing-code: #0b0d14;
+	--marketing-shadow: rgb(71 54 21 / 13%);
+}
+
+[data-honeydeck-color-mode="dark"] {
+	--honeydeck-color-background: #101017;
+	--honeydeck-color-foreground: #fbf7ea;
+	--honeydeck-color-surface: #201d28;
+	--honeydeck-color-border: #393343;
+	--honeydeck-color-primary: #ffd449;
+	--honeydeck-color-primary-foreground: #14100a;
+	--honeydeck-color-muted-foreground: #b9b2c6;
+	--marketing-panel: #181721;
+	--marketing-panel-strong: #231f33;
+	--marketing-code: #06070c;
+	--marketing-shadow: rgb(0 0 0 / 30%);
+}
+
+html {
+	font-size: 16px;
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+	}
+}
+
+body {
+	margin: 0;
+	min-width: 320px;
+	background:
+		linear-gradient(
+			180deg,
+			color-mix(in oklab, var(--honeydeck-color-primary) 10%, transparent),
+			transparent 22rem
+		),
+		var(--honeydeck-color-background);
+	color: var(--honeydeck-color-foreground);
+	font-family: var(--honeydeck-font-body);
+}
+
+button,
+a,
+input {
+	font: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--honeydeck-color-primary);
+	outline-offset: 3px;
+}
+
+::selection {
+	background: color-mix(
+		in oklab,
+		var(--honeydeck-color-primary) 28%,
+		transparent
+	);
+}
+
+.doc-content {
+	font-size: 1.03rem;
+	line-height: 1.75;
+	max-width: 74ch;
+}
+
+.doc-content h1,
+.doc-content h2,
+.doc-content h3 {
+	font-weight: 950;
+	line-height: 1.05;
+	margin-block: 2rem 1rem;
+}
+
+.doc-content h1 {
+	font-size: 2.7rem;
+	margin-top: 0;
+}
+
+.doc-content h2 {
+	font-size: 2rem;
+}
+
+.doc-content h3 {
+	font-size: 1.5rem;
+}
+
+.doc-content p,
+.doc-content ul,
+.doc-content ol,
+.doc-content pre,
+.doc-content table,
+.doc-content blockquote {
+	margin-block: 1rem;
+}
+
+.doc-content ul {
+	list-style: disc;
+	padding-left: 1.5rem;
+}
+
+.doc-content ol {
+	list-style: decimal;
+	padding-left: 1.5rem;
+}
+
+.doc-content li {
+	margin-block: 0.35rem;
+}
+
+.doc-content li > ul {
+	list-style: circle;
+	margin-block: 0.35rem;
+}
+
+.doc-content li > ol {
+	margin-block: 0.35rem;
+}
+
+.doc-content a {
+	color: var(--honeydeck-color-primary);
+	cursor: pointer;
+	font-weight: 800;
+	text-decoration-line: underline;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.18em;
+}
+
+.doc-content a:hover {
+	text-decoration-line: underline;
+}
+
+.doc-content code {
+	background: var(--honeydeck-color-surface);
+	border: 1px solid var(--honeydeck-color-border);
+	border-radius: 0.4rem;
+	font-size: 0.9em;
+	padding: 0.15rem 0.35rem;
+}
+
+.doc-content pre {
+	background: var(--marketing-code);
+	border: 1px solid color-mix(in oklab, var(--honeydeck-color-border) 45%, #000);
+	border-radius: 0.5rem;
+	color: #f7e9a0;
+	overflow: auto;
+	padding: 1rem;
+}
+
+.doc-content pre code {
+	background: transparent;
+	border: 0;
+	padding: 0;
+}
+
+.doc-content .honeydeck-code-block {
+	border: 1px solid var(--honeydeck-color-border);
+	line-height: 1.6;
+	margin-block: 1rem;
+}
+
+.doc-content .honeydeck-code-block pre {
+	background-color: var(--shiki-light-bg);
+	border: 0;
+	color: inherit;
+	margin: 0;
+	padding: 1rem;
+}
+
+[data-honeydeck-color-mode="dark"] .doc-content .honeydeck-code-block pre {
+	background-color: var(--shiki-dark-bg);
+}
+
+.doc-content .honeydeck-code-block .honeydeck-code-plain {
+	background: var(--honeydeck-color-surface);
+	color: var(--honeydeck-color-foreground);
+}
+
+.doc-content .honeydeck-code-copy-button {
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
+	color: var(--honeydeck-color-muted-foreground);
+	cursor: default;
+	opacity: 1;
+}
+
+.doc-content .honeydeck-code-copy-button:hover,
+.doc-content .honeydeck-code-copy-button:focus-visible {
+	background: color-mix(
+		in oklab,
+		var(--honeydeck-color-primary) 14%,
+		transparent
+	);
+	border-color: color-mix(
+		in oklab,
+		var(--honeydeck-color-primary) 28%,
+		transparent
+	);
+	color: var(--honeydeck-color-foreground);
+}
+
+.doc-content blockquote {
+	border-left: 4px solid var(--honeydeck-color-primary);
+	color: var(--honeydeck-color-muted-foreground);
+	padding-left: 1rem;
+}
+
+.doc-content table {
+	border-collapse: collapse;
+	display: block;
+	overflow-x: auto;
+	width: 100%;
+}
+
+.doc-content th,
+.doc-content td {
+	border: 1px solid var(--honeydeck-color-border);
+	padding: 0.6rem 0.75rem;
+}
+
+@media (min-width: 640px) {
+	.doc-content h1 {
+		font-size: 3.45rem;
+	}
+
+	.doc-content h2 {
+		font-size: 2.35rem;
+	}
+}

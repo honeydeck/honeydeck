@@ -1,0 +1,153 @@
+---
+title: demo-deck
+description: A clean Honeydeck starter deck
+# Define the color mode for your slides: light, dark, system.
+colorMode: system
+# Swap layouts for a custom layout map or the included bee theme (also update css).
+# - Custom layouts: layouts: "./layouts"
+# - Bee layouts: layouts: "@honeydeck/honeydeck/layouts/bee"
+# Run dev server and check: http://localhost:4201/#/layouts
+layouts: "@honeydeck/honeydeck/layouts"
+# --- Frontmatter for first slide.
+layout: Cover
+author: Built with Honeydeck ✨
+---
+
+import './styles.css'
+import { Reveal, RevealGroup, Notes, Keyboard } from '@honeydeck/honeydeck'
+import { Left, Right } from '@honeydeck/honeydeck/layouts/TwoCol'
+import { SparkleButton } from './components/SparkleButton'
+
+# Honeydeck Starter Deck 🐝
+
+Press → for next slide
+
+<Notes>
+  Welcome to Honeydeck 🎉
+  Open presenter mode with "p" to see this note.
+</Notes>
+
+---
+
+# Start with plain Markdown 📝
+
+All you need is `---` for new slides.
+
+```mdx
+---
+
+# Slide 😎
+
+```
+
+<Reveal>
+You can press <Keyboard>↓</Keyboard> to skip revealed content and jump to the next slide.
+</Reveal>
+
+---
+
+# Grow into React when needed ⚛️
+
+When Markdown is not enough, use React.
+
+<div className='p-8'>
+<SparkleButton />
+</div>
+
+---
+layout: Section
+---
+
+# Structure your talk with layouts
+
+See all at [/#/layouts](/#/layouts)
+
+<div className='absolute bottom-8 left-8'>
+👇 did you notice this bar?
+</div>
+
+---
+
+# Code step-through 🧑‍💻
+
+Add line groups to a code fence and Honeydeck turns them into timeline steps.
+
+`{0|1-2|4-6|all}`
+
+```ts {0|1-2|4-6|all}
+// Step 1: define your story beats
+const beats = ['hook', 'demo', 'takeaway']
+
+// Step 2: choose what the audience sees now
+const currentBeat = beats[0]
+console.log(currentBeat)
+```
+
+<Notes>
+  Walk through each highlighted step. The code fence metadata controls which
+  lines are emphasized.
+</Notes>
+
+---
+
+# Theme tokens and CSS variables 🎨
+
+Honeydeck starts clean by default and exposes friendly CSS variables. Override a few and the whole deck changes.
+
+<div className="grid grid-cols-2 gap-4 mb-8">
+  <div className="rounded-honeydeck bg-primary p-5 text-primary-foreground">--honeydeck-primary</div>
+  <div className="rounded-honeydeck bg-accent p-5 text-accent-foreground">--honeydeck-accent</div>
+  <div className="rounded-honeydeck border border-border bg-surface p-5 text-surface-foreground">--honeydeck-surface</div>
+  <div className="rounded-honeydeck border border-border bg-background p-5 text-foreground">--honeydeck-background</div>
+</div>
+
+Change them in `styles.css`.
+
+Read more at [honeydeck.dev](https://honeydeck.dev)
+
+---
+
+# Presenter mode + notes 🎤
+
+Speaker notes stay hidden from the audience but show up in presenter mode.
+
+```mdx
+<Notes>
+  Mention the surprising part here.
+  Keep yourself on track.
+</Notes>
+```
+
+Press <Keyboard>p</Keyboard> to open presenter mode, with current slide, next preview, notes, and a timer.
+
+<Notes>
+
+  This is a real note for the presenter. It should show in presenter mode and never render on the audience slide.
+
+</Notes>
+
+---
+
+# PDF export 📚
+
+Export your presentation with one command.
+
+```bash
+# Export with default settings
+npm run pdf
+
+# Export every reveal step as a separate page
+npx honeydeck pdf --steps all
+
+# Force dark mode
+npx honeydeck pdf --mode dark
+```
+
+---
+layout: Cover
+author: Happy presenting 🎞️
+---
+
+# Get started  🚀
+
+Edit `deck.mdx`, open the [theme reference](/#/theme), and build something fun.

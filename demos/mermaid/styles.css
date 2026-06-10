@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+@import "@honeydeck/honeydeck/themes/bee.css";
+
+.user-mermaid svg :is(p, div, span, .label, .nodeLabel, .edgeLabel) {
+	/* Honeydeck slide typography is large; keep Mermaid labels diagram-sized. */
+	font-size: 16px;
+}

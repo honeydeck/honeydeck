@@ -1,0 +1,91 @@
+# PDF Export
+
+## How It Works
+
+`honeydeck pdf` renders the deck using Playwright/Chromium. It builds into a temporary directory and starts a temporary local server — no pre-existing build or `dist/` pollution needed.
+
+This keeps PDF output on the same rendering path as the browser presentation, so MDX, React components, layouts, themes, and CSS behave consistently.
+
+If Chromium is missing or fails to launch after a fresh install, install the
+Playwright browser binary:
+
+```bash
+npx playwright install chromium
+```
+
+## Usage
+
+```bash
+honeydeck pdf                          # → deck.pdf
+honeydeck pdf -o my-talk.pdf           # custom filename
+honeydeck pdf --steps all              # all step states as separate pages
+honeydeck pdf --mode dark              # dark mode PDF
+honeydeck pdf --mode light             # explicit light mode
+honeydeck pdf --parallel 6             # capture up to 6 pages at a time
+```
+
+## Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o <file>` | Output filename | `deck.pdf` |
+| `--steps <final\|all>` | Override `pdfSteps` frontmatter | `final` |
+| `--mode <light\|dark>` | Override PDF color mode resolution | unset |
+| `--parallel <count>` | Parallel page captures, from `1` to `16` | CPU count, capped at `16` |
+
+## Frontmatter Settings
+
+```yaml
+---
+pdfColorMode: light    # light | dark
+pdfSteps: final        # final | all
+---
+```
+
+- **`pdfColorMode`** — optional PDF color mode. Resolution is CLI `--mode` > `pdfColorMode` > pinned deck `colorMode` (`light`/`dark`) > `light`. `system` is ignored for PDF.
+- **`pdfSteps`** — `final` renders each slide once in its final state. `all` renders every step as a separate PDF page.
+
+## Steps in PDF
+
+Honeydeck builds an ordered capture plan before taking screenshots. The final PDF always follows deck order; in `pdfSteps: all`, step pages ascend within each slide. Page screenshots may be captured in parallel, but completion order does not affect PDF page order.
+
+When `pdfSteps: all`:
+
+- Each `Reveal`/`RevealGroup` step becomes a separate page.
+- Stepped code blocks show their first highlight group on the baseline page; each later code highlight group becomes a separate page.
+- Both use the same underlying timeline.
+
+When `pdfSteps: final` (default):
+
+- All reveals shown in final (visible) state.
+- Code blocks shown with final highlight applied.
+- `useTimeline()` and `useTimelineSteps()` expose `isPdfFinalRender: true`, so
+  custom step-driven components can render an all-open/all-visible PDF state.
+
+In `pdfSteps: all`, `isPdfFinalRender` stays false because each step is captured
+with the same timeline state the browser presentation would use.
+
+## Aspect Ratio
+
+PDF pages follow the deck's `aspectRatio`. Width stays fixed at 1920 and height is derived from the ratio:
+
+```txt
+16:9 → 1920×1080
+4:3  → 1920×1440
+1:1  → 1920×1920
+```
+
+Invalid or missing ratios fall back to `16:9` / 1920×1080.
+
+## Terminal Output
+
+```txt
+  ✨ Honeydeck v0.1.0
+
+  🖨️  Exporting PDF...
+  🧵 Capturing 12 pages with N workers...
+  📄 Rendering page 1/12 (slide 1/12)...
+  📄 Rendering page 2/12 (slide 2/12)...
+  ...
+  ✅ Done! deck.pdf (12 pages)
+```

@@ -1,0 +1,29 @@
+{
+	"name": "@honeydeck/showcase",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "node --import tsx ../honeydeck/src/cli/index.ts build --deck deck.mdx",
+		"dev": "node --import tsx ../honeydeck/src/cli/index.ts dev --deck deck.mdx",
+		"pdf": "node --import tsx ../honeydeck/src/cli/index.ts pdf --deck deck.mdx -o showcase.pdf",
+		"pdf:steps": "node --import tsx ../honeydeck/src/cli/index.ts pdf --deck deck.mdx -o showcase-steps.pdf --steps all",
+		"format": "biome check --write .",
+		"lint": "biome check .",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"lucide-react": "^1.16.0",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"tailwindcss": "^4.3.0",
+		"@honeydeck/honeydeck": "file:../honeydeck"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.15",
+		"@types/node": "^25.6.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
+	}
+}

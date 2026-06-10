@@ -1,0 +1,39 @@
+---
+layout: Section
+---
+
+# Imported Slides
+
+This section lives in `packages/showcase/imported-slides.mdx`.
+
+---
+
+# Slide Group Expansion
+
+The root deck imports the file once:
+
+```mdx
+import ImportedSlides from './imported-slides.mdx'
+
+<ImportedSlides />
+```
+
+Honeydeck expands each slide from that file at the render location.
+
+---
+layout: ImageRight
+image: 
+alt: Launch moment
+---
+
+# Launch Moment
+
+Pair a prominent image with the same heading treatment used by the default content slides.
+
+```mdx
+layout: ImageRight
+image: 
+alt: Launch moment
+```
+
+There is also `layout: ImageLeft` 😉

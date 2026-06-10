@@ -1,0 +1,43 @@
+{
+	"name": "@honeydeck/marketing",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"predev": "npm run docs:sync",
+		"dev": "vite --host 0.0.0.0",
+		"prebuild": "npm run docs:sync",
+		"build": "vite build",
+		"postbuild": "node ./scripts/postbuild.mjs",
+		"docs:sync": "node ./scripts/sync-docs.mjs",
+		"pretypecheck": "npm run docs:sync",
+		"lint": "biome check .",
+		"format": "biome check --write .",
+		"pack:dry-run": "npm pack --dry-run",
+		"test": "node --test --import tsx \"src/**/*.test.ts\" \"src/**/*.test.tsx\" \"scripts/**/*.test.mjs\"",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@mdx-js/react": "^3.1.1",
+		"@vitejs/plugin-react": "^5.1.2",
+		"gray-matter": "^4.0.3",
+		"lucide-react": "^1.16.0",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"react-router": "^7.10.1",
+		"react-router-dom": "^7.10.1",
+		"remark-frontmatter": "^5.0.0",
+		"remark-gfm": "^4.0.1",
+		"vite": "^8.0.11",
+		"@honeydeck/honeydeck": "file:../honeydeck"
+	},
+	"devDependencies": {
+		"@mdx-js/rollup": "^3.1.1",
+		"@tailwindcss/vite": "^4.3.0",
+		"@types/node": "^25.6.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tailwindcss": "^4.3.0",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
+	}
+}

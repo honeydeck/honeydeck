@@ -1,0 +1,623 @@
+/**
+ * Honeydeck Base Theme
+ *
+ * CSS custom property tokens for color, typography, and code.
+ * Light/dark modes provide a cohesive default palette. Override the CSS
+ * variables to retheme a deck. A Tailwind v4 @theme block maps the tokens to
+ * utility classes (bg-background, text-foreground, rounded-honeydeck, etc.).
+ *
+ * Import in your project:
+ *   @import "tailwindcss";
+ *   @import "<path-to-honeydeck>/src/theme/base.css";
+ *
+ * Override any token after the import to customise colors / typography:
+ *   [data-honeydeck-color-mode="light"] { --honeydeck-primary: oklch(55% 0.25 145); }
+ */
+
+/* ── Source scanning ────────────────────────────────────────────────────────
+   Tell Tailwind to scan the built-in layouts for utility class candidates.
+   Without this, layouts live outside the Vite root (user's project dir) and
+   @tailwindcss/vite's oxide Scanner would never discover their classes.      */
+@source "../layouts";
+@source "../runtime";
+
+/* ── Typography tokens (shared across color modes) ─────────────────────────
+   These live on :root so layouts can read them without caring about mode.     */
+:root {
+	/* Content padding — internal spacing between slide edge and content */
+	--honeydeck-slide-padding: 2rem;
+
+	/* Font families */
+	--honeydeck-font-heading: system-ui, sans-serif;
+	--honeydeck-font-body: system-ui, sans-serif;
+	--honeydeck-font-mono:
+		ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+
+	/* Base size — seeds rem and all other size tokens */
+	--honeydeck-font-size-base: 36px;
+	--honeydeck-font-scale: 1.25;
+
+	/* Seed rem units — 1rem = --honeydeck-font-size-base */
+	font-size: var(--honeydeck-font-size-base, 36px);
+
+	/* Body / paragraph text */
+	--honeydeck-font-size-body: 1rem; /* = base */
+
+	/* Heading sizes — computed from scale^n (in rem, so relative to base) */
+	--honeydeck-font-size-display: calc(
+		1rem *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale)
+	); /* scale^5 — Section dividers */
+	--honeydeck-font-size-h1: calc(
+		1rem *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale)
+	); /* scale^4 */
+	--honeydeck-font-size-h2: calc(
+		1rem *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale)
+	); /* scale^3 */
+	--honeydeck-font-size-h3: calc(
+		1rem *
+		var(--honeydeck-font-scale) *
+		var(--honeydeck-font-scale)
+	); /* scale^2 */
+	--honeydeck-font-size-h4: calc(
+		1rem *
+		var(--honeydeck-font-scale)
+	); /* scale^1 */
+	--honeydeck-font-size-small: calc(
+		1rem /
+		var(--honeydeck-font-scale)
+	); /* scale^-1 */
+
+	/* Code blocks */
+	--honeydeck-font-size-code: 0.83rem; /* ~20px at 24px base */
+
+	/* Code step-through: opacity of non-highlighted lines during walkthroughs */
+	--honeydeck-code-line-dim-opacity: 0.4;
+}
+
+/* ── Light mode ─────────────────────────────────────────────────────────────
+   Clean black, white, and grey defaults.                                      */
+[data-honeydeck-color-mode="light"] {
+	color-scheme: light;
+
+	/* Primary brand color — change this to retheme the entire deck */
+	--honeydeck-primary: #000000;
+
+	/* Foreground on primary-colored backgrounds */
+	--honeydeck-primary-foreground: #ffffff;
+
+	/* Slide background */
+	--honeydeck-background: #ffffff;
+
+	/* Main text color */
+	--honeydeck-foreground: #111111;
+
+	/* Secondary surface (cards, code blocks, callouts) */
+	--honeydeck-surface: #f2f2f2;
+
+	/* Text on surface backgrounds */
+	--honeydeck-surface-foreground: #222222;
+
+	/* Divider / border color */
+	--honeydeck-border: #c8c8c8;
+
+	/* Accent / pop color */
+	--honeydeck-accent: #000000;
+
+	/* Text on accent backgrounds */
+	--honeydeck-accent-foreground: #ffffff;
+
+	--honeydeck-link-color: inherit;
+	--honeydeck-border-radius: 0.25rem;
+}
+
+/* ── Dark mode ───────────────────────────────────────────────────────────────
+   Clean inverted defaults for dark rooms.                                     */
+[data-honeydeck-color-mode="dark"] {
+	color-scheme: dark;
+
+	/* Primary brand color */
+	--honeydeck-primary: #ffffff;
+
+	--honeydeck-primary-foreground: #000000;
+
+	/* Deep dark slide background */
+	--honeydeck-background: #000000;
+
+	/* Near-white text */
+	--honeydeck-foreground: #f5f5f5;
+
+	/* Slightly lighter surface for cards / code blocks */
+	--honeydeck-surface: #1f1f1f;
+
+	--honeydeck-surface-foreground: #e8e8e8;
+
+	--honeydeck-border: #5c5c5c;
+
+	--honeydeck-accent: #ffffff;
+
+	--honeydeck-accent-foreground: #000000;
+
+	--honeydeck-link-color: inherit;
+	--honeydeck-border-radius: 0.25rem;
+}
+
+/* ── Tailwind v4 @theme — map tokens to utility classes ────────────────────
+   Each --color-* entry creates bg-*, text-*, border-*, ring-* utilities.
+   --font-* → font-* family utilities. --radius-* → rounded-* utilities.      */
+@theme {
+	/* Spacing — pixel-based (decoupled from root font-size which is 36px for slides) */
+	--spacing: 4px;
+
+	/* Text sizes — pixel-based for predictable sizing across contexts */
+	--text-2xs: 10px;
+	--text-xs: 11px;
+	--text-sm: 12px;
+	--text-base: 13px;
+	--text-md: 14px;
+	--text-lg: 15px;
+	--text-xl: 16px;
+	--text-2xl: 18px;
+	--text-3xl: 20px;
+	--text-4xl: 22px;
+	--text-5xl: 28px;
+	--text-6xl: 40px;
+
+	/* Colors — slide theme */
+	--color-primary: var(--honeydeck-primary);
+	--color-primary-foreground: var(--honeydeck-primary-foreground);
+	--color-background: var(--honeydeck-background);
+	--color-foreground: var(--honeydeck-foreground);
+	--color-surface: var(--honeydeck-surface);
+	--color-surface-foreground: var(--honeydeck-surface-foreground);
+	--color-border: var(--honeydeck-border);
+	--color-accent: var(--honeydeck-accent);
+	--color-accent-foreground: var(--honeydeck-accent-foreground);
+	--color-link: var(--honeydeck-link-color);
+
+	/* Colors — runtime fallbacks */
+	--color-error: #ff6b6b;
+	--color-error-surface: #1a0a0a;
+	--color-void: #111;
+
+	/* Border radius — pixel-based (unaffected by root font-size) */
+	--radius-xs: 4px;
+	--radius-sm: 5px;
+	--radius: 6px;
+	--radius-md: 8px;
+	--radius-lg: 10px;
+	--radius-xl: 12px;
+	--radius-honeydeck: var(--honeydeck-border-radius);
+
+	/* Fonts */
+	--font-heading: var(--honeydeck-font-heading);
+	--font-body: var(--honeydeck-font-body);
+	--font-mono: var(--honeydeck-font-mono);
+}
+
+/* ── Base element styles ────────────────────────────────────────────────────
+   Applied inside slide canvases.                                              */
+
+.honeydeck-slide-canvas {
+	font-family: var(--honeydeck-font-body);
+}
+
+.honeydeck-overview-thumbnail[data-boundary-feedback="up"] {
+	animation: honeydeck-overview-boundary-up 180ms ease-out;
+}
+
+.honeydeck-overview-thumbnail[data-boundary-feedback="down"] {
+	animation: honeydeck-overview-boundary-down 180ms ease-out;
+}
+
+@keyframes honeydeck-overview-boundary-up {
+	0%,
+	100% {
+		transform: translateY(0) scale(1.01);
+	}
+	35% {
+		transform: translateY(-6px) scale(1.01);
+	}
+	70% {
+		transform: translateY(3px) scale(1.01);
+	}
+}
+
+@keyframes honeydeck-overview-boundary-down {
+	0%,
+	100% {
+		transform: translateY(0) scale(1.01);
+	}
+	35% {
+		transform: translateY(6px) scale(1.01);
+	}
+	70% {
+		transform: translateY(-3px) scale(1.01);
+	}
+}
+
+.honeydeck-slide-canvas h1 {
+	font-family: var(--honeydeck-font-heading);
+	font-size: var(--honeydeck-font-size-h1);
+	font-weight: 600;
+	line-height: 1.15;
+	margin: 0 0 0.5em;
+}
+
+.honeydeck-slide-canvas h2 {
+	font-family: var(--honeydeck-font-heading);
+	font-size: var(--honeydeck-font-size-h2);
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 0 0 0.5em;
+}
+
+.honeydeck-slide-canvas h3 {
+	font-family: var(--honeydeck-font-heading);
+	font-size: var(--honeydeck-font-size-h3);
+	font-weight: 600;
+	line-height: 1.25;
+	margin: 0 0 0.4em;
+}
+
+.honeydeck-slide-canvas p {
+	font-size: var(--honeydeck-font-size-body);
+	line-height: 1.6;
+	margin: 0 0 0.75em;
+}
+
+.honeydeck-slide-canvas ul,
+.honeydeck-slide-canvas ol {
+	font-size: var(--honeydeck-font-size-body);
+	line-height: 1.7;
+	padding-left: 1.5em;
+	margin: 0 0 0.75em;
+}
+
+.honeydeck-slide-canvas ul {
+	list-style: disc;
+}
+
+.honeydeck-slide-canvas ol {
+	list-style: decimal;
+}
+
+.honeydeck-slide-canvas li {
+	margin-bottom: 0.35em;
+}
+
+.honeydeck-slide-canvas code {
+	font-family: var(--honeydeck-font-mono);
+	font-size: 0.9em;
+	background-color: var(--honeydeck-surface);
+	color: var(--honeydeck-surface-foreground);
+	padding: 0.1em 0.35em;
+	border-radius: 0.3em;
+}
+
+.honeydeck-slide-canvas pre {
+	font-family: var(--honeydeck-font-mono);
+	font-size: var(--honeydeck-font-size-code);
+	background-color: var(--honeydeck-surface);
+	color: var(--honeydeck-surface-foreground);
+	border-radius: var(--honeydeck-border-radius);
+	padding: 1.5em;
+	overflow-x: auto;
+}
+
+.honeydeck-slide-canvas pre code {
+	background: none;
+	padding: 0;
+	font-size: inherit;
+}
+
+.honeydeck-slide-canvas blockquote {
+	border-left: 4px solid var(--honeydeck-primary);
+	margin: 0 0 0.75em;
+	padding: 0.25em 0 0.25em 1em;
+	color: var(--honeydeck-surface-foreground);
+	font-style: italic;
+	font-size: var(--honeydeck-font-size-body);
+}
+
+.honeydeck-slide-canvas table {
+	width: 100%;
+	margin: 0 0 0.75em;
+	border-collapse: collapse;
+	font-size: calc(var(--honeydeck-font-size-body) * 0.68);
+	line-height: 1.35;
+}
+
+.honeydeck-slide-canvas th,
+.honeydeck-slide-canvas td {
+	padding: 0.55em 0.75em;
+	border-bottom: 1px solid var(--honeydeck-border);
+	vertical-align: top;
+}
+
+.honeydeck-slide-canvas th:first-child,
+.honeydeck-slide-canvas td:first-child {
+	padding-left: 0;
+}
+
+.honeydeck-slide-canvas th:last-child,
+.honeydeck-slide-canvas td:last-child {
+	padding-right: 0;
+}
+
+.honeydeck-slide-canvas th {
+	font-weight: 700;
+	text-align: left;
+}
+
+.honeydeck-slide-canvas th[align="center"],
+.honeydeck-slide-canvas td[align="center"] {
+	text-align: center;
+}
+
+.honeydeck-slide-canvas th[align="right"],
+.honeydeck-slide-canvas td[align="right"] {
+	text-align: right;
+}
+
+/* ── Shiki dual-theme code highlighting ─────────────────────────────────────
+   shiki's defaultColor:false mode emits CSS variables (--shiki-light,
+   --shiki-dark, --shiki-light-bg, --shiki-dark-bg) as inline styles.
+   These rules activate the correct set based on [data-honeydeck-color-mode].     */
+
+/* Light mode default (variable is on :root / the pre element itself) */
+.honeydeck-code-block .shiki {
+	/* override the generic .honeydeck-slide-canvas pre background */
+	background-color: var(--shiki-light-bg);
+	/* bring the shiki pre's padding/radius in from the wrapper */
+	border-radius: 0;
+	padding: 1.5em;
+	margin: 0;
+}
+
+.honeydeck-code-block .shiki span {
+	color: var(--shiki-light);
+}
+
+/* Dark mode */
+[data-honeydeck-color-mode="dark"] .honeydeck-code-block .shiki {
+	background-color: var(--shiki-dark-bg);
+}
+
+[data-honeydeck-color-mode="dark"] .honeydeck-code-block .shiki span {
+	color: var(--shiki-dark);
+}
+
+/* Override the generic .honeydeck-slide-canvas pre code rule */
+.honeydeck-code-block .shiki code {
+	background: transparent;
+	padding: 0;
+	font-size: inherit;
+	color: inherit;
+}
+
+.honeydeck-code-copy-button {
+	position: absolute;
+	top: 0.75em;
+	right: 0.75em;
+	z-index: 1;
+	display: inline-flex;
+	width: 2.25em;
+	height: 2.25em;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid
+		color-mix(in oklch, var(--honeydeck-border) 75%, transparent);
+	border-radius: calc(var(--honeydeck-border-radius) * 0.75);
+	background: color-mix(in oklch, var(--honeydeck-surface) 88%, transparent);
+	color: var(--honeydeck-surface-foreground);
+	box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+	cursor: pointer;
+	opacity: 0;
+	transition:
+		opacity 140ms ease-in,
+		background-color 140ms ease-in,
+		color 140ms ease-in;
+}
+
+.honeydeck-code-copy-button svg {
+	width: 1em;
+	height: 1em;
+}
+
+.honeydeck-code-block:hover .honeydeck-code-copy-button,
+.honeydeck-code-copy-button:focus-visible {
+	opacity: 1;
+}
+
+.honeydeck-code-copy-button:hover {
+	background: var(--honeydeck-primary);
+	color: var(--honeydeck-primary-foreground);
+}
+
+.honeydeck-code-block .line {
+	transition: opacity 150ms ease-in;
+}
+
+.honeydeck-code-block .line[data-dim="1"] {
+	opacity: var(--honeydeck-code-line-dim-opacity);
+}
+
+/* ── Plain code fallback (no shiki, unsupported lang) ────────────────────── */
+
+.honeydeck-code-plain {
+	padding: 1.5em;
+	background-color: var(--honeydeck-surface);
+	color: var(--honeydeck-surface-foreground);
+	border-radius: var(--honeydeck-border-radius);
+	overflow-x: auto;
+	font-family: var(--honeydeck-font-mono);
+	font-size: var(--honeydeck-font-size-code);
+}
+
+/* ── Documentation Markdown typography ──────────────────────────────────────
+   Rendered README/docs pages use plain MDX elements. Keep their typography
+   here instead of in DocsView so the React view stays structural.             */
+
+.honeydeck-docs-content {
+	max-width: 56rem;
+	color: color-mix(in oklch, var(--honeydeck-foreground) 80%, transparent);
+	font-size: 14px;
+	line-height: 28px;
+}
+
+.honeydeck-docs-content h1 {
+	margin: 0 0 16px;
+	color: var(--honeydeck-foreground);
+	font-size: 22px;
+	font-weight: 600;
+	letter-spacing: 0;
+	line-height: 1.2;
+}
+
+.honeydeck-docs-content h2 {
+	margin: 40px 0 12px;
+	padding-top: 32px;
+	border-top: 1px solid var(--honeydeck-border);
+	color: var(--honeydeck-foreground);
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.honeydeck-docs-content h3 {
+	margin: 28px 0 8px;
+	color: var(--honeydeck-foreground);
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.honeydeck-docs-content p,
+.honeydeck-docs-content ul,
+.honeydeck-docs-content ol {
+	margin: 16px 0;
+}
+
+.honeydeck-docs-content ul {
+	padding-left: 24px;
+	list-style: disc;
+}
+
+.honeydeck-docs-content ol {
+	padding-left: 24px;
+	list-style: decimal;
+}
+
+.honeydeck-docs-content li {
+	margin: 6px 0;
+}
+
+.honeydeck-docs-content a {
+	color: var(--honeydeck-primary);
+	font-weight: 500;
+	text-underline-offset: 4px;
+}
+
+.honeydeck-docs-content a:hover {
+	text-decoration: underline;
+}
+
+.honeydeck-docs-content blockquote {
+	margin: 20px 0;
+	padding-left: 16px;
+	border-left: 4px solid var(--honeydeck-primary);
+	color: color-mix(in oklch, var(--honeydeck-foreground) 65%, transparent);
+}
+
+.honeydeck-docs-content code {
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: var(--honeydeck-surface);
+	color: var(--honeydeck-surface-foreground);
+	font-family: var(--honeydeck-font-mono);
+	font-size: 12px;
+}
+
+.honeydeck-docs-content pre code,
+.honeydeck-docs-content .honeydeck-code-block .shiki code {
+	padding: 0;
+	background: transparent;
+}
+
+.honeydeck-docs-content .honeydeck-code-block {
+	margin: 20px 0;
+	font-size: 12px;
+	line-height: 24px;
+	border: 1px solid var(--honeydeck-border);
+}
+
+.honeydeck-docs-content .honeydeck-code-block pre {
+	overflow: auto;
+	padding: 16px;
+	border-radius: 8px;
+	font-size: 12px;
+}
+
+.honeydeck-docs-content table {
+	width: 100%;
+	margin: 20px 0;
+	border-collapse: collapse;
+	font-size: 12px;
+}
+
+.honeydeck-docs-content th,
+.honeydeck-docs-content td {
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--honeydeck-border);
+	vertical-align: top;
+}
+
+.honeydeck-docs-content th:first-child,
+.honeydeck-docs-content td:first-child {
+	padding-left: 0;
+}
+
+.honeydeck-docs-content th:last-child,
+.honeydeck-docs-content td:last-child {
+	padding-right: 0;
+}
+
+.honeydeck-docs-content th {
+	text-align: left;
+	font-weight: 700;
+}
+
+.honeydeck-docs-content th[align="center"],
+.honeydeck-docs-content td[align="center"] {
+	text-align: center;
+}
+
+.honeydeck-docs-content th[align="right"],
+.honeydeck-docs-content td[align="right"] {
+	text-align: right;
+}
+
+.honeydeck-slide-canvas a {
+	color: var(--honeydeck-link-color);
+	text-decoration: underline;
+}
+
+.honeydeck-slide-canvas strong {
+	font-weight: 700;
+}
+
+.honeydeck-slide-canvas em {
+	font-style: italic;
+}

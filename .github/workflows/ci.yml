@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+      - ready_for_review
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pull-request-title:
+    name: Pull request title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Conventional Commit title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          node <<'NODE'
+          const title = process.env.PR_TITLE ?? "";
+          const pattern = /^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._/-]+\))?!?: .+$/;
+
+          if (!pattern.test(title)) {
+            console.error(`Pull request title must use Conventional Commit format. Received: "${title}"`);
+            console.error("Examples: feat: add presenter timer, fix(pdf): wait for assets, docs!: reorganize docs");
+            process.exit(1);
+          }
+          NODE
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and format check
+        run: npm run lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build smoke test
+        run: npm run build
+
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package dry run
+        run: npm run pack:dry-run
+
+      - name: Packed install smoke test
+        run: npm run pack:smoke
+
+  release:
+    name: Release
+    if: github.event_name == 'push'
+    needs:
+      - lint
+      - typecheck
+      - test
+      - build
+      - package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js for trusted publishing
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Plan release
+        id: plan
+        run: npm run release:plan -- --write --github-output "$GITHUB_OUTPUT"
+
+      - name: Set repository metadata for npm trusted publishing
+        if: steps.plan.outputs.release == 'true'
+        run: npm pkg set repository.type=git repository.url="git+https://github.com/${GITHUB_REPOSITORY}.git" --workspace @honeydeck/honeydeck
+
+      - name: Check npm publication status
+        if: steps.plan.outputs.release == 'true'
+        id: npm-version
+        run: |
+          if npm view "@honeydeck/honeydeck@${{ steps.plan.outputs.version }}" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.plan.outputs.release == 'true' && steps.npm-version.outputs.published == 'false'
+        run: npm publish --workspace @honeydeck/honeydeck
+
+      - name: Create GitHub release
+        if: steps.plan.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_NOTES="$(cat "${{ steps.plan.outputs.notes_path }}")"
+          gh release create "${{ steps.plan.outputs.tag }}" \
+            --title "Honeydeck ${{ steps.plan.outputs.version }}" \
+            --notes "$RELEASE_NOTES" \
+            --generate-notes \
+            --target "$GITHUB_SHA" \
+            --latest

@@ -1,0 +1,21 @@
+{
+	"name": "@honeydeck/demo-mermaid",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "honeydeck dev",
+		"build": "honeydeck build"
+	},
+	"dependencies": {
+		"@honeydeck/honeydeck": "file:../../packages/honeydeck",
+		"mermaid": "^11.15.0",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3"
+	}
+}

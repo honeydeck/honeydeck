@@ -1,0 +1,35 @@
+/**
+ * Bee Theme
+ *
+ * Opinionated Honeydeck theme layer inspired by a playful bee palette.
+ * Import this after honeydeck/theme.css.
+ *
+ * This theme demonstrates how a theme layer can replace the clean defaults
+ * with a warmer, playful identity.
+ */
+
+[data-honeydeck-color-mode="light"] {
+	--honeydeck-primary: #6d4aff;
+	--honeydeck-primary-foreground: #fcfbff;
+	--honeydeck-background: #fffdf7;
+	--honeydeck-foreground: #1d1733;
+	--honeydeck-surface: #f3efff;
+	--honeydeck-surface-foreground: #2c2447;
+	--honeydeck-border: #dcebff;
+	--honeydeck-accent: #ffd93d;
+	--honeydeck-accent-foreground: #111111;
+	--honeydeck-border-radius: 0.5rem;
+}
+
+[data-honeydeck-color-mode="dark"] {
+	--honeydeck-primary: #6d4aff;
+	--honeydeck-primary-foreground: #fcfbff;
+	--honeydeck-background: #11101a;
+	--honeydeck-foreground: #f7f2ff;
+	--honeydeck-surface: #1f1b33;
+	--honeydeck-surface-foreground: #eee7ff;
+	--honeydeck-border: #3a315c;
+	--honeydeck-accent: #ffd93d;
+	--honeydeck-accent-foreground: #111111;
+	--honeydeck-border-radius: 0.5rem;
+}

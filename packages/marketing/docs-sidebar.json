@@ -1,0 +1,107 @@
+[
+	{
+		"label": "Start",
+		"items": [
+			{
+				"source": "docs/getting-started.md",
+				"slug": "getting-started",
+				"title": "Getting started"
+			},
+			{
+				"source": "docs/next-steps.md",
+				"slug": "next-steps",
+				"title": "Next steps"
+			}
+		]
+	},
+	{
+		"label": "Core",
+		"items": [
+			{
+				"source": "docs/slides.md",
+				"slug": "slides",
+				"title": "Slides"
+			},
+			{
+				"source": "docs/configuration.md",
+				"slug": "configuration",
+				"title": "Configuration"
+			},
+			{
+				"source": "docs/steps-and-reveals.md",
+				"slug": "steps-and-reveals",
+				"title": "Steps and reveals"
+			}
+		]
+	},
+	{
+		"label": "Reference",
+		"items": [
+			{
+				"source": "docs/components.md",
+				"slug": "components",
+				"title": "Components"
+			},
+			{
+				"source": "docs/kits.md",
+				"slug": "kits",
+				"title": "Kits"
+			},
+			{
+				"source": "docs/kit-authoring.md",
+				"slug": "kit-authoring",
+				"title": "Kit authoring"
+			}
+		]
+	},
+	{
+		"label": "Present",
+		"items": [
+			{
+				"source": "docs/navigation.md",
+				"slug": "navigation",
+				"title": "Navigation"
+			},
+			{
+				"source": "docs/mobile.md",
+				"slug": "mobile",
+				"title": "Mobile and touch"
+			},
+			{
+				"source": "docs/presenter-mode.md",
+				"slug": "presenter-mode",
+				"title": "Presenter mode"
+			},
+			{
+				"source": "docs/pdf-export.md",
+				"slug": "pdf-export",
+				"title": "PDF export"
+			}
+		]
+	},
+	{
+		"label": "Develop",
+		"items": [
+			{
+				"source": "docs/local-development.md",
+				"slug": "local-development",
+				"title": "Local development"
+			}
+		]
+	},
+	{
+		"label": "Migrate",
+		"items": [
+			{
+				"source": "docs/slidev-migration.md",
+				"slug": "slidev-migration",
+				"title": "Slidev migration"
+			},
+			{
+				"source": "docs/mermaid.md",
+				"slug": "mermaid",
+				"title": "Mermaid"
+			}
+		]
+	}
+]

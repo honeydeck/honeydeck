@@ -1,0 +1,104 @@
+# Presenter Mode
+
+## Overview
+
+Presenter mode shows the presenter everything they need while the audience sees only the slides.
+
+## UI Layout
+
+```txt
+┌──────────────────────────────────────────┐
+│  ┌──────────────────┐  ┌──────────┐      │
+│  │                  │  │          │      │
+│  │     Current      │  │   Next   │      │
+│  │                  │  │          │      │
+│  └──────────────────┘  └──────────┘      │
+│                                          │
+│  Notes:                                  │
+│  - Remember to demo the sparkle button   │
+│  - Mention PDF export                    │
+│                                          │
+│  Slide 3/12 · Step 2/4    12:34  [Open]  │
+└──────────────────────────────────────────┘
+```
+
+Includes:
+- Current slide preview (larger)
+- Next timeline-state preview (smaller): the next step on the current slide when one exists, otherwise the next slide at step 0
+- Speaker notes for current slide
+- Slide number / step counter
+- Wall clock
+- Button to open audience view in a new tab/window
+- Navigation buttons that move through the timeline while staying in presenter mode
+
+## Speaker Notes
+
+Use the `Notes` component:
+
+```mdx
+import { Notes } from '@honeydeck/honeydeck'
+
+# My Slide
+
+Content here.
+
+<Notes>
+  # Demo cue
+
+  - Remember to demo the sparkle button
+  - Mention PDF export
+</Notes>
+```
+
+`Notes` content is:
+- Hidden from the normal audience slide view.
+- Excluded from PDF output.
+- Visible only in presenter mode.
+- Rendered as compact Markdown prose in the notes panel, including headings, lists, links, code, and quotes.
+
+## Opening Presenter Mode
+
+- Keyboard shortcut `p` from normal presentation → opens in a new window/tab.
+- Navigation controls button in normal presentation.
+- Direct URL: `/#/presenter/1/0`
+
+Pressing `p` opens presenter mode in a **new window** so the audience view stays on the projector.
+
+## Navigation
+
+Presenter mode uses the same timeline keyboard shortcuts as normal slide view:
+
+| Shortcut | Action |
+|----------|--------|
+| `→` / `d` | Next step; if no next step remains, next slide at step 0 |
+| `←` / `a` | Previous step; if at step 0, previous slide at final step |
+| `↓` / `s` | Next slide |
+| `↑` / `w` | Previous slide |
+
+Keyboard navigation and presenter navigation buttons keep the URL under `/#/presenter/...`. Presenter controls use `lucide-react` icons imported from suffixed `...Icon` exports.
+
+The `Next` preview shows the next timeline state, not just the next slide. Reveals and code step-through highlights therefore preview exactly what the audience will see after the next forward navigation.
+
+Reveal content from later timeline steps is also shown in the `Next` preview at reduced opacity, so the speaker can see what is still coming on that slide. Future steps remain hidden in audience view and in the presenter `Current` preview.
+
+When no next timeline state exists, the `Next` preview shows an end-of-deck placeholder instead of trying to render a missing slide.
+
+## Presenter/Audience Sync
+
+Presenter mode and audience view synchronize navigation via `BroadcastChannel` in the same browser/profile.
+
+- Presenter mode acts as the controller.
+- Audience view (opened from presenter mode) listens for navigation updates.
+- No server, internet, WebSocket, or device pairing required.
+- If `BroadcastChannel` is unavailable, both views function independently.
+
+This supports the common laptop/projector setup.
+
+## Mobile Presenter Mode
+
+On mobile, presenter mode shows:
+- Current slide
+- Notes
+- Navigation buttons
+
+No next slide preview (space constraint).

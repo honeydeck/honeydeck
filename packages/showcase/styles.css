@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+@import "@honeydeck/honeydeck/themes/bee.css";
+
+/* Slightly dim images in dark mode */
+[data-honeydeck-color-mode="dark"] img {
+	opacity: 0.9;
+}
