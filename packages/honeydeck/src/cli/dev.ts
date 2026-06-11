@@ -24,7 +24,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createServer, type Plugin } from "vite";
+import { createServer, type Plugin, searchForWorkspaceRoot } from "vite";
 import { honeydeckPlugin } from "#vite-plugin/index.ts";
 import { hasHelpFlag } from "./args.ts";
 import { formatCommandBanner } from "./banner.ts";
@@ -57,6 +57,20 @@ const INDEX_HTML_PATH = resolve(APP_SHELL_DIR, "index.html");
  * files under src/ even when the Vite root is set to the deck dir.
  */
 const PACKAGE_ROOT = resolve(__dirname, "../..");
+
+/**
+ * Bare dependencies imported by the Honeydeck app shell/runtime before any
+ * user-authored HTML entry exists. Vite cannot discover these reliably from
+ * its normal HTML scan because `honeydeck dev` serves a custom app shell from
+ * /@fs/, so keep the CommonJS/large ESM deps pre-bundled explicitly.
+ */
+const DEV_OPTIMIZE_DEPS = [
+	"react",
+	"react/jsx-runtime",
+	"react/jsx-dev-runtime",
+	"react-dom/client",
+	"lucide-react",
+] as const;
 
 // ---------------------------------------------------------------------------
 // Arg parsing
@@ -156,7 +170,7 @@ export function parseDevArgs(args: string[]): DevOptions {
  *     /@fs/ script src, and lets Vite's `transformIndexHtml` pipeline apply
  *     any further HTML transforms (e.g. inject the HMR client).
  */
-function appShellPlugin(): Plugin {
+function appShellPlugin(projectRoot: string): Plugin {
 	return {
 		name: "honeydeck:app-shell",
 
@@ -164,9 +178,11 @@ function appShellPlugin(): Plugin {
 			return {
 				server: {
 					fs: {
-						// Allow Vite's /@fs/ handler to serve any file under the honeydeck
-						// package root (so src/runtime/app-shell/main.tsx is accessible).
-						allow: [PACKAGE_ROOT],
+						// Setting server.fs.allow replaces Vite's default allow list.
+						// Keep the user's workspace root allowed for normal node_modules
+						// serving, then add the Honeydeck package root so /@fs/ can reach
+						// src/runtime/app-shell/main.tsx when it lives outside that root.
+						allow: [searchForWorkspaceRoot(projectRoot), PACKAGE_ROOT],
 					},
 				},
 			};
@@ -232,9 +248,13 @@ export async function runDev(args: string[]): Promise<void> {
 
 		server: createDevServerConfig(port, open),
 
+		optimizeDeps: {
+			include: [...DEV_OPTIMIZE_DEPS],
+		},
+
 		plugins: [
 			// 1. App shell: serve our index.html + configure fs.allow
-			appShellPlugin(),
+			appShellPlugin(root),
 			// 2. Virtual modules + MDX compilation + Tailwind
 			...honeydeckPlugin({ root, entry }),
 		],

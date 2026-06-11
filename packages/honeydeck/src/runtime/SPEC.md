@@ -199,6 +199,7 @@ Observable build/dev behavior:
 - `honeydeck build` produces a static single-page application.
 - Project `public/` assets are served/copied at the web root.
 - Project-local CSS, React components, layout maps, and static image imports work from the selected deck root.
+- In dev, Honeydeck's package app shell may be served from outside the selected deck root, but Vite still allows the user's workspace root for normal dependency serving and pre-bundles Honeydeck runtime browser dependencies such as React, React DOM, and runtime icons.
 - Built decks use hash-based routes and can be deployed to static hosts without server-side routing.
 - The app shell applies the initial effective `data-honeydeck-color-mode` to `<html>` before mounting React so first-render browser defaults and generated assets match the deck mode.
 

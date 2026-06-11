@@ -116,7 +116,9 @@ function runCommand(command: string, cwd: string): Promise<void> {
 				return;
 			}
 
-			const reason = signal ? `signal ${signal}` : `exit code ${code ?? "unknown"}`;
+			const reason = signal
+				? `signal ${signal}`
+				: `exit code ${code ?? "unknown"}`;
 			rejectCommand(new Error(`${command} failed with ${reason}`));
 		});
 	});
