@@ -19,3 +19,4 @@ Expected behavior:
 - The `slidev-migration` skill instructs agents to inspect existing Slidev projects, preserve source files until the user approves cleanup, initialize or merge Honeydeck starter files, migrate common Slidev syntax to Honeydeck MDX/React, and document unsupported or approximated features.
 - `honeydeck init` should offer to open the interactive skills installer for the generated project and make clear that accepting runs `npx skills add`.
 - `honeydeck init` and `honeydeck skill` should delegate bundled skill selection, scope selection, and agent selection to the same `npx skills add <honeydeck-package-source> --copy` flow.
+- `docs/skills.md` should document why and how to install the bundled skills, list the `honeydeck`, `presentation-writing`, and `slidev-migration` skills, and link to the Slidev migration guide for migration-specific details.

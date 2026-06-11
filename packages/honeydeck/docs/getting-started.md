@@ -109,6 +109,7 @@ honeydeck skill               # install optional Honeydeck agent skills
 - [Presenter mode](presenter-mode.md) - notes, presenter window, sync, and mobile behavior
 - [PDF export](pdf-export.md) - options, color modes, and step handling
 - [Local development](local-development.md) - running Honeydeck from this repository
+- [Skills](skills.md) - optional agent skills for authoring, writing, and migration help
 - [Slidev migration](slidev-migration.md) - moving from Slidev with the bundled agent skill
 
 ## Learn inside a running deck

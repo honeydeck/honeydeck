@@ -362,18 +362,11 @@ type LayoutProps<F = Record<string, unknown>> = {
 
 ## Agent skills
 
-Honeydeck ships optional agent skills:
-
-- `honeydeck` for Honeydeck-specific MDX and CLI guidance
-- `presentation-writing` for help writing strong slide narratives
-- `slidev-migration` for moving decks from Slidev to Honeydeck
-
-`honeydeck init` can open the same interactive skills installer as `honeydeck skill`.
+Honeydeck ships optional agent skills for Honeydeck authoring, presentation writing, and Slidev migration. `honeydeck init` can open the same interactive skills installer as `honeydeck skill`.
 
 ```bash
 honeydeck skill
-npx skills add <honeydeck-repo-url> --copy
-npx skills add <honeydeck-repo-url> --copy --skill slidev-migration
 ```
 
+See [Skills](skills.md) for installation options and bundled skill details.
 Coming from Slidev? See the [Slidev migration guide](slidev-migration.md).

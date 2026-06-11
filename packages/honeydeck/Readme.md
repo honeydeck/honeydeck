@@ -30,6 +30,7 @@ Decks are plain MDX files separated into slides with `---`; see the first deck e
 - [Presenter mode](docs/presenter-mode.md) - notes, presenter window, sync, and mobile behavior
 - [PDF export](docs/pdf-export.md) - options, color modes, and step handling
 - [Local development](docs/local-development.md) - running Honeydeck from this repository
+- [Skills](docs/skills.md) - optional agent skills for authoring, writing, and migration help
 - [Slidev migration](docs/slidev-migration.md) - moving from Slidev with the bundled agent skill
 
 ## Common commands

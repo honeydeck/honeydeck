@@ -88,6 +88,11 @@
 		"label": "Advanced",
 		"items": [
 			{
+				"source": "docs/skills.md",
+				"slug": "skills",
+				"title": "Skills"
+			},
+			{
 				"source": "docs/slidev-migration.md",
 				"slug": "slidev-migration",
 				"title": "Slidev migration"
