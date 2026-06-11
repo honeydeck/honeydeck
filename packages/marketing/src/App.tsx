@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { AudiencePage } from "./pages/AudiencePage.js";
 import { DocPage } from "./pages/DocPage.js";
 import { LandingPage } from "./pages/LandingPage.js";
@@ -11,6 +12,7 @@ export function App() {
 
 	return (
 		<div className="flex min-h-dvh flex-col">
+			<ScrollToTop />
 			<Header mode={mode} onSetMode={setMode} />
 			<Routes>
 				<Route path="/" element={<LandingPage />} />
@@ -30,4 +32,18 @@ export function App() {
 			<Footer />
 		</div>
 	);
+}
+
+function ScrollToTop() {
+	const { pathname, search } = useLocation();
+
+	return <RouteScrollReset key={`${pathname}${search}`} />;
+}
+
+function RouteScrollReset() {
+	useEffect(() => {
+		window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+	}, []);
+
+	return null;
 }

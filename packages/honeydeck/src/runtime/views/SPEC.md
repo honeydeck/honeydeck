@@ -100,7 +100,7 @@ Toggled via `o` or the overview button. Overview is also directly addressable as
 
 Built-in reference pages start at `/#/theme`. Included in both dev and production builds.
 
-User-facing product copy should call this area "reference pages". Reserve "kit" for the reusable theme/layout/component package concept described in [Kits — Theme, Layouts, Components](../../layouts/SPEC.md#kits--theme-layouts-components).
+User-facing product copy should call this area "reference pages". Theme, layout, and component customization is described in [Customization — Theme CSS, Layout Maps, Components](../../layouts/SPEC.md#customization--theme-css-layout-maps-components).
 
 ### Routes
 

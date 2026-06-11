@@ -1,6 +1,6 @@
 ---
 name: honeydeck
-description: Help users create, edit, debug, and export Honeydeck MDX presentations. Use for Honeydeck syntax, deck.mdx structure, layouts, frontmatter, steps/reveals, presenter notes, code blocks, custom React components, kits/themes, CLI commands, dev preview, build, or PDF export.
+description: Help users create, edit, debug, and export Honeydeck MDX presentations. Use for Honeydeck syntax, deck.mdx structure, layouts, frontmatter, steps/reveals, presenter notes, code blocks, custom React components, themes, CLI commands, dev preview, build, or PDF export.
 ---
 
 # Honeydeck
@@ -22,11 +22,11 @@ Important docs:
 
 - `Readme.md` for the compact package overview and documentation index
 - `docs/getting-started.md` for quick start and first-run orientation
-- `docs/next-steps.md` for CLI details, feature overview, architecture, exports, and agent skills
+- `docs/deeper-dive.md` for CLI details, feature overview, architecture, exports, and agent skills
 - root/package `SPEC.md` and linked colocated `SPEC.md` files for expected behavior
 - `docs/slides.md` for deck structure, slide separators, and multi-file decks
 - `docs/steps-and-reveals.md` for step-by-step reveals and code steps
-- `docs/kits.md` and `docs/kit-authoring.md` for themes, layouts, and reusable kits
+- `docs/customization.md` for themes, layouts, custom React components, layout maps, demos, and design tokens
 - `docs/configuration.md` for frontmatter options
 - `docs/navigation.md`, `docs/mobile.md`, `docs/presenter-mode.md`, and `docs/pdf-export.md` for presenting/exporting
 

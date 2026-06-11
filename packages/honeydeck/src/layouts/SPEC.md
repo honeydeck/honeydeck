@@ -1,122 +1,18 @@
-# Honeydeck Layouts and Kits Specification
+# Honeydeck Layouts and Customization Specification
 
-> Observable behavior for kits, layout maps, built-in layouts, layout props, and layout demos.
+> Observable behavior for theme CSS, layout maps, built-in layouts, layout props, and layout demos.
 
-## Kits — Theme, Layouts, Components
+## Customization — Theme CSS, Layout Maps, Components
 
-A **kit** is an npm package (or local folder) that bundles three concerns. Honeydeck does not require a special registry mechanism; themes are CSS imports, layouts are default-exported layout maps, and components are normal React/MDX imports:
+Honeydeck customization is explicit composition. Themes are CSS imports, layouts come from a default-exported layout map, and components are normal React/MDX imports:
 
 | Concern | What it is | How it's used |
 |---------|-----------|---------------|
-| Theme | CSS file (tokens, colors, typography) | explicit CSS import from MDX or another CSS file |
-| Layouts | Layout component map | `layouts:` in frontmatter |
-| Components | Reusable React components | `import` in MDX |
+| Theme | CSS file with tokens, colors, and typography | explicit CSS import from MDX or another CSS file |
+| Layouts | layout component map | `layouts:` in frontmatter |
+| Components | reusable React components | explicit `import` in MDX |
 
-### Kit Package Structure
-
-```txt
-@company/honeydeck-kit-brand/
-  package.json
-  theme.css              ← CSS tokens/variables
-  layouts/
-    index.ts             ← exports LayoutMap
-    Blank.tsx
-    Default.tsx
-    Cover.tsx
-    Section.tsx
-    TwoCol.tsx
-    Image.tsx
-    ImageLeft.tsx
-    ImageRight.tsx
-  components/
-    Callout.tsx
-    Badge.tsx
-```
-
-### Using a Kit
-
-```mdx
----
-title: My Talk
-layouts: "@company/honeydeck-kit-brand/layouts"
----
-
-import '@company/honeydeck-kit-brand/theme.css'
-import './my-overrides.css'
-
-import { Callout } from '@company/honeydeck-kit-brand/components'
-
-# First slide
-
-<Callout>Important!</Callout>
-```
-
-### Mix and Match
-
-Theme CSS from one kit, layouts from another, components from a third:
-
-```mdx
----
-layouts: "@company/honeydeck-kit-brand/layouts"
----
-
-import '@other/honeydeck-kit-minimal/theme.css'
-import { Badge } from '@third/honeydeck-kit-fancy/components'
-```
-
-### Local Kits
-
-Create a kit in your project folder:
-
-```txt
-awesome-talk/
-  theme.css
-  layouts/
-    index.ts
-    MyCustom.tsx
-```
-
-Reference locally (relative to the deck entry file):
-
-```yaml
----
-layouts: "./layouts"
----
-```
-
-```mdx
-import './theme.css'
-```
-
-### Kit CSS Inheritance
-
-Use standard CSS `@import` for extending another kit's theme:
-
-```css
-/* theme.css — extends company kit */
-@import '@company/honeydeck-kit-brand/theme.css';
-
-:root {
-  --honeydeck-primary: oklch(55% 0.25 145);
-}
-```
-
-### Layout Inheritance
-
-Use JS spread to compose layouts from multiple sources:
-
-```ts
-// layouts/index.ts
-import companyLayouts from '@company/honeydeck-kit-brand/layouts'
-import fancyLayouts from '@fancy/honeydeck-kit/layouts'
-import { MyCustomCover } from './Cover'
-
-export default {
-  ...companyLayouts,
-  Section: fancyLayouts.Section,
-  Cover: MyCustomCover,
-} satisfies LayoutMap
-```
+These references may point to local project files or normal installed packages. Honeydeck does not provide special publishing or registry behavior.
 
 ### Zero Config
 
@@ -128,9 +24,9 @@ A plain `deck.mdx` file with no frontmatter still works with built-in layouts:
 This renders with the built-in default layout.
 ```
 
-Styling is provided only by explicit CSS imports. Honeydeck does not auto-inject Tailwind, `@honeydeck/honeydeck/theme.css`, or kit theme CSS. The starter project imports `./styles.css` from `deck.mdx`; `styles.css` imports Tailwind and `@honeydeck/honeydeck/theme.css`. Without that import, slides still render with built-in layouts, but mostly with browser/default styling. User imports override via cascade.
+Styling is provided only by explicit CSS imports. Honeydeck does not auto-inject Tailwind, `@honeydeck/honeydeck/theme.css`, or custom theme CSS. The starter project imports `./styles.css` from `deck.mdx`; `styles.css` imports Tailwind and `@honeydeck/honeydeck/theme.css`. Without that import, slides still render with built-in layouts, but mostly with browser/default styling. User imports override via cascade.
 
-### Bundled Theme Layers
+### Theme Layering
 
 Honeydeck ships optional theme layers that are imported after the base theme. Theme layers are token overrides and are not standalone replacements for the base theme:
 
@@ -151,17 +47,50 @@ Honeydeck includes:
 
 Use `@honeydeck/honeydeck/layouts` for clean default layouts. Use `@honeydeck/honeydeck/layouts/bee` together with `@honeydeck/honeydeck/themes/bee.css` for the Bee visual style.
 
+### CSS Overrides
+
+Use standard CSS cascade and `@import` to layer overrides:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+
+:root {
+  --honeydeck-primary: oklch(55% 0.25 145);
+}
+```
+
+### Layout Maps
+
+Create a layout map in the project and reference it relative to the deck entry file:
+
+```yaml
+---
+layouts: "./layouts"
+---
+```
+
+Layout maps may compose entries with JavaScript spread:
+
+```ts
+// layouts/index.ts
+import defaultLayouts from '@honeydeck/honeydeck/layouts'
+import { MyCustomCover } from './Cover'
+
+export default {
+  ...defaultLayouts,
+  Cover: MyCustomCover,
+} satisfies LayoutMap
+```
+
 ### Progressive Customization
 
 ```txt
 Level 0: plain `deck.mdx`    → built-in layouts, browser/default styling
-Level 1: import CSS             → Tailwind, base styling, and token overrides
-Level 2: set layouts:           → custom layout map
-Level 3: local kit folder       → full control
-Level 4: publish npm kit        → share across projects
+Level 1: import CSS          → Tailwind, base styling, and token overrides
+Level 2: import components   → reusable React pieces in MDX
+Level 3: set layouts:        → custom layout map
 ```
-
----
 
 ---
 

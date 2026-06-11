@@ -42,7 +42,7 @@ The Honeydeck specification is distributed:
 - `react`, `react-dom`, and Tailwind are peer dependencies of `honeydeck`.
 - Honeydeck wires the Tailwind Vite plugin internally, but Tailwind/theme CSS is only loaded when user-authored CSS imports it; generated projects install `tailwindcss` and import `./styles.css` from `deck.mdx`.
 - Generated projects use compatible semver ranges for React, Tailwind, TypeScript, and types.
-- Published third-party kits are plain npm packages; supported runtime ranges are managed by package metadata, not by a Honeydeck-specific mechanism.
+- Custom themes, layouts, and components are plain CSS/TypeScript modules; installed-package usage is handled by standard package metadata rather than by a Honeydeck-specific mechanism.
 - Icons come from `lucide-react` and must use suffixed `...Icon` component exports (for example `ChevronLeftIcon`), not inline SVG path helpers, emoji glyphs, or unsuffixed aliases.
 
 ---
@@ -59,7 +59,7 @@ The Honeydeck specification is distributed:
 | Runtime | [`src/runtime/SPEC.md`](src/runtime/SPEC.md) | timeline semantics, keyboard/touch navigation, SPA/build behavior, runtime errors |
 | Runtime components | [`src/runtime/components/SPEC.md`](src/runtime/components/SPEC.md) | `Reveal`, `RevealGroup`, `TimelineSteps`, `ListStyle`, `Keyboard`, `BrowserFrame`, `Notes` |
 | Runtime views | [`src/runtime/views/SPEC.md`](src/runtime/views/SPEC.md) | presenter mode, overview mode, theme/layout/component reference pages |
-| Layouts and kits | [`src/layouts/SPEC.md`](src/layouts/SPEC.md) | kit model, built-in layouts, layout props, demos, layout resolution |
+| Layouts and customization | [`src/layouts/SPEC.md`](src/layouts/SPEC.md) | custom theme/layout/component model, built-in layouts, layout props, demos, layout resolution |
 | Theme | [`src/theme/SPEC.md`](src/theme/SPEC.md) | design tokens, base theme CSS, Tailwind mapping, color mode behavior |
 | Public exports | [`src/SPEC.md`](src/SPEC.md) | import paths and public TypeScript types |
 | Public release governance | Repository root `.github/SPEC.md` | protected branch, CI checks, PR title contract, publishing automation; repository-only, not shipped in the npm package |
@@ -80,7 +80,7 @@ The Honeydeck specification is distributed:
 Honeydeck prioritizes:
 
 1. **Zero to presenting** — a plain `deck.mdx` works with built-in layouts, even before CSS is imported.
-2. **Progressive power** — add explicit CSS imports, React, custom layout maps, and kits as needed.
+2. **Progressive power** — add explicit CSS imports, React components, and custom layout maps as needed.
 3. **Explicit composition** — see imports and configuration; no user-content auto-discovery and no automatic theme CSS injection.
 4. **Presentation-native** — timeline, steps, presenter mode, runtime reference pages, and PDF export built in.
 5. **Fun** — starter sparkle button, tasteful CLI output, playful defaults.

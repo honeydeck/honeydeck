@@ -34,7 +34,7 @@ The skill guides an agent through the common Slidev-to-Honeydeck mapping:
 | `pages/*.md` with `src:` includes | imported `.mdx` slide groups |
 | `public/**` | `public/**` |
 | `components/*.vue` | React `components/*.tsx` |
-| `layouts/*.vue` or Slidev themes | Honeydeck layouts, layout maps, or kits |
+| `layouts/*.vue` or Slidev themes | Honeydeck layouts, layout maps, React components, and CSS |
 | `<v-click>` / `<v-clicks>` | `<Reveal>` / `<RevealGroup>` |
 | trailing note comments | `<Notes>` |
 | `slidev`, `slidev build`, `slidev export` | `honeydeck dev`, `honeydeck build`, `honeydeck pdf` |

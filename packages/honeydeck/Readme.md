@@ -19,13 +19,12 @@ Decks are plain MDX files separated into slides with `---`; see the first deck e
 ## Documentation
 
 - [Getting started](docs/getting-started.md) - first deck, first commands, and the shortest path to presenting
-- [Next steps](docs/next-steps.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills
+- [Deeper dive](docs/deeper-dive.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills
 - [Slides](docs/slides.md) - separators, multiple files, layouts, and assets
 - [Configuration](docs/configuration.md) - deck-level and slide-level frontmatter
 - [Steps and reveals](docs/steps-and-reveals.md) - timeline, reveal groups, code steps, and PDF behavior
 - [Components](docs/components.md) - core Honeydeck components such as `BrowserFrame` and `Keyboard`
-- [Kits](docs/kits.md) - themes, layout sets, Tailwind tokens, and third-party kits
-- [Kit authoring](docs/kit-authoring.md) - layout maps, layout props, demos, and design tokens for kit authors
+- [Customization](docs/customization.md) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
 - [Navigation](docs/navigation.md) - keyboard, touch, overview mode, and URL state
 - [Mobile and touch](docs/mobile.md) - mobile controls, touch gestures, and pinch zoom
 - [Presenter mode](docs/presenter-mode.md) - notes, presenter window, sync, and mobile behavior

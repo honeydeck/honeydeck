@@ -122,8 +122,8 @@ describe("docs sync", () => {
 			publicMarkdown,
 			/copiedFrom: "packages\/honeydeck\/docs\/getting-started\.md"/,
 		);
-		assert.match(publicMarkdown, /\[Next steps\]\(\/docs\/next-steps\)/);
+		assert.match(publicMarkdown, /\[Deeper dive\]\(\/docs\/deeper-dive\)/);
 		assert.match(publicMarkdown, /\[Slides\]\(\/docs\/slides\)/);
-		assert.doesNotMatch(publicMarkdown, /\]\(next-steps\.md\)/);
+		assert.doesNotMatch(publicMarkdown, /\]\(deeper-dive\.md\)/);
 	});
 });

@@ -98,13 +98,12 @@ honeydeck skill               # install optional Honeydeck agent skills
 
 ## Where to go next
 
-- [Next steps](next-steps.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills in one follow-up guide
+- [Deeper dive](deeper-dive.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills in one follow-up guide
 - [Slides](slides.md) - separators, multiple files, layouts, and assets
 - [Configuration](configuration.md) - deck-level and slide-level frontmatter
 - [Steps and reveals](steps-and-reveals.md) - timeline, reveal groups, code steps, and PDF behavior
 - [Components](components.md) - core Honeydeck components such as `BrowserFrame` and `Keyboard`
-- [Kits](kits.md) - themes, layout sets, Tailwind tokens, and third-party kits
-- [Kit authoring](kit-authoring.md) - layout maps, layout props, demos, and design tokens for kit authors
+- [Customization](customization.md) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
 - [Navigation](navigation.md) - keyboard, touch, overview mode, and URL state
 - [Mobile and touch](mobile.md) - mobile controls, touch gestures, and pinch zoom
 - [Presenter mode](presenter-mode.md) - notes, presenter window, sync, and mobile behavior

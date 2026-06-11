@@ -16,7 +16,7 @@ Before changing files, read the available project/package docs:
 - `Readme.md`, `docs/getting-started.md`, root `SPEC.md`, linked colocated `SPEC.md` files, and `docs/slides.md` for Honeydeck deck structure
 - `docs/configuration.md` for Honeydeck frontmatter
 - `docs/steps-and-reveals.md` for Reveal/RevealGroup/code steps
-- `docs/kits.md` and `docs/kit-authoring.md` for layouts/themes/components
+- `docs/customization.md` for layouts, themes, components, layout maps, and design tokens
 - Existing Slidev files: `slides.md`, `pages/**/*.md`, `components/**/*.vue`, `layouts/**/*.vue`, `styles/**`, `public/**`, `package.json`, `vite.config.*`, and local theme/addon packages
 
 If Honeydeck docs are not nearby, package docs may be in `node_modules/@honeydeck/honeydeck`, or the user can use the public docs site. A migrated deck's runtime reference pages cover active theme tokens, layouts, and built-in components.
@@ -51,7 +51,7 @@ Create a working Honeydeck presentation that preserves the talk's structure, con
 | `public/**` | `public/**` copied unchanged; root-relative `/assets/...` paths usually keep working |
 | `components/*.vue` | `components/*.tsx` React components |
 | `layouts/*.vue` | React layouts plus a layout map selected with deck frontmatter `layouts: "./layouts"` |
-| Slidev theme package | Honeydeck kit/theme/layout map, or local React layouts + CSS |
+| Slidev theme package | Honeydeck theme CSS, layout map, or local React layouts + CSS |
 | `styles/style.css` or `styles/index.*` | `styles.css` imported from `deck.mdx` |
 | `slidev`, `slidev build`, `slidev export` scripts | `honeydeck dev`, `honeydeck build`, `honeydeck pdf` scripts |
 

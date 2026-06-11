@@ -1,4 +1,4 @@
-# Next steps
+# Diving deeper
 
 Use this guide after the quick start when you want to understand the main Honeydeck workflows without jumping straight into every reference page.
 
@@ -285,24 +285,26 @@ All tokens are mapped to Tailwind utilities:
 
 Available color utilities: `primary`, `primary-foreground`, `accent`, `accent-foreground`, `background`, `foreground`, `surface`, `surface-foreground`, and `border`.
 
-See [Kits](kits.md) for theme and layout customization.
+See [Customization](customization.md) for theme and layout customization.
 
-## Kits
+## Customization
 
-A kit is an npm package bundling a theme, layouts, and components.
+Customize Honeydeck with explicit CSS imports, React component imports, and layout maps.
 
 ```mdx
 ---
-layouts: "@company/honeydeck-kit-brand/layouts"
+layouts: "./layouts"
 ---
 
-import '@company/honeydeck-kit-brand/theme.css'
-import { Callout } from '@company/honeydeck-kit-brand/components'
+import './styles.css'
+import { Callout } from './components/Callout'
 
-# Slide with brand kit
+# Slide with custom pieces
+
+<Callout>Important!</Callout>
 ```
 
-Zero config still works: built-in defaults apply without imports. See [Kits](kits.md) and [Kit authoring](kit-authoring.md).
+Zero config still works: built-in defaults apply without imports. See [Customization](customization.md).
 
 ## Runtime reference
 

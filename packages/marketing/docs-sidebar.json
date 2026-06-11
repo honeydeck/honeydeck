@@ -8,9 +8,9 @@
 				"title": "Getting started"
 			},
 			{
-				"source": "docs/next-steps.md",
-				"slug": "next-steps",
-				"title": "Next steps"
+				"source": "docs/deeper-dive.md",
+				"slug": "deeper-dive",
+				"title": "Deeper dive"
 			}
 		]
 	},
@@ -43,14 +43,9 @@
 				"title": "Components"
 			},
 			{
-				"source": "docs/kits.md",
-				"slug": "kits",
-				"title": "Kits"
-			},
-			{
-				"source": "docs/kit-authoring.md",
-				"slug": "kit-authoring",
-				"title": "Kit authoring"
+				"source": "docs/customization.md",
+				"slug": "customization",
+				"title": "Customization"
 			}
 		]
 	},
@@ -90,7 +85,7 @@
 		]
 	},
 	{
-		"label": "Migrate",
+		"label": "Advanced",
 		"items": [
 			{
 				"source": "docs/slidev-migration.md",

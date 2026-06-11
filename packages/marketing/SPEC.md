@@ -16,6 +16,8 @@
 | `/llms.txt` | Short AI/LLM discovery document |
 | `/llms-full.txt` | Fuller generated docs corpus for AI tools |
 
+Client-side navigation between marketing pages must reset the document scroll position to the top of the new page instead of preserving the previous page scroll position. Hash-only navigation may keep normal browser anchor behavior.
+
 ## Landing page
 
 The primary landing page must stay short and prioritize:
@@ -50,7 +52,7 @@ During marketing dev, the Vite dev server must watch the curated docs sidebar pl
 
 Generated Markdown copies must include a `copiedFrom` frontmatter field pointing at the canonical source path. They must not include HTML comments about auto-generation and must not carry `generated: true`. Generated files must not be manually edited.
 
-Docs navigation is manual/curated through `docs-sidebar.json` rather than derived from the filesystem or Markdown frontmatter weights. The generated Markdown copies must not carry sidebar ordering metadata; sidebar grouping and ordering belongs to the explicit sidebar config and generated index metadata. The first docs group starts with concise Getting started content and then a follow-up guide for broader CLI, authoring, theme, architecture, exports, and agent-skill details.
+Docs navigation is manual/curated through `docs-sidebar.json` rather than derived from the filesystem or Markdown frontmatter weights. The generated Markdown copies must not carry sidebar ordering metadata; sidebar grouping and ordering belongs to the explicit sidebar config and generated index metadata. The first docs group starts with concise Getting started content and then a follow-up guide for broader CLI, authoring, theme, architecture, exports, and agent-skill details. Theme, layout, and component customization belongs on a single Customization docs page rather than split kits/kit-authoring pages.
 
 When generated docs are copied, local Markdown cross-links that target sources present in `docs-sidebar.json` must be rewritten to the generated `/docs/:slug` route. Source docs keep package-relative Markdown links; generated marketing docs should route readers through the web docs experience.
 
