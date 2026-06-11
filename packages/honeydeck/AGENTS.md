@@ -18,8 +18,7 @@ From repo root:
 npm -w @honeydeck/honeydeck run dev
 npm -w @honeydeck/honeydeck run test
 npm -w @honeydeck/honeydeck run typecheck
-npm -w @honeydeck/honeydeck run build
 npm -w @honeydeck/honeydeck run pack:dry-run
 ```
 
-For full monorepo gates use root workspace scripts: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run pack:dry-run`.
+For full monorepo gates use root workspace scripts: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run pack:dry-run`. Root `npm run build` runs only workspaces that define a build script.

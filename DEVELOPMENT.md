@@ -27,7 +27,7 @@ npm install
 | `npm run lint` | Biome validation for the monorepo |
 | `npm run typecheck` | Typecheck all workspaces |
 | `npm test` | Run workspace test suites |
-| `npm run build` | Build all workspaces |
+| `npm run build` | Run build scripts for workspaces that define one |
 | `npm run pack:dry-run` | Dry-run package contents for shippable workspaces |
 
 Target a workspace directly with npm workspaces:
@@ -35,7 +35,6 @@ Target a workspace directly with npm workspaces:
 ```bash
 npm -w @honeydeck/honeydeck run dev          # starter template smoke-test deck
 npm -w @honeydeck/honeydeck run test
-npm -w @honeydeck/honeydeck run build
 npm -w @honeydeck/honeydeck run typecheck
 npm -w @honeydeck/showcase run dev
 npm -w @honeydeck/showcase run build
@@ -68,7 +67,7 @@ Before finishing broad changes, run:
 npm run lint
 npm run typecheck
 npm test
-npm run build
+npm run build        # builds only workspaces that define a build script
 npm run pack:dry-run
 ```
 

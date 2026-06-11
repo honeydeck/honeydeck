@@ -89,7 +89,6 @@
 		"#vite-plugin/*": "./src/vite-plugin/*"
 	},
 	"scripts": {
-		"build": "npm run typecheck",
 		"dev": "node --import tsx ./src/cli/index.ts dev --deck src/cli/templates/starter/deck.mdx",
 		"dev:init": "node --import tsx ./src/cli/index.ts dev --deck src/cli/templates/starter/deck.mdx",
 		"format": "biome check --write",

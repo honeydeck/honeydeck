@@ -87,7 +87,6 @@ npx playwright install chromium
 
 | Script | Purpose |
 |--------|---------|
-| `npm run build` | Run the package TypeScript build gate |
 | `npm run dev` | Run source CLI against starter template deck |
 | `npm run dev:init` | Run source CLI against starter template deck |
 | `npm run format` | Format/lint with Biome and write fixes |
@@ -114,7 +113,6 @@ npm run format
 npm run lint
 npm run typecheck
 npm test
-npm run build
 npm run pack:dry-run
 ```
 
