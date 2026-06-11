@@ -79,6 +79,7 @@ The site must emit:
 - Marketing raster images should use Dex as the mascot reference, keep text out of the bitmap, prefer WebP when browser-delivered raster assets can be encoded without losing required transparency/detail, and prefer transparent-background cutouts where the page background or dark mode should show through.
 - Documentation pages must show the article content in the first viewport on narrow screens; use compact mobile navigation below desktop sizes and a sticky sidebar on wide screens. The wide-screen docs sidebar must scroll independently from the article content when its navigation exceeds the viewport.
 - The header color mode switcher must use the shared `@honeydeck/honeydeck/components` color mode cycle button (`system` → `light` → `dark` → `system`). `system` follows `prefers-color-scheme`; `light` and `dark` pin the effective mode.
+- The header GitHub link must point to `https://github.com/honeydeck/honeydeck` and use a recognizable GitHub logo icon in a regular text link.
 - Marketing buttons, icon controls, compact docs controls, and quiet demo links should use the shared `@honeydeck/honeydeck/components` button class recipes unless a component needs a marketing-only visual treatment.
 - Focus states must be visible.
 - Reduced motion preferences must be respected.

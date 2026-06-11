@@ -2,7 +2,7 @@ import {
 	type ColorMode,
 	ColorModeCycleButton,
 } from "@honeydeck/honeydeck/components";
-import { Code2Icon, PackageIcon } from "lucide-react";
+import { PackageIcon } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { DexMascot } from "./DexMascot.js";
 import { iconButtonClass } from "./styles.js";
@@ -31,19 +31,23 @@ export function Header({
 					<NavItem to="/docs/getting-started">Docs</NavItem>
 				</div>
 				<div className="flex items-center gap-2">
+					<a
+						className="inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--honeydeck-color-muted-foreground)] no-underline transition-colors hover:text-[color:var(--honeydeck-color-foreground)]"
+						href="https://github.com/honeydeck/honeydeck"
+						aria-label="Honeydeck on GitHub"
+					>
+						<span
+							className="size-[18px] bg-current [mask-image:url('/github-mark.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+							aria-hidden="true"
+						/>
+						<span>GitHub</span>
+					</a>
 					<ColorModeCycleButton
 						className={iconButtonClass}
 						colorMode={mode}
 						onSetColorMode={onSetMode}
 						iconSize={18}
 					/>
-					<a
-						className={iconButtonClass}
-						href="https://github.com/HoverBaum/honeydeck"
-						aria-label="Honeydeck on GitHub"
-					>
-						<Code2Icon size={18} aria-hidden="true" />
-					</a>
 				</div>
 			</nav>
 		</header>

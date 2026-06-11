@@ -284,7 +284,7 @@ export function syncDocs({
 		"## Key resources",
 		"",
 		"- Package: https://www.npmjs.com/package/@honeydeck/honeydeck",
-		"- GitHub: https://github.com/HoverBaum/honeydeck",
+		"- GitHub: https://github.com/honeydeck/honeydeck",
 		"- Starter command: `npx @honeydeck/honeydeck init`",
 		"- Starter demo deck: https://demo.honeydeck.dev/starter",
 		"- Feature showcase deck: https://demo.honeydeck.dev/features",
