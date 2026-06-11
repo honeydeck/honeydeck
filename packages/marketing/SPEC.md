@@ -7,9 +7,7 @@
 | Route | Behavior |
 |---|---|
 | `/` | Short landing page focused on developer activation and `npx @honeydeck/honeydeck init` |
-| `/for/developers` | SEO audience landing page for developers who know MDX/React/source control; not linked from top-level navigation or the primary landing page |
-| `/for/ai` | SEO audience landing page for AI-assisted authoring; positions Honeydeck as AI-friendly, not AI-first; not linked from top-level navigation or the primary landing page |
-| `/for/product` | SEO audience landing page for product owners/managers using AI to draft slide narratives; not linked from top-level navigation or the primary landing page |
+| `/for/product` | SEO audience landing page for product owners/managers using AI to draft slide narratives; not linked from desktop top-level navigation, the compact docs menu, or the primary landing page |
 | `/docs` | Generated docs experience starting directly with concise Getting started content |
 | `/docs/:slug` | Generated public docs page |
 | `/docs/:slug.md` | Clean Markdown sibling file served from `public/docs` |
@@ -77,7 +75,8 @@ The site must emit:
 - Component-level marketing layout and controls should prefer Tailwind utilities in React over custom CSS classes; keep custom CSS for global tokens, MDX prose, and bespoke mascot/illustration details.
 - The visual style should feel bee-forward and editorially calm: warm primary accents, restrained purple as a supporting color, readable heading scale, and compact 8px-radius cards/tools.
 - Marketing raster images should use Dex as the mascot reference, keep text out of the bitmap, prefer WebP when browser-delivered raster assets can be encoded without losing required transparency/detail, and prefer transparent-background cutouts where the page background or dark mode should show through.
-- Documentation pages must show the article content in the first viewport on narrow screens; use compact mobile navigation below desktop sizes and a sticky sidebar on wide screens. The wide-screen docs sidebar must scroll independently from the article content when its navigation exceeds the viewport.
+- Header navigation must collapse below desktop sizes into an accessible leftmost hamburger menu that exposes Home, grouped docs pages, GitHub, and package links without causing horizontal overflow.
+- Documentation pages must show the article content in the first viewport on narrow screens; use the header hamburger as the compact docs navigation below desktop sizes and a sticky sidebar on wide screens. The wide-screen docs sidebar must scroll independently from the article content when its navigation exceeds the viewport.
 - The header color mode switcher must use the shared `@honeydeck/honeydeck/components` color mode cycle button (`system` → `light` → `dark` → `system`). `system` follows `prefers-color-scheme`; `light` and `dark` pin the effective mode.
 - The header GitHub link must point to `https://github.com/honeydeck/honeydeck` and use a recognizable GitHub logo icon in a regular text link.
 - Marketing buttons, icon controls, compact docs controls, and quiet demo links should use the shared `@honeydeck/honeydeck/components` button class recipes unless a component needs a marketing-only visual treatment.

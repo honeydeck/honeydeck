@@ -30,18 +30,6 @@ const pages = [
 			"Build beautiful slide decks with MDX and React. AI-friendly plain-text decks for humans and agents.",
 	},
 	{
-		path: "/for/developers",
-		title: "Honeydeck for developers",
-		description:
-			"Use React components, MDX, Vite, Tailwind, and a friendly CLI to ship decks fast.",
-	},
-	{
-		path: "/for/ai",
-		title: "Honeydeck for AI-assisted decks",
-		description:
-			"Plain-text MDX makes Honeydeck decks easy for AI agents and humans to review and edit.",
-	},
-	{
 		path: "/for/product",
 		title: "Honeydeck for product teams",
 		description:

@@ -5,7 +5,7 @@
 ## Responsibilities
 
 - Landing page at `/` optimized for developer activation and `npx @honeydeck/honeydeck init`.
-- Audience pages at `/for/developers`, `/for/ai`, and `/for/product`.
+- Product audience page at `/for/product`.
 - Custom docs experience under `/docs` generated from canonical `packages/honeydeck` docs.
 - Markdown sibling routes in `public/docs/*.md` for AI-friendly viewing/copying.
 - `llms.txt`, `llms-full.txt`, `robots.txt`, `sitemap.xml`, and Open Graph/Twitter basics.
