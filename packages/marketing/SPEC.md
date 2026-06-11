@@ -24,9 +24,7 @@ The primary landing page must stay short and prioritize:
 - AI-friendly subtitle explaining that plain-text MDX is easy for humans and AI agents to edit
 - primary command CTA: `npx @honeydeck/honeydeck init`
 - docs CTA
-- two outbound demo deck CTAs:
-  - starter/tour deck
-  - feature showcase deck
+- one outbound showcase deck CTA linking to `https://showcase.honeydeck.dev/`
 - Dex/bee visual treatment that feels playful rather than sterile enterprise docs
 - viewport-height fit on screens where the landing content can fit with the header and footer
 - no audience-page cards or `/for/*` promotion on the primary landing page
