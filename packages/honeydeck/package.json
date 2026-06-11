@@ -1,6 +1,6 @@
 {
 	"name": "@honeydeck/honeydeck",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "MDX and React-based presentation framework for AI-friendly slide decks.",
 	"license": "MIT",
 	"publishConfig": {
