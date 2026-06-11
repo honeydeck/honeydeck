@@ -13,7 +13,7 @@
  *  8. outro() — success message with next steps.
  */
 
-import { execSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import * as p from "@clack/prompts";
@@ -100,6 +100,27 @@ export function parseInitArgs(args: string[]): InitOptions {
 // ---------------------------------------------------------------------------
 
 const INSTALL_COMMAND = "npm install";
+
+function runCommand(command: string, cwd: string): Promise<void> {
+	return new Promise((resolveCommand, rejectCommand) => {
+		const child = spawn(command, {
+			cwd,
+			shell: true,
+			stdio: "ignore",
+		});
+
+		child.once("error", rejectCommand);
+		child.once("exit", (code, signal) => {
+			if (code === 0) {
+				resolveCommand();
+				return;
+			}
+
+			const reason = signal ? `signal ${signal}` : `exit code ${code ?? "unknown"}`;
+			rejectCommand(new Error(`${command} failed with ${reason}`));
+		});
+	});
+}
 
 // ---------------------------------------------------------------------------
 // Validation
@@ -285,10 +306,7 @@ export async function runInit(args: string[]): Promise<void> {
 		installSpinner.start("Installing dependencies with npm…");
 
 		try {
-			execSync(INSTALL_COMMAND, {
-				cwd: projectDir,
-				stdio: "pipe",
-			});
+			await runCommand(INSTALL_COMMAND, projectDir);
 			installSpinner.stop("Dependencies installed ✅");
 		} catch (_err) {
 			installSpinner.stop("Dependency installation failed ⚠️");
@@ -352,7 +370,7 @@ export async function runInit(args: string[]): Promise<void> {
 			`    cd ${projectName}`,
 			"    npm run dev",
 			"",
-			"  Happy presenting! 🎞",
+			"  Happy presenting! 🐝",
 			"",
 		].join("\n"),
 	);

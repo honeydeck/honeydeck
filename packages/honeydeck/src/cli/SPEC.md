@@ -43,6 +43,7 @@ Behavior:
 - Generates starter files, including `deck.mdx`, `styles.css`, `.gitignore`, `package.json`, `public/`, and `components/SparkleButton.tsx`
 - Renders `deck.mdx` and `styles.css` from real template files that can also run as a development demo
 - Installs dependencies with npm unless `--skip-install` is used
+- Shows a live process indicator for non-interactive work such as starter file generation and dependency installation; long-running installs keep updating so users know work is still active
 - Asks whether to open the Honeydeck agent skills installer unless `--skip-skill` or `--install-skill` is used, and makes clear that accepting runs `npx skills add`
 - Cancelling any `honeydeck init` prompt or interrupting the spawned skills installer aborts the init flow instead of continuing
 - If cancellation or interruption happens after `honeydeck init` created a new project directory, Honeydeck cleans up that generated project directory before exiting; it never deletes a directory that existed before init started
