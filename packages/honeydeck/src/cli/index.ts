@@ -116,7 +116,7 @@ ${formatTopLevelBanner()}
     honeydeck dev --open
     honeydeck pdf --steps all --mode dark -o slides.pdf
 
-  🎞  Happy presenting!
+  🐝  Happy presenting!
 `);
 }
 

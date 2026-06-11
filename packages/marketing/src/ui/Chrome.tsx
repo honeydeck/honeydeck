@@ -71,7 +71,7 @@ export function Footer() {
 	return (
 		<footer className="border-t border-[color:var(--honeydeck-color-border)] px-4 py-8 sm:px-6">
 			<div className="mx-auto flex max-w-7xl flex-col gap-4 text-sm text-[color:var(--honeydeck-color-muted-foreground)] sm:flex-row sm:items-center sm:justify-between">
-				<p>Honeydeck: Deck Experience for MDX and React slides.</p>
+				<p>Honeydeck: fun, buzzing MDX Decks 🐝</p>
 				<div className="flex flex-wrap gap-4">
 					<a href="/llms.txt">llms.txt</a>
 					<a href="/llms-full.txt">llms-full.txt</a>

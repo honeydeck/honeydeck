@@ -46,6 +46,8 @@ The marketing package must generate copies before dev/build via `npm -w @honeyde
 - `public/llms.txt` and `public/llms-full.txt`
 - `public/robots.txt` and `public/sitemap.xml`
 
+During marketing dev, the Vite dev server must watch the curated docs sidebar plus every canonical `packages/honeydeck` Markdown source listed in that sidebar. When any watched docs source changes, dev must rerun docs sync, update the generated Markdown/public outputs, refresh the watched source list if needed, and trigger a browser reload so editing canonical docs such as `packages/honeydeck/docs/getting-started.md` is reflected without restarting dev.
+
 Generated Markdown copies must include a `copiedFrom` frontmatter field pointing at the canonical source path. They must not include HTML comments about auto-generation and must not carry `generated: true`. Generated files must not be manually edited.
 
 Docs navigation is manual/curated through `docs-sidebar.json` rather than derived from the filesystem or Markdown frontmatter weights. The generated Markdown copies must not carry sidebar ordering metadata; sidebar grouping and ordering belongs to the explicit sidebar config and generated index metadata. The first docs group starts with concise Getting started content and then a follow-up guide for broader CLI, authoring, theme, architecture, exports, and agent-skill details.

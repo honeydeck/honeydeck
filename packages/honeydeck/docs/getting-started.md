@@ -1,6 +1,6 @@
 # Getting started
 
-Honeydeck helps you create polished, interactive presentations from plain-text MDX. Write slides in Markdown, add React components when you need them, and present with built-in layouts, speaker notes, presenter mode, and PDF export.
+Honeydeck helps you create polished, interactive presentations using MDX. Write slides in Markdown, use different Layout, add React components when you need them, present using presenter mode, and export to PDF for easy sharing.
 
 ## Quick start
 
@@ -21,11 +21,11 @@ npm run build
 npm run pdf
 ```
 
-Running `honeydeck` with no subcommand shows CLI help.
+`npx @honeydeck/honeydeck` to see cli help.
 
 ## Your first deck
 
-Decks are MDX files. The first frontmatter block configures the deck and opening slide. Later `---` separators start new slides.
+Decks are MDX files. The first frontmatter block [configures the deck](configuration.md) and opening slide. Later `---` separators start new slides.
 
 ```mdx
 ---
@@ -62,7 +62,7 @@ Add React when it helps.
 </Right>
 ```
 
-Use `layout:` to choose a slide layout. Built-in layouts include `Blank`, `Default`, `Cover`, `Section`, `TwoCol`, `Image`, `ImageLeft`, and `ImageRight`.
+Use `layout:` to choose a slide layout. Built-in layouts include `Blank`, `Default`, `Cover`, `Section`, `TwoCol`, `Image`, `ImageLeft`, and `ImageRight`. See them in the [showacase/#/layouts](https://showcase.honeydeck.dev/#/layouts).
 
 ## What Honeydeck gives you
 
@@ -75,6 +75,13 @@ Use `layout:` to choose a slide layout. Built-in layouts include `Blank`, `Defau
 - Overview mode, keyboard/touch navigation, and URL state
 - PDF export through headless Chromium
 - Optional Honeydeck agent skills for writing and migration help
+
+## Navigating your deck
+
+- Next or previous step using `→` `d` / `←` `a`
+- Next or previous slide with `↓` `s` / `↑` `w`
+- Overview of all slides `o`
+- Presenter mode `p`
 
 ## Common commands
 
@@ -112,5 +119,7 @@ During development, open the runtime reference pages to see:
 - theme token names and live computed values
 - layout previews with copyable usage snippets
 - built-in component docs
+
+See those in our [showcase](https://showcase.honeydeck.dev/#/layouts)
 
 Honeydeck is built with MDX, React, Vite, and Tailwind v4.
