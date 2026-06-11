@@ -16,15 +16,7 @@ export function App() {
 			<Header mode={mode} onSetMode={setMode} />
 			<Routes>
 				<Route path="/" element={<LandingPage />} />
-				<Route
-					path="/for/developers"
-					element={<AudiencePage audience="developers" />}
-				/>
-				<Route path="/for/ai" element={<AudiencePage audience="ai" />} />
-				<Route
-					path="/for/product"
-					element={<AudiencePage audience="product" />}
-				/>
+				<Route path="/for/product" element={<AudiencePage />} />
 				<Route path="/docs" element={<DocPage />} />
 				<Route path="/docs/:slug" element={<DocPage />} />
 				<Route path="*" element={<NotFound />} />

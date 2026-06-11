@@ -20,7 +20,7 @@ export function LandingPage() {
 	return (
 		<main className="flex flex-1">
 			<section className="relative flex flex-1 overflow-hidden">
-				<div className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,0.8fr)]">
+				<div className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,0.8fr)] lg:gap-10">
 					<div className="max-w-3xl">
 						<p className={eyebrowClass}>
 							<SparklesIcon size={16} aria-hidden="true" /> Deck Experience for
@@ -29,7 +29,7 @@ export function LandingPage() {
 						<h1 className="mt-5 text-balance text-4xl font-black leading-[1.02] sm:text-6xl lg:text-7xl">
 							Build beautiful slide decks with MDX and React.
 						</h1>
-						<p className="mt-6 max-w-2xl text-pretty text-xl leading-8 text-[color:var(--honeydeck-color-muted-foreground)]">
+						<p className="mt-5 max-w-2xl text-pretty text-lg leading-7 text-[color:var(--honeydeck-color-muted-foreground)] sm:mt-6 sm:text-xl sm:leading-8">
 							Honeydeck keeps decks as plain text code, so humans and AI agents
 							can edit the same presentation with confidence.
 						</p>

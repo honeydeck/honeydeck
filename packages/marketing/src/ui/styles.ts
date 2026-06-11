@@ -13,8 +13,6 @@ export const eyebrowClass =
 export const panelClass =
 	"rounded-lg border border-[color:var(--honeydeck-color-border)] bg-[color-mix(in_oklab,var(--marketing-panel)_86%,transparent)] shadow-[0_18px_48px_var(--marketing-shadow)]";
 export const heroCardClass = `${panelClass} p-[clamp(1.1rem,3vw,1.6rem)]`;
-export const docsMobileNavClass =
-	"group rounded-lg border border-[color:var(--honeydeck-color-border)] bg-[color-mix(in_oklab,var(--marketing-panel)_86%,transparent)] p-3 lg:hidden";
 const docsNavLinkBaseClass =
 	"block rounded-lg border px-3 py-2 text-[0.94rem] font-bold no-underline";
 const docsNavLinkActiveClass =
