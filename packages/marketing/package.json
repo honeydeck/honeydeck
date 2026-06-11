@@ -12,7 +12,6 @@
 		"pretypecheck": "npm run docs:sync",
 		"lint": "biome check .",
 		"format": "biome check --write .",
-		"pack:dry-run": "npm pack --dry-run",
 		"test": "node --test --import tsx \"src/**/*.test.ts\" \"src/**/*.test.tsx\" \"scripts/**/*.test.mjs\"",
 		"typecheck": "tsc --noEmit"
 	},

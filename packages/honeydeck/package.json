@@ -24,7 +24,7 @@
 	],
 	"type": "module",
 	"bin": {
-		"honeydeck": "./src/cli/bin.js"
+		"honeydeck": "src/cli/bin.js"
 	},
 	"engines": {
 		"node": ">=22.18.0"
