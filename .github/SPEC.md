@@ -47,6 +47,7 @@ Release automation must:
 - update `packages/honeydeck/package.json` and the root lockfile metadata for the public package when a release is planned
 - verify the packed `@honeydeck/honeydeck` tarball installs and can build a generated starter project on the minimum supported Node.js version before publishing
 - publish a new `@honeydeck/honeydeck` npm version for every release-planning merge to `main`
-- create a GitHub release with generated release notes when a release is planned
+- commit the release version metadata (`packages/honeydeck/package.json` and root `package-lock.json`) back to `main` after publication using a GitHub App installation token that can bypass the `main` ruleset and a non-Conventional Commit `[skip ci]` message so the release commit does not trigger another release
+- create a GitHub release with generated release notes when a release is planned, targeting the release version metadata commit when one is created
 - use least-privilege workflow permissions and npm trusted publishing through OIDC
 - avoid publishing from pull request workflows
