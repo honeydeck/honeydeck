@@ -121,10 +121,11 @@ Reference page routes intentionally do not encode slide or step. During one brow
 
 Shown in normal slide view only (not presenter/reference views).
 
-- Positioned bottom-left
+- Positioned bottom-center on narrow mobile screens and bottom-left from wider breakpoints
 - **Hidden by default** on desktop — appears on cursor hover near bottom edge
 - **Always visible** on mobile/tablet portrait
 - **Hidden by default** on mobile/tablet landscape — appears when the center tap zone is tapped, fades after roughly 3 seconds of idle time, and stays visible while being interacted with
+- On narrow mobile screens, stays within the viewport by wrapping controls into compact groups instead of extending past the screen edge
 - Contains:
   - Current slide number
   - Navigation arrows (step left/right)

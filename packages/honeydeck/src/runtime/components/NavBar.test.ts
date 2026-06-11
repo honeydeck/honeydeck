@@ -33,4 +33,16 @@ describe("<NavBar>", () => {
 			);
 		}
 	});
+
+	it("keeps the floating controls bounded and wrappable on narrow screens", () => {
+		const source = readFileSync(
+			new URL("./NavBar.tsx", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(source, /max-w-\[calc\(100vw-1rem\)\]/);
+		assert.match(source, /flex-wrap/);
+		assert.match(source, /justify-center/);
+		assert.match(source, /sm:flex-nowrap/);
+	});
 });
