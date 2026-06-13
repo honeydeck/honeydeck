@@ -1,0 +1,89 @@
+---
+title: "Honeydeck"
+layouts: "./layouts"
+layout: BeeCover
+---
+
+import './styles.css'
+import { Reveal, RevealGroup, Keyboard } from '@honeydeck/honeydeck'
+
+# Honeydeck
+
+Build slides in React <Keyboard>→</Keyboard>
+
+---
+layout: DiagonalSplit
+---
+
+# Why Honeydeck?
+
+<RevealGroup>
+
+- **MDX-native** — Markdown + React, tech you know
+- **Static export** — Host anywhere, no runtime JS needed
+- **Open format** — Plain text forever, export to PDF anytime
+- **AI-ready** — Agent skills for writing and migration
+
+</RevealGroup>
+
+---
+layout: HexGrid
+---
+
+# Code Highlighting
+
+Step through code with Shiki — syntax highlighting at build time.
+
+```mdx {1-5|6-7|all}
+---
+layout: Cover
+author: Jane
+---
+# My Talk
+---
+# Second Slide
+```
+
+---
+layout: Brutalist
+---
+
+# Theme Tokens
+
+Override CSS variables to brand any deck. The Bee theme brings deep purple and golden yellow. Build your own with `oklch` relative color syntax.
+
+```css
+--honeydeck-primary: #6d4aff;
+--honeydeck-accent: #ffd93d;
+--honeydeck-background: #11101a;
+```
+
+<Reveal>
+
+<div className="absolute bottom-8 bg-foreground text-background px-2">👇 check live docs 📖</div>
+
+</Reveal>
+
+---
+layout: HexGrid
+---
+
+# Get Started Now
+
+<div className="mt-4 rounded-xl border border-border overflow-hidden shadow-2xl shadow-primary/10">
+  <div className="flex items-center gap-2 bg-surface px-4 py-2">
+    <div className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+    <div className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+    <div className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
+    <span className="ml-3 font-mono text-xs text-surface-foreground/50">terminal</span>
+  </div>
+  <div className="bg-surface/30 p-6 font-mono text-sm text-surface-foreground/80 space-y-2">
+    <p><span className="text-primary">$</span> npx @honeydeck/honeydeck init --name my-talk</p>
+    <p><span className="text-primary">$</span> cd my-talk && npm run dev</p>
+    <p className="text-accent mt-3">✓ Edit deck.mdx · Hot-reload · Present · Export PDF</p>
+  </div>
+</div>
+
+<br/>
+<br/>
+[honeydeck.dev](https://honeydeck.dev/)

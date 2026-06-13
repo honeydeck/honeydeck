@@ -5,7 +5,8 @@
 	"workspaces": [
 		"packages/honeydeck",
 		"packages/marketing",
-		"packages/showcase"
+		"packages/showcase",
+		"packages/welcome-deck"
 	],
 	"engines": {
 		"node": ">=22.18.0"

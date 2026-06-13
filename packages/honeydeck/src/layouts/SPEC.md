@@ -180,7 +180,7 @@ Building the future of presentations.`,
 }
 ```
 
-`mdx` is required on `LayoutDemo` and is the single source for both the live visual preview and the copyable snippet shown in the layouts docs tab. Honeydeck compiles this MDX with the same slide MDX compiler family, extracts frontmatter/title/steps from it, and renders the resulting slide through the active layout map. Honeydeck statically crawls analyzable active layout maps at build time and discovers colocated `demo` exports from layout modules. Dynamic maps, computed entries, non-static imports, and demos whose `mdx` value is not a static string may be skipped with warnings. If no static MDX demo is discovered, the layout still appears in the reference pages with a "No demo MDX provided" hint.
+`mdx` is required on `LayoutDemo` and is the single source for both the live visual preview and the copyable snippet shown in the layouts docs tab. Honeydeck compiles this MDX with the same slide MDX compiler family, extracts frontmatter/title/steps from it, and renders the resulting slide through the active layout map. Honeydeck statically crawls analyzable active layout maps at build time and discovers colocated `demo` exports from layout modules. Analyzable map entries include direct static imports, named imports from layout barrels, spread static default imports, and static member references into an imported layout map such as `Default: defaultLayouts.Default`. Dynamic maps, computed entries, non-static imports, and demos whose `mdx` value is not a static string may be skipped with warnings. If no static MDX demo is discovered, the layout still appears in the reference pages with a "No demo MDX provided" hint.
 
 ### TwoCol Slot Components
 

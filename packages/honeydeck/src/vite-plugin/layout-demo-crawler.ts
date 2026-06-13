@@ -168,37 +168,18 @@ function crawlLayoutMapFile(
 			continue;
 
 		const layoutName = getLayoutName(property);
-		const localName = getLayoutLocalIdentifier(property);
-		if (!layoutName || !localName) continue;
+		if (!layoutName) continue;
 
-		const binding = bindings.get(localName);
-		if (!binding) {
-			context.warnings.push(
-				`Layout "${layoutName}" is not backed by a static import; demo auto-discovery skipped.`,
-			);
-			continue;
-		}
-
-		const modulePath = resolveImportedModule(
+		const reference = resolveLayoutModuleReference({
+			property,
+			layoutName,
+			bindings,
 			mapPath,
-			binding.moduleSpecifier,
-			context.packageRoot,
-		);
-		if (!modulePath) {
-			context.warnings.push(
-				`Could not resolve layout module "${binding.moduleSpecifier}" for layout "${layoutName}".`,
-			);
-			continue;
-		}
-
-		context.watchedFiles.add(modulePath);
-		const publicModuleSpecifier = toPublicSpecifier({
-			entryPath: context.entryPath,
-			packageRoot: context.packageRoot,
-			mapPath,
-			modulePath,
-			originalSpecifier: binding.moduleSpecifier,
+			context,
 		});
+		if (!reference) continue;
+
+		const { modulePath, publicModuleSpecifier } = reference;
 
 		let demoMetadata: StaticDemoMetadata | undefined;
 		try {
@@ -372,13 +353,303 @@ function getLayoutName(
 	return null;
 }
 
-function getLayoutLocalIdentifier(
-	property: ts.PropertyAssignment | ts.ShorthandPropertyAssignment,
-): string | null {
-	if (ts.isShorthandPropertyAssignment(property)) return property.name.text;
+type LayoutModuleReference = Pick<
+	DiscoveredLayoutDemo,
+	"modulePath" | "publicModuleSpecifier"
+>;
 
-	const initializer = unwrapExpression(property.initializer);
-	return ts.isIdentifier(initializer) ? initializer.text : null;
+function resolveLayoutModuleReference({
+	property,
+	layoutName,
+	bindings,
+	mapPath,
+	context,
+}: {
+	property: ts.PropertyAssignment | ts.ShorthandPropertyAssignment;
+	layoutName: string;
+	bindings: Map<string, ImportBinding>;
+	mapPath: string;
+	context: CrawlContext;
+}): LayoutModuleReference | null {
+	const value = ts.isShorthandPropertyAssignment(property)
+		? property.name
+		: unwrapExpression(property.initializer);
+
+	if (ts.isIdentifier(value)) {
+		return resolveImportedLayoutReference(
+			value.text,
+			layoutName,
+			bindings,
+			mapPath,
+			context,
+		);
+	}
+
+	if (ts.isPropertyAccessExpression(value)) {
+		return resolveLayoutMapMemberReference(
+			value,
+			layoutName,
+			bindings,
+			mapPath,
+			context,
+		);
+	}
+
+	context.warnings.push(
+		`Layout "${layoutName}" is not backed by a static import; demo auto-discovery skipped.`,
+	);
+	return null;
+}
+
+function resolveImportedLayoutReference(
+	localName: string,
+	layoutName: string,
+	bindings: Map<string, ImportBinding>,
+	mapPath: string,
+	context: CrawlContext,
+): LayoutModuleReference | null {
+	const binding = bindings.get(localName);
+	if (!binding) {
+		context.warnings.push(
+			`Layout "${layoutName}" is not backed by a static import; demo auto-discovery skipped.`,
+		);
+		return null;
+	}
+
+	const importedModulePath = resolveImportedModule(
+		mapPath,
+		binding.moduleSpecifier,
+		context.packageRoot,
+	);
+	if (!importedModulePath) {
+		context.warnings.push(
+			`Could not resolve layout module "${binding.moduleSpecifier}" for layout "${layoutName}".`,
+		);
+		return null;
+	}
+
+	context.watchedFiles.add(importedModulePath);
+	const modulePath =
+		binding.importedName === "default"
+			? importedModulePath
+			: (resolveNamedExportModulePath(
+					importedModulePath,
+					binding.importedName,
+					context.packageRoot,
+					context.watchedFiles,
+				) ?? importedModulePath);
+	context.watchedFiles.add(modulePath);
+
+	return {
+		modulePath,
+		publicModuleSpecifier: toPublicSpecifier({
+			entryPath: context.entryPath,
+			packageRoot: context.packageRoot,
+			mapPath,
+			modulePath,
+			originalSpecifier: binding.moduleSpecifier,
+		}),
+	};
+}
+
+function resolveLayoutMapMemberReference(
+	memberExpression: ts.PropertyAccessExpression,
+	layoutName: string,
+	bindings: Map<string, ImportBinding>,
+	mapPath: string,
+	context: CrawlContext,
+): LayoutModuleReference | null {
+	const mapIdentifier = unwrapExpression(memberExpression.expression);
+	if (
+		!ts.isIdentifier(mapIdentifier) ||
+		!ts.isIdentifier(memberExpression.name)
+	) {
+		context.warnings.push(
+			`Layout "${layoutName}" is not backed by a static import; demo auto-discovery skipped.`,
+		);
+		return null;
+	}
+
+	const binding = bindings.get(mapIdentifier.text);
+	if (!binding) {
+		context.warnings.push(
+			`Layout "${layoutName}" references layout map "${mapIdentifier.text}" without a static import; demo auto-discovery skipped.`,
+		);
+		return null;
+	}
+
+	if (binding.importedName !== "default") {
+		context.warnings.push(
+			`Layout "${layoutName}" references layout map "${mapIdentifier.text}", but only default-imported layout maps can be inspected.`,
+		);
+		return null;
+	}
+
+	const memberMapPath = resolveImportedModule(
+		mapPath,
+		binding.moduleSpecifier,
+		context.packageRoot,
+	);
+	if (!memberMapPath) {
+		context.warnings.push(
+			`Could not resolve layout map "${binding.moduleSpecifier}" for layout "${layoutName}".`,
+		);
+		return null;
+	}
+
+	const memberName = memberExpression.name.text;
+	const lookupContext = {
+		...context,
+		visitedMaps: new Set<string>(),
+	};
+	const reference = crawlLayoutMapFile(memberMapPath, lookupContext).find(
+		(demo) => demo.layoutName === memberName,
+	);
+
+	if (!reference) {
+		context.warnings.push(
+			`Could not statically find layout "${memberName}" in layout map "${binding.moduleSpecifier}" for layout "${layoutName}".`,
+		);
+	}
+
+	return reference ?? null;
+}
+
+function resolveNamedExportModulePath(
+	modulePath: string,
+	exportedName: string,
+	packageRoot: string,
+	watchedFiles?: Set<string>,
+	visited = new Set<string>(),
+): string | null {
+	const visitKey = `${modulePath}#${exportedName}`;
+	if (visited.has(visitKey)) return null;
+	visited.add(visitKey);
+	watchedFiles?.add(modulePath);
+
+	let sourceFile: ts.SourceFile;
+	try {
+		sourceFile = parseFile(modulePath);
+	} catch {
+		return null;
+	}
+
+	for (const statement of sourceFile.statements) {
+		if (!ts.isExportDeclaration(statement)) continue;
+
+		if (!statement.exportClause) {
+			if (
+				!statement.moduleSpecifier ||
+				!ts.isStringLiteral(statement.moduleSpecifier)
+			)
+				continue;
+
+			const starModulePath = resolveImportedModule(
+				modulePath,
+				statement.moduleSpecifier.text,
+				packageRoot,
+			);
+			if (!starModulePath) continue;
+			watchedFiles?.add(starModulePath);
+			const resolved = resolveNamedExportModulePath(
+				starModulePath,
+				exportedName,
+				packageRoot,
+				watchedFiles,
+				visited,
+			);
+			if (resolved) return resolved;
+			continue;
+		}
+
+		if (!ts.isNamedExports(statement.exportClause)) continue;
+
+		for (const element of statement.exportClause.elements) {
+			if (element.name.text !== exportedName) continue;
+
+			if (
+				statement.moduleSpecifier &&
+				ts.isStringLiteral(statement.moduleSpecifier)
+			) {
+				const importedModulePath = resolveImportedModule(
+					modulePath,
+					statement.moduleSpecifier.text,
+					packageRoot,
+				);
+				if (!importedModulePath) return null;
+				watchedFiles?.add(importedModulePath);
+
+				const importedName = element.propertyName?.text ?? element.name.text;
+				if (importedName === "default") return importedModulePath;
+
+				return (
+					resolveNamedExportModulePath(
+						importedModulePath,
+						importedName,
+						packageRoot,
+						watchedFiles,
+						visited,
+					) ?? importedModulePath
+				);
+			}
+
+			const localName = element.propertyName?.text ?? element.name.text;
+			const binding = collectImportBindings(sourceFile).get(localName);
+			if (!binding) return modulePath;
+
+			const importedModulePath = resolveImportedModule(
+				modulePath,
+				binding.moduleSpecifier,
+				packageRoot,
+			);
+			if (!importedModulePath) return null;
+			if (binding.importedName === "default") return importedModulePath;
+
+			watchedFiles?.add(importedModulePath);
+			return (
+				resolveNamedExportModulePath(
+					importedModulePath,
+					binding.importedName,
+					packageRoot,
+					watchedFiles,
+					visited,
+				) ?? importedModulePath
+			);
+		}
+	}
+
+	for (const statement of sourceFile.statements) {
+		if (!hasExportModifier(statement)) continue;
+		if (
+			(ts.isFunctionDeclaration(statement) ||
+				ts.isClassDeclaration(statement)) &&
+			statement.name?.text === exportedName
+		) {
+			return modulePath;
+		}
+
+		if (ts.isVariableStatement(statement)) {
+			for (const declaration of statement.declarationList.declarations) {
+				if (
+					ts.isIdentifier(declaration.name) &&
+					declaration.name.text === exportedName
+				)
+					return modulePath;
+			}
+		}
+	}
+
+	return null;
+}
+
+function hasExportModifier(node: ts.Node): boolean {
+	return (
+		ts.canHaveModifiers(node) &&
+		(ts
+			.getModifiers(node)
+			?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ??
+			false)
+	);
 }
 
 function resolveImportedModule(

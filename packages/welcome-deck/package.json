@@ -1,0 +1,24 @@
+{
+	"name": "@honeydeck/welcome-deck",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "node --import tsx ../honeydeck/src/cli/index.ts build --deck deck.mdx",
+		"dev": "node --import tsx ../honeydeck/src/cli/index.ts dev --deck deck.mdx",
+		"pdf": "node --import tsx ../honeydeck/src/cli/index.ts pdf --deck deck.mdx -o welcome.pdf",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"tailwindcss": "^4.3.0",
+		"@honeydeck/honeydeck": "file:../honeydeck"
+	},
+	"devDependencies": {
+		"@types/node": "^25.6.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
+	}
+}

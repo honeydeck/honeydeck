@@ -86,6 +86,8 @@ export default {
   TwoCol: TwoColLayout,
   Image: ImageLayout,
 }
+
+export { BlankLayout, DefaultLayout, TwoColLayout, ImageLayout }
 `,
 	);
 	writeCleanLayoutFixtures(packageRoot);
@@ -174,6 +176,161 @@ export const demo = { mdx: '# Hero Demo' }
 			result.demos.find((demo) => demo.layoutName === "Hero")?.demoMetadata
 				?.mdx,
 			"# Hero Demo",
+		);
+	});
+
+	it("discovers demos from named imports re-exported by layout barrels", () => {
+		const root = createTempRoot("honeydeck-layout-crawler-named-barrel-");
+		writeDefaultLayoutFixture(root);
+		writeFileSync(
+			join(root, "deck.mdx"),
+			'---\nlayouts: "./layouts"\n---\n\n# Hello',
+		);
+		writeFileSync(
+			join(root, "layouts.ts"),
+			`
+import { DefaultLayout as CleanDefaultLayout } from '@honeydeck/honeydeck/layouts'
+import type { LayoutMap } from '@honeydeck/honeydeck/types'
+
+export default {
+  Default: CleanDefaultLayout,
+} satisfies LayoutMap
+`,
+		);
+
+		const result = crawlLayoutDemos({
+			entryPath: join(root, "deck.mdx"),
+			packageRoot: root,
+			layoutSpecifier: "./layouts",
+		});
+
+		assert.deepEqual(result.warnings, []);
+		assert.equal(result.demos.length, 1);
+		assert.equal(result.demos[0]?.layoutName, "Default");
+		assert.equal(result.demos[0]?.demoMetadata?.mdx, "# Clean Default Demo");
+		assert.equal(
+			result.demos[0]?.publicModuleSpecifier,
+			"@honeydeck/honeydeck/layouts/Default",
+		);
+	});
+
+	it("discovers demos from named imports re-exported through export-star barrels", () => {
+		const root = createTempRoot("honeydeck-layout-crawler-export-star-");
+		writeFileSync(
+			join(root, "deck.mdx"),
+			'---\nlayouts: "./layouts"\n---\n\n# Hello',
+		);
+		writeFileSync(
+			join(root, "layouts.ts"),
+			`
+import { StarLayout } from './barrel'
+
+export default {
+  Star: StarLayout,
+}
+`,
+		);
+		writeFileSync(join(root, "barrel.ts"), "export * from './StarLayout'\n");
+		writeFileSync(
+			join(root, "StarLayout.tsx"),
+			`
+export function StarLayout() { return null }
+export const demo = { mdx: '# Star Demo' }
+`,
+		);
+
+		const result = crawlLayoutDemos({
+			entryPath: join(root, "deck.mdx"),
+			packageRoot: root,
+			layoutSpecifier: "./layouts",
+		});
+
+		assert.deepEqual(result.warnings, []);
+		assert.equal(result.demos.length, 1);
+		assert.equal(result.demos[0]?.layoutName, "Star");
+		assert.equal(result.demos[0]?.demoMetadata?.mdx, "# Star Demo");
+	});
+
+	it("discovers demos from static member references into imported layout maps", () => {
+		const root = createTempRoot("honeydeck-layout-crawler-member-");
+		writeDefaultLayoutFixture(root);
+		writeFileSync(
+			join(root, "deck.mdx"),
+			'---\nlayouts: "./layouts"\n---\n\n# Hello',
+		);
+		writeFileSync(
+			join(root, "layouts.ts"),
+			`
+import defaultLayouts from '@honeydeck/honeydeck/layouts'
+import HeroLayout from './Hero'
+
+export default {
+  Default: defaultLayouts.Default,
+  Hero: HeroLayout,
+}
+`,
+		);
+		writeFileSync(
+			join(root, "Hero.tsx"),
+			`
+export default function HeroLayout() { return null }
+export const demo = { mdx: '# Hero Demo' }
+`,
+		);
+
+		const result = crawlLayoutDemos({
+			entryPath: join(root, "deck.mdx"),
+			packageRoot: root,
+			layoutSpecifier: "./layouts",
+		});
+
+		assert.deepEqual(result.warnings, []);
+		assert.deepEqual(
+			result.demos.map((demo) => demo.layoutName),
+			["Default", "Hero"],
+		);
+		assert.equal(
+			result.demos.find((demo) => demo.layoutName === "Default")?.demoMetadata
+				?.mdx,
+			"# Clean Default Demo",
+		);
+		assert.equal(
+			result.demos.find((demo) => demo.layoutName === "Default")
+				?.publicModuleSpecifier,
+			"@honeydeck/honeydeck/layouts/Default",
+		);
+	});
+
+	it("discovers member-reference demos after spreading the same layout map", () => {
+		const root = createTempRoot("honeydeck-layout-crawler-member-spread-");
+		writeDefaultLayoutFixture(root);
+		writeFileSync(
+			join(root, "deck.mdx"),
+			'---\nlayouts: "./layouts"\n---\n\n# Hello',
+		);
+		writeFileSync(
+			join(root, "layouts.ts"),
+			`
+import defaultLayouts from '@honeydeck/honeydeck/layouts'
+
+export default {
+  ...defaultLayouts,
+  AliasDefault: defaultLayouts.Default,
+}
+`,
+		);
+
+		const result = crawlLayoutDemos({
+			entryPath: join(root, "deck.mdx"),
+			packageRoot: root,
+			layoutSpecifier: "./layouts",
+		});
+
+		assert.deepEqual(result.warnings, []);
+		assert.equal(
+			result.demos.find((demo) => demo.layoutName === "AliasDefault")
+				?.demoMetadata?.mdx,
+			"# Clean Default Demo",
 		);
 	});
 

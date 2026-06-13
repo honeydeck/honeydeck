@@ -9,6 +9,7 @@ packages/
   honeydeck/    public scoped Honeydeck CLI/runtime package and shared UI primitives
   marketing/    private marketing/docs site package
   showcase/     private feature showcase deck package
+  welcome-deck/ private compact welcome deck package
 ```
 
 Root `SPEC.md` maps product behavior specs. Package-level and colocated `SPEC.md` files own detailed behavior.
@@ -40,6 +41,9 @@ npm -w @honeydeck/showcase run dev
 npm -w @honeydeck/showcase run build
 npm -w @honeydeck/showcase run pdf
 npm -w @honeydeck/showcase run pdf:steps
+npm -w @honeydeck/welcome-deck run dev
+npm -w @honeydeck/welcome-deck run build
+npm -w @honeydeck/welcome-deck run pdf
 npm -w @honeydeck/marketing run dev
 npm -w @honeydeck/marketing run docs:sync
 npm -w @honeydeck/marketing run build

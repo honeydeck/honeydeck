@@ -1,10 +1,11 @@
 # Honeydeck monorepo development guide
 
-Honeydeck is an npm-workspace monorepo with two packages:
+Honeydeck is an npm-workspace monorepo with four packages:
 
 - `packages/honeydeck` — public scoped `@honeydeck/honeydeck` CLI/runtime package for MDX, React, Vite, Tailwind v4 presentations. It also owns shared UI primitives exported through `@honeydeck/honeydeck/components`.
 - `packages/marketing` — private `@honeydeck/marketing` Vite/React site for the landing page, public docs, LLM discovery files, and search.
 - `packages/showcase` — private `@honeydeck/showcase` feature showcase deck for demos and smoke tests.
+- `packages/welcome-deck` — private `@honeydeck/welcome-deck` compact welcome deck for first-impression demos and layout-reference smoke tests.
 
 ## Coding guidelines
 
@@ -21,6 +22,7 @@ Root `SPEC.md` is the monorepo/product overview and navigation map. Detailed obs
 - `packages/honeydeck/SPEC.md` and nested `SPEC.md` files own CLI/runtime/deck behavior and shared UI primitive behavior.
 - `packages/marketing/SPEC.md` and nested specs own marketing/docs behavior.
 - `packages/showcase/SPEC.md` owns showcase deck behavior.
+- `packages/welcome-deck/SPEC.md` owns welcome deck behavior.
 - `DEVELOPMENT.md` documents monorepo workflow; package-specific development details live beside each package.
 
 When changing behavior:
@@ -54,6 +56,9 @@ npm -w @honeydeck/showcase run dev
 npm -w @honeydeck/showcase run build
 npm -w @honeydeck/showcase run pdf
 npm -w @honeydeck/showcase run pdf:steps
+npm -w @honeydeck/welcome-deck run dev
+npm -w @honeydeck/welcome-deck run build
+npm -w @honeydeck/welcome-deck run pdf
 npm -w @honeydeck/marketing run dev
 npm -w @honeydeck/marketing run docs:sync
 npm -w @honeydeck/marketing run build
@@ -64,6 +69,6 @@ npm -w @honeydeck/marketing run build
 - `packages/honeydeck/Readme.md` is the compact package README. `packages/honeydeck/docs/getting-started.md` is the canonical first-run guide. Other `packages/honeydeck/docs/*.md` files and specs are canonical Honeydeck docs shipped in the public npm package.
 - Shared React UI primitives used by runtime and marketing live in `packages/honeydeck/src/runtime/components` and are imported via `@honeydeck/honeydeck/components`.
 - `packages/marketing` copies selected canonical docs at build/dev time into generated content. Do not manually edit generated docs.
-- The showcase package may depend on the public `@honeydeck/honeydeck` package for demos; `honeydeck` must not depend on `@honeydeck/showcase`.
+- The showcase and welcome-deck packages may depend on the public `@honeydeck/honeydeck` package for demos; `honeydeck` must not depend on `@honeydeck/showcase` or `@honeydeck/welcome-deck`.
 - The marketing package may depend on the public `@honeydeck/honeydeck` package, but `honeydeck` must not depend on `@honeydeck/marketing`.
 - Deployment artifacts (`dist/`, generated PDFs) stay untracked.
