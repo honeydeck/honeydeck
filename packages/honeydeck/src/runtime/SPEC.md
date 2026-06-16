@@ -6,16 +6,19 @@
 
 ### Concept
 
-The **timeline** is a first-class Honeydeck concept. Each slide has a local timeline of steps. Code walkthroughs, reveal components, and statically registered custom component steps all hook into the same timeline.
+The **timeline** is a first-class Honeydeck concept. Each slide has a local timeline of steps. Code walkthroughs, Magic Code blocks, reveal components, and statically registered custom component steps all hook into the same timeline.
 
 Fenced code blocks join the timeline when their metadata uses `{group|group}` step syntax. The first code group is the block's baseline active highlight and consumes no timeline step. Each later group consumes one timeline step.
+
+Magic Code blocks join the same timeline. Each inner code fence contributes its normal code highlight states; Honeydeck advances through those highlight states before morphing to the next inner code fence. Magic Code step counting is `sum(inner fence highlight groups) - 1`.
 
 ### Timeline State
 
 - Initial state: `stepIndex = 0` (no reveal or custom step content active)
 - Stepped code blocks show their first metadata group immediately as their baseline state whenever the block is visible
+- Magic Code blocks show their first inner code fence and its first metadata group immediately whenever the block is visible
 - First reveal/custom timeline entry activates at `stepIndex = 1`
-- For code walkthroughs, the second and later metadata groups activate at their assigned timeline steps
+- For code walkthroughs and Magic Code inner code states, the second and later metadata groups activate at their assigned timeline steps
 - Timeline entries are determined by document order (top-to-bottom)
 - Compiler-injected or manually-authored `<Reveal at={n}>` is preserved and excluded from automatic step counting
 - Timeline entries are flat within each slide, even when authored with nested

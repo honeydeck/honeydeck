@@ -14,6 +14,8 @@
  *   [data-honeydeck-color-mode="light"] { --honeydeck-primary: oklch(55% 0.25 145); }
  */
 
+@import "@shikijs/magic-move/style.css";
+
 /* ── Source scanning ────────────────────────────────────────────────────────
    Tell Tailwind to scan the built-in layouts for utility class candidates.
    Without this, layouts live outside the Vite root (user's project dir) and
@@ -407,6 +409,59 @@
 	color: inherit;
 }
 
+.honeydeck-code-block .shiki-magic-move-container {
+	box-sizing: border-box;
+	min-height: 0;
+	margin: 0;
+	padding: 1.5em;
+	overflow: auto;
+	border-radius: 0;
+	font-family: var(--honeydeck-font-mono);
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.honeydeck-code-block .shiki-magic-move-item {
+	opacity: var(--honeydeck-magic-code-token-opacity, 1);
+	transition-property: color, opacity, background-color, transform;
+}
+
+@keyframes honeydeck-magic-code-token-enter {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: var(--honeydeck-magic-code-token-opacity, 1);
+	}
+}
+
+@keyframes honeydeck-magic-code-token-leave {
+	from {
+		opacity: var(--honeydeck-magic-code-token-opacity, 1);
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+.honeydeck-code-block .shiki-magic-move-enter-active {
+	animation-name: honeydeck-magic-code-token-enter;
+	animation-duration: var(--smm-duration, 500ms);
+	animation-timing-function: var(--smm-easing, ease);
+	animation-delay: var(--smm-stagger, 0ms);
+	animation-fill-mode: both;
+}
+
+.honeydeck-code-block .shiki-magic-move-leave-active {
+	animation-name: honeydeck-magic-code-token-leave;
+	animation-duration: var(--smm-duration, 500ms);
+	animation-timing-function: var(--smm-easing, ease);
+	animation-delay: var(--smm-stagger, 0ms);
+	animation-fill-mode: both;
+}
+
 .honeydeck-code-copy-button {
 	position: absolute;
 	top: 0.75em;
@@ -446,12 +501,22 @@
 	color: var(--honeydeck-primary-foreground);
 }
 
+@keyframes honeydeck-code-line-highlight-enter {
+	from {
+		opacity: var(--honeydeck-code-line-dim-opacity);
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
 .honeydeck-code-block .line {
 	transition: opacity 150ms ease-in;
 }
 
-.honeydeck-code-block .line[data-dim="1"] {
-	opacity: var(--honeydeck-code-line-dim-opacity);
+.honeydeck-code-block .line[data-highlight="1"] {
+	animation: honeydeck-code-line-highlight-enter 300ms ease-out both;
 }
 
 /* ── Plain code fallback (no shiki, unsupported lang) ────────────────────── */

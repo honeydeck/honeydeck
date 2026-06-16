@@ -70,7 +70,7 @@ Use `layout:` to choose a slide layout. Built-in layouts include `Blank`, `Defau
 - Vite dev/build with hot reload
 - Built-in layouts and theme tokens
 - Tailwind v4-friendly styling
-- Reveal steps and code step-through
+- Reveal steps, code step-through, and Magic Code transitions
 - Presenter mode with speaker notes
 - Overview mode, keyboard/touch navigation, and URL state
 - PDF export through headless Chromium

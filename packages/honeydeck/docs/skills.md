@@ -31,9 +31,9 @@ npx skills add <honeydeck-repo-url> --copy --skill slidev-migration
 
 | Skill | Use it for |
 | --- | --- |
-| `honeydeck` | Honeydeck-specific guidance for MDX decks, layouts, CSS imports, presenter notes, reveals, code steps, PDF export, and package docs. |
+| `honeydeck` | Honeydeck-specific guidance for MDX decks, layouts, CSS imports, presenter notes, reveals, code steps, Magic Code, PDF export, and package docs. |
 | `presentation-writing` | Framework-agnostic help with audience, storyline, slide headlines, speaker notes, timing, and review heuristics. |
-| `slidev-migration` | Migrating Slidev decks to Honeydeck while preserving source files until you approve cleanup. |
+| `slidev-migration` | Migrating Slidev decks to Honeydeck, including rewriting Slidev `md magic-move` blocks to Honeydeck `md magic-code`, while preserving source files until you approve cleanup. |
 
 The `honeydeck` and `presentation-writing` skills work well together: one keeps the agent inside Honeydeck conventions, while the other improves the story and delivery. Add `slidev-migration` when you are converting an existing Slidev project.
 
@@ -48,7 +48,7 @@ For example, an agent with the `honeydeck` skill should prefer:
 - slide frontmatter for layouts
 - explicit imports from `@honeydeck/honeydeck`
 - `<Notes>` for speaker notes
-- `<Reveal>`, `<RevealGroup>`, and code metadata for steps
+- `<Reveal>`, `<RevealGroup>`, code metadata, and Magic Code for steps
 - `honeydeck pdf` for PDF export
 
 The skills also point agents back to the packaged docs and specs, so generated deck changes can stay aligned with the installed Honeydeck version.

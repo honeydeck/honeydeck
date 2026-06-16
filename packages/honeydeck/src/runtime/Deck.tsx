@@ -41,12 +41,17 @@ import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { NavBar } from "./components/NavBar.tsx";
 import { SlideNumberBadge } from "./components/SlideNumberBadge.tsx";
+import {
+	type EffectiveColorMode,
+	EffectiveColorModeProvider,
+} from "./EffectiveColorModeContext.tsx";
 import { rememberSlideRoute } from "./lastSlideRoute.ts";
 import {
 	closeOverview,
 	toggleOverview as toggleOverviewRoute,
 } from "./navigation.ts";
 import { useRoute } from "./router.ts";
+import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
 	BASE_WIDTH,
@@ -94,6 +99,8 @@ export function Deck() {
 		if (c === "light" || c === "dark") return c;
 		return "system";
 	});
+	const [effectiveColorMode, setEffectiveColorMode] =
+		useState<EffectiveColorMode>("light");
 
 	const route = useRoute();
 	const pointerLayout = usePointerLayout();
@@ -105,9 +112,9 @@ export function Deck() {
 	// ── Color mode: apply data-honeydeck-color-mode to <html> ──────────────────
 	useLayoutEffect(() => {
 		function applyMode(darkFromSystem: boolean) {
-			applyHoneydeckColorMode(
-				resolveEffectiveColorMode(colorMode, darkFromSystem),
-			);
+			const mode = resolveEffectiveColorMode(colorMode, darkFromSystem);
+			applyHoneydeckColorMode(mode);
+			setEffectiveColorMode(mode);
 		}
 
 		const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -263,7 +270,8 @@ export function Deck() {
 		route.view === "slide" || route.view === "overview"
 			? { ...route, slide: currentSlide, step: currentStep }
 			: route;
-	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${scale * slideZoom})`;
+	const activeSlideScale = scale * slideZoom;
+	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${activeSlideScale})`;
 	const showSlideNumbers = config.showSlideNumbers === true;
 	const disableSlideTextSelection =
 		route.view === "slide" &&
@@ -275,129 +283,134 @@ export function Deck() {
 	// ---------------------------------------------------------------------------
 
 	return (
-		<div className="fixed inset-0 overflow-hidden bg-black">
-			{/* ── Sizing container: fills viewport for scale calc ──────── */}
-			<div
-				ref={stageRef}
-				className={`absolute inset-0 ${disableSlideTextSelection ? "select-none" : ""}`}
-			>
-				{/* ── Stage backdrop: themed bg at slide size, prevents flicker ──── */}
+		<EffectiveColorModeProvider mode={effectiveColorMode}>
+			<div className="fixed inset-0 overflow-hidden bg-black">
+				{/* ── Sizing container: fills viewport for scale calc ──────── */}
 				<div
-					aria-hidden="true"
-					className="absolute inset-0 flex items-center justify-center"
+					ref={stageRef}
+					className={`absolute inset-0 ${disableSlideTextSelection ? "select-none" : ""}`}
 				>
+					{/* ── Stage backdrop: themed bg at slide size, prevents flicker ──── */}
 					<div
-						className="shrink-0 bg-background"
-						style={{
-							width: BASE_WIDTH,
-							height: BASE_HEIGHT,
-							transform: `scale(${scale})`,
-							transformOrigin: "center center",
-						}}
-					/>
-				</div>
-
-				{/* ── All slides (only current is visible) ──────────────────────── */}
-				{slideData.map((data, i) => {
-					const slideNumber = i + 1;
-					const isCurrent = slideNumber === currentSlide;
-					const { Component, stepCount, title, frontmatter, layoutName } = data;
-					const LayoutComponent = resolveLayout(layoutName);
-
-					return (
+						aria-hidden="true"
+						className="absolute inset-0 flex items-center justify-center"
+					>
 						<div
-							key={data.id}
-							aria-hidden={!isCurrent}
-							className={`absolute inset-0 flex items-center justify-center ${
-								isCurrent
-									? "opacity-100 visible pointer-events-auto z-1"
-									: "opacity-0 invisible pointer-events-none z-0"
-							}`}
-							style={{
-								transition: enableTransition
-									? `opacity 200ms ease, visibility 0s ${isCurrent ? "0s" : "200ms"}`
-									: "none",
-							}}
-						>
-							<TimelineProvider
-								stepIndex={isCurrent ? currentStep : 0}
-								stepCount={stepCount}
-							>
-								<div
-									className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
-									style={{
-										width: BASE_WIDTH,
-										height: BASE_HEIGHT,
-										transform: slideTransform,
-										transformOrigin: "center center",
-									}}
-								>
-									<ErrorBoundary slideNumber={slideNumber}>
-										<LayoutComponent
-											title={title || null}
-											frontmatter={frontmatter}
-											rawChildren={<Component />}
-										>
-											<Component />
-										</LayoutComponent>
-									</ErrorBoundary>
-								</div>
-							</TimelineProvider>
-						</div>
-					);
-				})}
-
-				{showSlideNumbers && (
-					<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-						<div
-							className="honeydeck-slide-number-layer shrink-0 relative"
+							className="shrink-0 bg-background"
 							style={{
 								width: BASE_WIDTH,
 								height: BASE_HEIGHT,
-								transform: slideTransform,
+								transform: `scale(${scale})`,
 								transformOrigin: "center center",
 							}}
-						>
-							<SlideNumberBadge slide={currentSlide} />
-						</div>
+						/>
 					</div>
+
+					{/* ── All slides (only current is visible) ──────────────────────── */}
+					{slideData.map((data, i) => {
+						const slideNumber = i + 1;
+						const isCurrent = slideNumber === currentSlide;
+						const { Component, stepCount, title, frontmatter, layoutName } =
+							data;
+						const LayoutComponent = resolveLayout(layoutName);
+
+						return (
+							<div
+								key={data.id}
+								aria-hidden={!isCurrent}
+								className={`absolute inset-0 flex items-center justify-center ${
+									isCurrent
+										? "opacity-100 visible pointer-events-auto z-1"
+										: "opacity-0 invisible pointer-events-none z-0"
+								}`}
+								style={{
+									transition: enableTransition
+										? `opacity 200ms ease, visibility 0s ${isCurrent ? "0s" : "200ms"}`
+										: "none",
+								}}
+							>
+								<TimelineProvider
+									stepIndex={isCurrent ? currentStep : 0}
+									stepCount={stepCount}
+								>
+									<SlideScaleProvider scale={activeSlideScale}>
+										<div
+											className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
+											style={{
+												width: BASE_WIDTH,
+												height: BASE_HEIGHT,
+												transform: slideTransform,
+												transformOrigin: "center center",
+											}}
+										>
+											<ErrorBoundary slideNumber={slideNumber}>
+												<LayoutComponent
+													title={title || null}
+													frontmatter={frontmatter}
+													rawChildren={<Component />}
+												>
+													<Component />
+												</LayoutComponent>
+											</ErrorBoundary>
+										</div>
+									</SlideScaleProvider>
+								</TimelineProvider>
+							</div>
+						);
+					})}
+
+					{showSlideNumbers && (
+						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+							<div
+								className="honeydeck-slide-number-layer shrink-0 relative"
+								style={{
+									width: BASE_WIDTH,
+									height: BASE_HEIGHT,
+									transform: slideTransform,
+									transformOrigin: "center center",
+								}}
+							>
+								<SlideNumberBadge slide={currentSlide} />
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* ── Overview overlay ──────────────────────────────────────────── */}
+				{isOverview && (
+					<OverviewView
+						currentSlide={currentSlide}
+						currentStep={currentStep}
+						onClose={() =>
+							closeOverview(controlRoute, {
+								slideCount: slideData.length,
+								getStepCount,
+							})
+						}
+					/>
+				)}
+
+				{/* ── Navigation bar ────────────────────────────────────────────── */}
+				{/* GAP-06: showSlideNumbers wired from config */}
+				{!isOverview && (
+					<NavBarWithHover
+						route={controlRoute}
+						isOverview={isOverview}
+						colorMode={colorMode}
+						onToggleOverview={toggleOverview}
+						onSetColorMode={setColorMode}
+						isZoomed={slideZoom > 1}
+						onResetZoom={resetZoom}
+						toggleSignal={navBarToggleSignal}
+						showTextSelectionToggle={pointerLayout.isTouchDevice}
+						isTextSelectionEnabled={slideTextSelectionEnabled}
+						onToggleTextSelection={() =>
+							setSlideTextSelectionEnabled((value) => !value)
+						}
+					/>
 				)}
 			</div>
-
-			{/* ── Overview overlay ──────────────────────────────────────────── */}
-			{isOverview && (
-				<OverviewView
-					currentSlide={currentSlide}
-					currentStep={currentStep}
-					onClose={() =>
-						closeOverview(controlRoute, {
-							slideCount: slideData.length,
-							getStepCount,
-						})
-					}
-				/>
-			)}
-
-			{/* ── Navigation bar ────────────────────────────────────────────── */}
-			{/* GAP-06: showSlideNumbers wired from config */}
-			{!isOverview && (
-				<NavBarWithHover
-					route={controlRoute}
-					isOverview={isOverview}
-					colorMode={colorMode}
-					onToggleOverview={toggleOverview}
-					onSetColorMode={setColorMode}
-					isZoomed={slideZoom > 1}
-					onResetZoom={resetZoom}
-					toggleSignal={navBarToggleSignal}
-					showTextSelectionToggle={pointerLayout.isTouchDevice}
-					isTextSelectionEnabled={slideTextSelectionEnabled}
-					onToggleTextSelection={() =>
-						setSlideTextSelectionEnabled((value) => !value)
-					}
-				/>
-			)}
-		</div>
+		</EffectiveColorModeProvider>
 	);
 }
 

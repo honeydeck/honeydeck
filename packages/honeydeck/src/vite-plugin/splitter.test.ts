@@ -100,6 +100,14 @@ describe("splitSlides — with-frontmatter.mdx", () => {
 		assert.equal(result.deckFrontmatter.colorMode, "dark");
 	});
 
+	it("extracts Magic Code duration as deck-level frontmatter", () => {
+		assert.equal(result.deckFrontmatter.magicCodeDuration, 500);
+		assert.ok(
+			!result.slides[0]?.rawMdx.includes("magicCodeDuration"),
+			"deck-level Magic Code duration should not leak into first slide frontmatter",
+		);
+	});
+
 	it("frontmatter YAML does not leak into slide content", () => {
 		for (const slide of result.slides) {
 			assert.ok(

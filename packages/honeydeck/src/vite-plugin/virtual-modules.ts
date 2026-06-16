@@ -349,7 +349,7 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				// e.g. '\0virtual:honeydeck/slide/2.mdx' → index 2
 				const suffix = id.slice(RESOLVED_SLIDE_PREFIX.length); // '2.mdx'
 				const index = parseInt(suffix.replace(".mdx", ""), 10);
-				const { slides } = getResult();
+				const { deckFrontmatter, slides } = getResult();
 				const slide = slides[index];
 
 				if (!slide) {
@@ -368,7 +368,10 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 						remarkGfm,
 						remarkH1Extract,
 						remarkStepNumbering,
-						remarkShikiCodeBlocks,
+						[
+							remarkShikiCodeBlocks,
+							{ magicCodeDuration: deckFrontmatter.magicCodeDuration },
+						],
 					],
 					jsxImportSource: "react",
 					outputFormat: "program",
@@ -529,25 +532,32 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 			splitResult = newResult; // commit new cache
 
 			const affected: ModuleNode[] = [];
+			const invalidatedIds = new Set<string>();
 
 			/** Invalidate a virtual module by its resolved ID, if it's in the graph. */
 			const invalidate = (resolvedId: string): void => {
+				if (invalidatedIds.has(resolvedId)) return;
 				const mod = ctx.server.moduleGraph.getModuleById(resolvedId);
 				if (mod) {
+					invalidatedIds.add(resolvedId);
 					ctx.server.moduleGraph.invalidateModule(mod);
 					affected.push(mod);
 				}
 			};
 
-			// Config changed?
-			if (
+			const deckFrontmatterChanged =
 				JSON.stringify(oldResult.deckFrontmatter) !==
-				JSON.stringify(newResult.deckFrontmatter)
-			) {
+				JSON.stringify(newResult.deckFrontmatter);
+
+			// Config changed?
+			if (deckFrontmatterChanged) {
 				invalidate(RESOLVED_CONFIG_ID);
 				invalidate(RESOLVED_LAYOUTS_ID);
 				for (let i = 0; i < layoutDemoSources.length; i++) {
 					invalidate(`${RESOLVED_LAYOUT_DEMO_PREFIX}${i}.mdx`);
+				}
+				for (let i = 0; i < newResult.slides.length; i++) {
+					invalidate(`${RESOLVED_SLIDE_PREFIX}${i}.mdx`);
 				}
 			}
 

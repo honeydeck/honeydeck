@@ -522,6 +522,65 @@ Press <Keyboard keys={["→", "d"]} separator=" / " /> to step through highlight
 
 ---
 
+# Magic Code ✨
+
+Magic Code morphs between precompiled Shiki token states and still follows the slide timeline:
+
+````md magic-code {duration:700}
+```typescript
+function greet(name: string) {
+  return `Hello, ${name}!`
+}
+
+console.log(greet('Dex'))
+```
+
+```typescript
+type Bee = {
+  name: string
+  excited?: boolean
+}
+
+function greet(bee: Bee) {
+  const suffix = bee.excited ? '!!' : '!'
+  return `Hello, ${bee.name}${suffix}`
+}
+
+console.log(greet({ name: 'Dex', excited: true }))
+```
+````
+
+---
+
+# Magic Code with highlights
+
+
+````md magic-code {duration:700}
+```typescript {1-3|all}
+function greet(name: string) {
+  return `Hello, ${name}!`
+}
+
+console.log(greet('Dex'))
+```
+
+```typescript {6-9|all}
+type Bee = {
+  name: string
+  excited?: boolean
+}
+
+function greet(bee: Bee) {
+  const suffix = bee.excited ? '!!' : '!'
+  return `Hello, ${bee.name}${suffix}`
+}
+
+console.log(greet({ name: 'Dex', excited: true }))
+```
+````
+
+---
+
 # Mixed Timeline 🎯
 
 <Reveal>First this text appears.</Reveal>

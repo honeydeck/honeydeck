@@ -126,7 +126,7 @@ export const demo = {
 		}
 	});
 
-	it("invalidates layout demo modules when deck frontmatter changes", async () => {
+	it("invalidates compiled slide and layout demo modules when deck frontmatter changes", async () => {
 		const root = mkdtempSync(join(tmpdir(), "honeydeck-layout-demo-hmr-"));
 		const deckPath = join(root, "deck.mdx");
 
@@ -176,6 +176,7 @@ export const demo = {
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layouts",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
+					"\0virtual:honeydeck/slide/0.mdx",
 				].map((id) => [id, { id }]),
 			);
 			const handleHotUpdate = plugin.handleHotUpdate as unknown as (
@@ -211,6 +212,7 @@ export const demo = {
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
 					"\0virtual:honeydeck/layouts",
+					"\0virtual:honeydeck/slide/0.mdx",
 				].sort(),
 			);
 			assert.deepEqual(
@@ -219,6 +221,7 @@ export const demo = {
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
 					"\0virtual:honeydeck/layouts",
+					"\0virtual:honeydeck/slide/0.mdx",
 				].sort(),
 			);
 		} finally {

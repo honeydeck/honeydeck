@@ -49,7 +49,7 @@ export type {
 } from "./TimelineSteps.tsx";
 export { TimelineSteps, useTimelineSteps } from "./TimelineSteps.tsx";
 
-// HoneydeckCodeBlock is intentionally NOT exported from the public barrel.
-// It is an internal component injected by remarkShikiCodeBlocks via a
-// direct subpath import: '@honeydeck/honeydeck/components/code-block'.
-// Do not import it from '@honeydeck/honeydeck' or '@honeydeck/honeydeck/components' — use the subpath.
+// HoneydeckCodeBlock and HoneydeckMagicCodeBlock are intentionally NOT exported
+// from the public component barrel. They are internal components injected by
+// remarkShikiCodeBlocks via direct code-block implementation subpaths.
+// Do not import them from '@honeydeck/honeydeck' or '@honeydeck/honeydeck/components'.

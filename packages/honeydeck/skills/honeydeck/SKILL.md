@@ -25,7 +25,7 @@ Important docs:
 - `docs/deeper-dive.md` for CLI details, feature overview, architecture, exports, and agent skills
 - root/package `SPEC.md` and linked colocated `SPEC.md` files for expected behavior
 - `docs/slides.md` for deck structure, slide separators, and multi-file decks
-- `docs/steps-and-reveals.md` for step-by-step reveals and code steps
+- `docs/steps-and-reveals.md` for step-by-step reveals, code steps, and Magic Code
 - `docs/customization.md` for themes, layouts, custom React components, layout maps, demos, and design tokens
 - `docs/configuration.md` for frontmatter options
 - `docs/navigation.md`, `docs/mobile.md`, `docs/presenter-mode.md`, and `docs/pdf-export.md` for presenting/exporting
@@ -42,7 +42,7 @@ If the user is inside a generated Honeydeck project and package docs are not nea
 - Frontmatter may provide additional properties for the selected layout. Check layout source or docs for available properties.
 - Built-in layouts include `Blank`, `Cover`, `Default`, `Section`, `TwoCol`, `Image`, `ImageLeft`, and `ImageRight`.
 - Built-in styling is explicit: generated decks import `./styles.css`, and that file imports Honeydeck/Tailwind theme CSS.
-- MDX can mix Markdown, JSX, imported React components, Honeydeck components, and code blocks.
+- MDX can mix Markdown, JSX, imported React components, Honeydeck components, code blocks, and Magic Code blocks.
 - Presenter notes belong in slide frontmatter when useful for narrative, timing, and delivery cues.
 - Use reveals/steps for progressive disclosure, not for every bullet by default.
 - PDF export is available with `npx honeydeck pdf`; use `--steps all` when revealed states matter.

@@ -211,7 +211,10 @@ honeydeck
 │   └── bee/               → src/layouts/bee/*
 └── ./components/
     ├── .                  → src/runtime/components/index.ts
-    └── code-block         → src/runtime/components/CodeBlock.tsx
+    ├── code-block         → src/runtime/components/CodeBlock.tsx
+    └── code-block/
+        ├── normal         → src/runtime/components/NormalCodeBlock.tsx
+        └── magic          → src/runtime/components/MagicCodeBlock.tsx
 ```
 
 ---

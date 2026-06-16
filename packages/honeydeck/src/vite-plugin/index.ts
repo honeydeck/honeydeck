@@ -137,6 +137,20 @@ export function honeydeckPlugin(
 						// the bare 'honeydeck' entry (Vite processes array aliases in order).
 						alias: [
 							{
+								find: "@honeydeck/honeydeck/components/code-block/normal",
+								replacement: resolve(
+									__dirname,
+									"../runtime/components/NormalCodeBlock.tsx",
+								),
+							},
+							{
+								find: "@honeydeck/honeydeck/components/code-block/magic",
+								replacement: resolve(
+									__dirname,
+									"../runtime/components/MagicCodeBlock.tsx",
+								),
+							},
+							{
 								find: "@honeydeck/honeydeck/components/code-block",
 								replacement: resolve(
 									__dirname,

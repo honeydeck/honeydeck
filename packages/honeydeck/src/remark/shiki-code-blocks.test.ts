@@ -66,16 +66,17 @@ describe("parseStepMeta", () => {
 // Integration tests: compile MDX with all remark plugins
 // ---------------------------------------------------------------------------
 
-const allPlugins = [
-	remarkFrontmatter,
-	remarkH1Extract,
-	remarkStepNumbering,
-	remarkShikiCodeBlocks,
-] as const;
-
-async function compileMdx(source: string) {
+async function compileMdx(
+	source: string,
+	options: { magicCodeDuration?: unknown } = {},
+) {
 	const vfile = await compile(source, {
-		remarkPlugins: [...allPlugins],
+		remarkPlugins: [
+			remarkFrontmatter,
+			remarkH1Extract,
+			remarkStepNumbering,
+			[remarkShikiCodeBlocks, options],
+		],
 		jsxImportSource: "react",
 		outputFormat: "program",
 	});
@@ -93,7 +94,7 @@ const x = 1;
     `);
 		assert.match(
 			js,
-			/import \{HoneydeckCodeBlock\} from '@honeydeck\/honeydeck\/components\/code-block'/,
+			/import \{HoneydeckCodeBlock\} from '@honeydeck\/honeydeck\/components\/code-block\/normal'/,
 			"compiled output should inject the HoneydeckCodeBlock import",
 		);
 		assert.match(js, /stepsJson:\s*"\[\]"/);
@@ -216,5 +217,158 @@ const e = 5
 		);
 		// basic.mdx has one step-through block {1|3} → 1 step
 		assert.equal(data.stepCount, 1, "fixture step count should be 1");
+	});
+
+	it("precompiles two-fence Magic Code to HoneydeckMagicCodeBlock", async () => {
+		const { js, data } = await compileMdx(`
+\`\`\`\`md magic-code {duration:500}
+\`\`\`ts {1|2}
+const a = 1
+const b = 2
+\`\`\`
+
+\`\`\`ts {all}
+const sum = a + b
+\`\`\`
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 2);
+		assert.match(js, /HoneydeckMagicCodeBlock/);
+		assert.match(
+			js,
+			/import \{HoneydeckMagicCodeBlock\} from '@honeydeck\/honeydeck\/components\/code-block\/magic'/,
+			"compiled output should inject the HoneydeckMagicCodeBlock import",
+		);
+		assert.match(js, /lightTokenStatesJson:\s*"/);
+		assert.match(js, /darkTokenStatesJson:\s*"/);
+		assert.match(js, /tokenStateIndexesJson:\s*"\[0,0,1\]"/);
+		assert.match(js, /duration:\s*500/);
+		assert.match(js, /startAt:\s*1/);
+
+		const match = js.match(/stepGroupsJson:\s*"((?:\\.|[^"\\])*)"/);
+		assert.ok(match, "compiled output should contain stepGroupsJson");
+		const encoded = JSON.parse(`"${match[1]}"`);
+		assert.equal(encoded, '[[1],[2],"all"]');
+	});
+
+	it("renders one-fence Magic Code as a normal stepped code block", async () => {
+		const { js, data } = await compileMdx(`
+\`\`\`\`md magic-code
+\`\`\`ts {1|2}
+const a = 1
+const b = 2
+\`\`\`
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.match(js, /HoneydeckCodeBlock/);
+		assert.doesNotMatch(js, /HoneydeckMagicCodeBlock/);
+		assert.match(js, /stepsJson:\s*"\[\[1\],\[2\]\]"/);
+		assert.match(js, /startAt:\s*1/);
+	});
+
+	it("removes empty Magic Code blocks without adding timeline steps", async () => {
+		const { js, data } = await compileMdx(`
+\`\`\`\`md magic-code
+This prose is ignored.
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 0);
+		assert.doesNotMatch(js, /HoneydeckCodeBlock/);
+		assert.doesNotMatch(js, /HoneydeckMagicCodeBlock/);
+	});
+
+	it("accepts magic-move as a compatibility alias", async () => {
+		const { js, data } = await compileMdx(`
+\`\`\`\`md magic-move
+\`\`\`ts
+const a = 1
+\`\`\`
+
+\`\`\`ts
+const a = 2
+\`\`\`
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.match(js, /HoneydeckMagicCodeBlock/);
+	});
+
+	it("uses deck-level Magic Code duration when a block has no override", async () => {
+		const { js } = await compileMdx(
+			`
+\`\`\`\`md magic-code
+\`\`\`ts
+const a = 1
+\`\`\`
+
+\`\`\`ts
+const a = 2
+\`\`\`
+\`\`\`\`
+    `,
+			{ magicCodeDuration: 500 },
+		);
+
+		assert.match(js, /duration:\s*500/);
+	});
+
+	it("falls back to default Magic Code duration when deck-level duration is invalid", async () => {
+		const { js } = await compileMdx(
+			`
+\`\`\`\`md magic-code
+\`\`\`ts
+const a = 1
+\`\`\`
+
+\`\`\`ts
+const a = 2
+\`\`\`
+\`\`\`\`
+    `,
+			{ magicCodeDuration: "fast" },
+		);
+
+		assert.match(js, /duration:\s*800/);
+	});
+
+	it("lets block Magic Code duration override the deck-level duration", async () => {
+		const { js } = await compileMdx(
+			`
+\`\`\`\`md magic-code {duration:300}
+\`\`\`ts
+const a = 1
+\`\`\`
+
+\`\`\`ts
+const a = 2
+\`\`\`
+\`\`\`\`
+    `,
+			{ magicCodeDuration: 500 },
+		);
+
+		assert.match(js, /duration:\s*300/);
+	});
+
+	it("rejects invalid explicit Magic Code duration", async () => {
+		await assert.rejects(
+			compileMdx(`
+\`\`\`\`md magic-code {duration:fast}
+\`\`\`ts
+const a = 1
+\`\`\`
+
+\`\`\`ts
+const a = 2
+\`\`\`
+\`\`\`\`
+      `),
+			/Magic Code duration/,
+		);
 	});
 });

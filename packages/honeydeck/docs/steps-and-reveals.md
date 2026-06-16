@@ -1,12 +1,13 @@
 # Steps & Reveals
 
-Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup` components, custom component step blocks, and code highlight ranges, counted in document order.
+Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup` components, custom component step blocks, code highlight ranges, and Magic Code states, counted in document order.
 
 ## Timeline Model
 
 - Slides start at **step 0** — no reveals or custom component steps active.
 - Stepped code blocks show their first highlight group immediately whenever the block is visible.
-- Each `Reveal`, `RevealGroup` child, `TimelineSteps` block, or code highlight group after the first adds a step.
+- Magic Code blocks show their first inner code fence and first highlight group immediately whenever the block is visible.
+- Each `Reveal`, `RevealGroup` child, `TimelineSteps` block, code highlight group after the first, or Magic Code state after the first adds a step.
 - All step-producing elements share one slide-local timeline.
 - Nested step-producing elements are flattened into that same timeline. A parent
   reveal target appears first; nested reveals, reveal groups, and code highlight
@@ -140,6 +141,52 @@ console.log(c)
 - **Non-cumulative:** Only the lines specified for the active group are highlighted; previous highlights don't persist.
 - **Dim approach:** Non-highlighted lines are dimmed (controlled by `--honeydeck-code-line-dim-opacity: 0.4`).
 - **Shiki at build time:** No runtime JS cost for syntax highlighting.
+
+## Magic Code
+
+Magic Code animates between multiple code states while keeping the same Honeydeck timeline model. It builds on Shiki Magic Code / Shiki Magic Move and uses build-time precompiled highlighting data.
+
+`````mdx
+````md magic-code {duration:500}
+```ts
+const count = 1
+```
+
+```ts
+const count = 2
+```
+````
+`````
+
+- The canonical Honeydeck syntax is `md magic-code`.
+- `md magic-move` is accepted as a Slidev compatibility alias.
+- Use `{duration:500}` to override the animation duration for one block.
+- Set a deck-wide default with `magicCodeDuration: 500` in deck-level frontmatter.
+- Content inside a Magic Code block that is not a fenced code block is ignored.
+- Magic Code looks and copies like a normal Honeydeck code block. Copying always copies the currently visible code text.
+
+Inner code fences keep normal code step metadata:
+
+`````mdx
+````md magic-code
+```ts {1|2}
+const a = 1
+const b = 2
+```
+
+```ts {all}
+const sum = a + b
+```
+````
+`````
+
+Timeline:
+
+1. First code state, line 1 highlighted
+2. First code state, line 2 highlighted
+3. Morph to second code state, all lines highlighted
+
+Magic Code states may use different languages, but animations usually look best when all states use the same language.
 
 ## Mixed Timeline Example
 

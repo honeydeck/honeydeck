@@ -437,6 +437,33 @@ const x = 1;
 
 		assert.equal(data.stepCount, 0);
 	});
+
+	it("Magic Code counts flattened inner fence states", async () => {
+		const { data } = await compileMdx(`
+\`\`\`\`md magic-code {duration:500}
+\`\`\`ts {1|2}
+const a = 1
+const b = 2
+\`\`\`
+
+\`\`\`ts {all}
+const sum = a + b
+\`\`\`
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 2, "3 Magic Code states add 2 steps");
+	});
+
+	it("Magic Code duration metadata is not counted as code step metadata", async () => {
+		const { data } = await compileMdx(`
+\`\`\`\`md magic-code {duration:500}
+No inner code fences.
+\`\`\`\`
+    `);
+
+		assert.equal(data.stepCount, 0);
+	});
 });
 
 // ---------------------------------------------------------------------------

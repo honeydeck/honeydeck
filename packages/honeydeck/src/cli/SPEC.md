@@ -214,8 +214,9 @@ PDF color mode resolves in this order:
 
 ### Step Handling
 
-- `pdfSteps: final` — each slide appears once, all reveals visible, code at final highlight
-- `pdfSteps: all` — step `0` through final step state are separate PDF pages
+- `pdfSteps: final` — each slide appears once, all reveals visible, code at final highlight, and Magic Code at final code state/final highlight
+- `pdfSteps: all` — step `0` through final step state are separate PDF pages, including Magic Code line-highlight states and morph states
+- Magic Code is captured at the requested state, not mid-transition; PDF export disables Magic Move animation while preserving the selected timeline state
 - Capture order is slide order first; in `pdfSteps: all`, step states ascend within each slide. Parallel capture must not change this final PDF page order.
 - During `pdfSteps: final`, `useTimeline()` and `useTimelineSteps()` expose
   `isPdfFinalRender: true` so custom step-driven components can render an

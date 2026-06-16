@@ -10,6 +10,7 @@
  * so that surrounding layout can measure and position it correctly.
  */
 
+import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
 	BASE_WIDTH,
@@ -72,23 +73,25 @@ export function SlideCanvas({
 				stepCount={stepCount}
 				showFutureSteps={showFutureSteps}
 			>
-				<div
-					className="honeydeck-slide-canvas absolute top-0 left-0 overflow-hidden box-border"
-					style={{
-						width: BASE_WIDTH,
-						height: BASE_HEIGHT,
-						transform: `scale(${scale})`,
-						transformOrigin: "top left",
-					}}
-				>
-					<LayoutComponent
-						title={title || null}
-						frontmatter={frontmatter}
-						rawChildren={<Component />}
+				<SlideScaleProvider scale={scale}>
+					<div
+						className="honeydeck-slide-canvas absolute top-0 left-0 overflow-hidden box-border"
+						style={{
+							width: BASE_WIDTH,
+							height: BASE_HEIGHT,
+							transform: `scale(${scale})`,
+							transformOrigin: "top left",
+						}}
 					>
-						<Component />
-					</LayoutComponent>
-				</div>
+						<LayoutComponent
+							title={title || null}
+							frontmatter={frontmatter}
+							rawChildren={<Component />}
+						>
+							<Component />
+						</LayoutComponent>
+					</div>
+				</SlideScaleProvider>
 			</TimelineProvider>
 		</div>
 	);

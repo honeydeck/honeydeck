@@ -202,6 +202,22 @@ console.log(b)
 - `{2-3|5|all}` starts with lines 2-3 active, then steps to line 5, then all lines.
 - Highlight groups after the first interleave with `<Reveal>` in document order.
 
+Magic Code animates between multiple code states. It builds on Shiki Magic Code / Shiki Magic Move while keeping Honeydeck's build-time highlighting and timeline behavior:
+
+`````mdx
+````md magic-code {duration:500}
+```ts
+const count = 1
+```
+
+```ts
+const count = 2
+```
+````
+`````
+
+Each inner code fence is a state. Inner code fence line metadata still works, so Honeydeck advances through a state's highlight groups before morphing to the next code state. Content inside a Magic Code block that is not a fenced code block is ignored. `md magic-move` is accepted as a Slidev compatibility alias, but Honeydeck docs and examples use `md magic-code`.
+
 ## Navigation, presenting, and PDF
 
 Keyboard shortcuts:

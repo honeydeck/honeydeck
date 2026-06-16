@@ -36,7 +36,10 @@ The skill guides an agent through the common Slidev-to-Honeydeck mapping:
 | `components/*.vue` | React `components/*.tsx` |
 | `layouts/*.vue` or Slidev themes | Honeydeck layouts, layout maps, React components, and CSS |
 | `<v-click>` / `<v-clicks>` | `<Reveal>` / `<RevealGroup>` |
+| Slidev Magic Move code blocks (`md magic-move`) | Honeydeck Magic Code blocks (`md magic-code`) |
 | trailing note comments | `<Notes>` |
 | `slidev`, `slidev build`, `slidev export` | `honeydeck dev`, `honeydeck build`, `honeydeck pdf` |
+
+The migration skill rewrites Slidev `md magic-move` code animation blocks to Honeydeck's canonical `md magic-code` syntax. Honeydeck still accepts `md magic-move` as a compatibility alias.
 
 Advanced Slidev features such as Vue directives, `$clicks`, custom theme internals, Monaco/live-code blocks, and complex click positioning may need React-specific follow-up after the first migration pass.

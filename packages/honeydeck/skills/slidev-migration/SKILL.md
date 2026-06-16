@@ -99,6 +99,7 @@ import { Reveal, RevealGroup, TimelineSteps, Notes, BrowserFrame } from '@honeyd
 
 - Keep normal fenced code blocks.
 - Convert common Slidev stepped highlights like `{1|2|3}` to Honeydeck-supported code step metadata when possible. If unsure, preserve the fence and leave a TODO comment near the block.
+- Convert Slidev Magic Move code blocks (`md magic-move`) to Honeydeck's canonical Magic Code syntax (`md magic-code`). Preserve inner fenced code blocks and their line-highlight metadata. Honeydeck accepts `md magic-move` as a compatibility alias, but migrated decks should use `md magic-code`.
 - Slidev Monaco/live-code features need manual React components or simplified static code.
 
 ### Vue to React conversion

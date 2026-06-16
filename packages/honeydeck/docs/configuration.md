@@ -15,6 +15,7 @@ Defined in the first frontmatter block of the deck entry file (before any slide 
 | `pdfColorMode` | `"light" \| "dark"` | unset | Optional PDF color mode; when unset, falls back to pinned `colorMode`, then `light` |
 | `pdfSteps` | `"final" \| "all"` | `"final"` | PDF includes all steps or final state |
 | `transition` | `boolean` | `true` | Enable crossfade between slides |
+| `magicCodeDuration` | `number` | `800` | Default Magic Code animation duration in milliseconds |
 | `layouts` | `string` | `""` (built-in) | Layout map module path |
 | `defaultLayout` | `string` | `"Default"` | Layout used when slide has no `layout:` |
 | `showSlideNumbers` | `boolean` | `false` | Show the current slide number in the bottom-right corner of slides |
@@ -49,6 +50,16 @@ A subtle crossfade (~200ms) is applied between slides by default:
 transition: true    # default
 transition: false   # disable
 ```
+
+### Magic Code Duration
+
+Magic Code animations default to 800ms. Set a deck-wide default with `magicCodeDuration`:
+
+```yaml
+magicCodeDuration: 500
+```
+
+A Magic Code block can override this locally with `{duration:500}`. Slide-level frontmatter does not configure Magic Code; the same key in slide frontmatter is treated as a layout prop.
 
 ## Slide-Level Settings
 

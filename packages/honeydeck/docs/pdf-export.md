@@ -53,12 +53,14 @@ When `pdfSteps: all`:
 
 - Each `Reveal`/`RevealGroup` step becomes a separate page.
 - Stepped code blocks show their first highlight group on the baseline page; each later code highlight group becomes a separate page.
-- Both use the same underlying timeline.
+- Magic Code blocks show their first inner code fence on the baseline page; later line-highlight states and code morph states become separate pages according to the same timeline.
+- Reveals, stepped code blocks, Magic Code, and custom `TimelineSteps` blocks use the same underlying timeline.
 
 When `pdfSteps: final` (default):
 
 - All reveals shown in final (visible) state.
 - Code blocks shown with final highlight applied.
+- Magic Code blocks shown at their final code state with final highlight applied.
 - `useTimeline()` and `useTimelineSteps()` expose `isPdfFinalRender: true`, so
   custom step-driven components can render an all-open/all-visible PDF state.
 

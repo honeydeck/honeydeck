@@ -27,4 +27,26 @@ describe("base theme CSS", () => {
 		assert.doesNotMatch(baseCss, /^\s*ul\s*{[^}]*list-style:/m);
 		assert.doesNotMatch(baseCss, /^\s*ol\s*{[^}]*list-style:/m);
 	});
+
+	it("ships Magic Move base CSS with Honeydeck-specific fade overrides", () => {
+		assert.match(baseCss, /@import "@shikijs\/magic-move\/style\.css";/);
+		assert.match(baseCss, /\.shiki-magic-move-container/);
+		assert.match(baseCss, /\.shiki-magic-move-item/);
+		assert.match(baseCss, /honeydeck-magic-code-token-enter/);
+		assert.match(baseCss, /honeydeck-magic-code-token-leave/);
+		assert.match(baseCss, /animation-duration:\s*var\(--smm-duration, 500ms\)/);
+		assert.doesNotMatch(baseCss, /--honeydeck-magic-code-enter-delay/);
+	});
+
+	it("fades normal code line highlights from dimmed to full opacity", () => {
+		assert.match(baseCss, /honeydeck-code-line-highlight-enter/);
+		assert.match(
+			baseCss,
+			/\.honeydeck-code-block \.line\[data-highlight="1"\]/,
+		);
+		assert.match(
+			baseCss,
+			/opacity:\s*var\(--honeydeck-code-line-dim-opacity\)/,
+		);
+	});
 });

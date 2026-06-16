@@ -86,6 +86,10 @@ const __dirname = dirname(__filename);
 const FINAL_STEP_INDEX = 999;
 const MAX_PDF_CAPTURE_CONCURRENCY = 16;
 
+function buildPdfRenderQuery(isPdfFinalRender: boolean): string {
+	return `?honeydeckPdfRender=${isPdfFinalRender ? "final" : "step"}`;
+}
+
 // ---------------------------------------------------------------------------
 // Arg parsing
 // ---------------------------------------------------------------------------
@@ -342,7 +346,7 @@ function startStaticServer(dir: string): Promise<StaticServer> {
  * counts are identical to what the runtime reports.
  */
 async function getStepCounts(entryPath: string): Promise<number[]> {
-	const { slides } = loadDeck(entryPath);
+	const { deckFrontmatter, slides } = loadDeck(entryPath);
 
 	const counts: number[] = [];
 
@@ -353,7 +357,10 @@ async function getStepCounts(entryPath: string): Promise<number[]> {
 					remarkFrontmatter,
 					remarkH1Extract,
 					remarkStepNumbering,
-					remarkShikiCodeBlocks,
+					[
+						remarkShikiCodeBlocks,
+						{ magicCodeDuration: deckFrontmatter.magicCodeDuration },
+					],
 				],
 				jsxImportSource: "react",
 				outputFormat: "program",
@@ -498,7 +505,7 @@ async function captureSlide(
 	getPageError: () => Error | null,
 ): Promise<Buffer> {
 	if (firstLoad) {
-		const pdfRenderQuery = isPdfFinalRender ? "?honeydeckPdfRender=final" : "";
+		const pdfRenderQuery = buildPdfRenderQuery(isPdfFinalRender);
 
 		// Full navigation: boots the SPA and waits for network to settle.
 		await page.goto(`${serverUrl}/${pdfRenderQuery}#/${slide}/${step}`, {
@@ -537,7 +544,7 @@ async function prepareCapturePage(
 	isPdfFinalRender: boolean,
 	getPageError: () => Error | null,
 ): Promise<void> {
-	const pdfRenderQuery = isPdfFinalRender ? "?honeydeckPdfRender=final" : "";
+	const pdfRenderQuery = buildPdfRenderQuery(isPdfFinalRender);
 
 	await page.goto(`${serverUrl}/${pdfRenderQuery}#/1/0`, {
 		waitUntil: "networkidle",

@@ -18,8 +18,9 @@
  *       (JSON-encoded step groups), and `startAt` (1-based timeline step where
  *       the second group activates, from `node.data.honeydeckStartAt`), plus
  *       `source` (the original fenced code text for clipboard copying).
- * 3. Injects a single `import { HoneydeckCodeBlock } from '@honeydeck/honeydeck/components/code-block'`
- *    declaration into the MDAST root when at least one code block was transformed.
+ * 3. Injects `HoneydeckCodeBlock` from '@honeydeck/honeydeck/components/code-block/normal'
+ *    when at least one normal code block was transformed, and `HoneydeckMagicCodeBlock`
+ *    from '@honeydeck/honeydeck/components/code-block/magic' when needed.
  *
  * ### CSS variable activation
  * The highlighted HTML uses shiki's dual-theme variable names
@@ -31,10 +32,13 @@
  * - `{2}` — highlight line 2 immediately; consumes no timeline steps
  * - `{2|4-5|all}` — three step groups; first group is baseline, then later groups activate at `startAt`, `startAt+1`
  *
- * @see HoneydeckCodeBlock in `src/runtime/components/CodeBlock.tsx`
+ * @see HoneydeckCodeBlock in `src/runtime/components/NormalCodeBlock.tsx`
+ * @see HoneydeckMagicCodeBlock in `src/runtime/components/MagicCodeBlock.tsx`
  * @see remarkStepNumbering for the counter that provides `honeydeckStartAt`
  */
 
+import type { KeyedTokensInfo } from "@shikijs/magic-move/core";
+import { codeToKeyedTokens } from "@shikijs/magic-move/core";
 import type { Program } from "estree";
 import type { Code, Root } from "mdast";
 import type {
@@ -46,13 +50,40 @@ import type { MdxjsEsm } from "mdast-util-mdxjs-esm";
 import { getSingletonHighlighter } from "shiki";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
+import {
+	codeFenceGroups,
+	isMagicCodeFence,
+	type ParsedCodeFence,
+	parseInnerCodeFences,
+	parseMagicCodeDuration,
+	parseStepMeta,
+	type StepGroup,
+} from "./code-utils.ts";
+
+export type { StepGroup } from "./code-utils.ts";
+export { parseStepMeta } from "./code-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-/** A single step-through group: either an array of 1-based line numbers or 'all'. */
-export type StepGroup = number[] | "all";
+export type RemarkShikiCodeBlocksOptions = {
+	/** Deck-level Magic Code default duration from root frontmatter. */
+	magicCodeDuration?: unknown;
+};
+
+type MagicTimelineState = {
+	fence: ParsedCodeFence;
+	group: StepGroup;
+	tokenStateIndex: number;
+};
+
+type MagicTokenPayload = {
+	lightTokenStates: KeyedTokensInfo[];
+	darkTokenStates: KeyedTokensInfo[];
+	tokenStateIndexes: number[];
+	sources: string[];
+};
 
 // ---------------------------------------------------------------------------
 // Singleton shiki highlighter
@@ -86,55 +117,6 @@ async function loadLang(
 		// Language not in shiki's bundle — fall back to plain text
 		return "text";
 	}
-}
-
-// ---------------------------------------------------------------------------
-// Step meta parsing
-// ---------------------------------------------------------------------------
-
-/**
- * Parse a code fence meta string like `{2|4-5|all}` into an array of step groups.
- *
- * Returns `[]` when there is no `{…}` block in the meta string.
- * Even a single group like `{2}` produces `[[2]]` — a baseline highlight that
- * consumes no timeline steps.
- *
- * @example
- * parseStepMeta('{2|4-5|all}')  // → [[2], [4,5], 'all']
- * parseStepMeta('{2}')          // → [[2]]  (baseline highlight, no timeline step)
- * parseStepMeta(null)           // → []
- */
-export function parseStepMeta(meta: string | null | undefined): StepGroup[] {
-	if (!meta) return [];
-
-	const match = meta.match(/\{([^}]+)\}/);
-	if (!match?.[1]) return [];
-
-	const groupStrings = match[1].split("|").filter(Boolean);
-	if (groupStrings.length === 0) return [];
-	// Note: single groups are valid — they represent a baseline highlight and
-	// consume no timeline steps.
-
-	return groupStrings.map((group): StepGroup => {
-		const trimmed = group.trim();
-		if (trimmed === "all") return "all";
-
-		const lines: number[] = [];
-		for (const part of trimmed.split(",")) {
-			const dashIdx = part.indexOf("-");
-			if (dashIdx !== -1) {
-				const start = parseInt(part.slice(0, dashIdx).trim(), 10);
-				const end = parseInt(part.slice(dashIdx + 1).trim(), 10);
-				if (!Number.isNaN(start) && !Number.isNaN(end)) {
-					for (let i = start; i <= end; i++) lines.push(i);
-				}
-			} else {
-				const n = parseInt(part.trim(), 10);
-				if (!Number.isNaN(n)) lines.push(n);
-			}
-		}
-		return lines;
-	});
 }
 
 // ---------------------------------------------------------------------------
@@ -227,11 +209,195 @@ function injectImport(tree: Root, specifier: string, source: string): void {
 }
 
 // ---------------------------------------------------------------------------
+// Highlight helpers
+// ---------------------------------------------------------------------------
+
+async function codeToHighlightedHtml(
+	highlighter: Awaited<ReturnType<typeof getSingletonHighlighter>>,
+	value: string,
+	rawLang: string,
+): Promise<string> {
+	const lang = await loadLang(highlighter, rawLang);
+
+	try {
+		return highlighter.codeToHtml(value, {
+			lang,
+			themes: { light: "github-light", dark: "github-dark" },
+			defaultColor: false,
+			transformers: [
+				{
+					line(lineNode, lineNumber) {
+						if (!lineNode.properties) lineNode.properties = {};
+						lineNode.properties["data-line"] = lineNumber;
+					},
+				},
+			],
+		});
+	} catch {
+		const escaped = value
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;");
+		return `<pre class="honeydeck-code-plain"><code>${escaped}</code></pre>`;
+	}
+}
+
+function getMagicTokenStateKey(fence: ParsedCodeFence): string {
+	return `${fence.lang}\0${fence.value}`;
+}
+
+function flattenMagicTimeline(fences: ParsedCodeFence[]): MagicTimelineState[] {
+	const tokenStateIndexes = new Map<string, number>();
+	return fences.flatMap((fence) => {
+		const key = getMagicTokenStateKey(fence);
+		let tokenStateIndex = tokenStateIndexes.get(key);
+		if (tokenStateIndex === undefined) {
+			tokenStateIndex = tokenStateIndexes.size;
+			tokenStateIndexes.set(key, tokenStateIndex);
+		}
+		return codeFenceGroups(fence.meta).map((group) => ({
+			fence,
+			group,
+			tokenStateIndex,
+		}));
+	});
+}
+
+function getUniqueMagicTokenStates(
+	states: MagicTimelineState[],
+): ParsedCodeFence[] {
+	const uniqueStates: ParsedCodeFence[] = [];
+	for (const state of states) {
+		if (!uniqueStates[state.tokenStateIndex]) {
+			uniqueStates[state.tokenStateIndex] = state.fence;
+		}
+	}
+	return uniqueStates;
+}
+
+async function codeToMagicTokens(
+	highlighter: Awaited<ReturnType<typeof getSingletonHighlighter>>,
+	state: MagicTimelineState,
+	theme: "github-light" | "github-dark",
+): Promise<KeyedTokensInfo> {
+	const lang = await loadLang(highlighter, state.fence.lang);
+
+	try {
+		return codeToKeyedTokens(
+			highlighter,
+			state.fence.value,
+			{ lang, theme } as Parameters<typeof highlighter.codeToTokens>[1],
+			false,
+		);
+	} catch {
+		return codeToKeyedTokens(
+			highlighter,
+			state.fence.value,
+			{ lang: "text", theme } as Parameters<typeof highlighter.codeToTokens>[1],
+			false,
+		);
+	}
+}
+
+async function compileMagicTokens(
+	highlighter: Awaited<ReturnType<typeof getSingletonHighlighter>>,
+	fences: ParsedCodeFence[],
+	theme: "github-light" | "github-dark",
+): Promise<KeyedTokensInfo[]> {
+	const tokens: KeyedTokensInfo[] = [];
+	for (const fence of fences) {
+		tokens.push(
+			await codeToMagicTokens(
+				highlighter,
+				{ fence, group: "all", tokenStateIndex: 0 },
+				theme,
+			),
+		);
+	}
+	return tokens;
+}
+
+async function compileMagicTokenPayload(
+	highlighter: Awaited<ReturnType<typeof getSingletonHighlighter>>,
+	states: MagicTimelineState[],
+): Promise<MagicTokenPayload> {
+	const tokenFences = getUniqueMagicTokenStates(states);
+	return {
+		lightTokenStates: await compileMagicTokens(
+			highlighter,
+			tokenFences,
+			"github-light",
+		),
+		darkTokenStates: await compileMagicTokens(
+			highlighter,
+			tokenFences,
+			"github-dark",
+		),
+		tokenStateIndexes: states.map((state) => state.tokenStateIndex),
+		sources: tokenFences.map((fence) => fence.value),
+	};
+}
+
+function makeCodeBlockNode(
+	html: string,
+	steps: StepGroup[],
+	startAt: number,
+	source: string,
+): MdxJsxFlowElement {
+	return {
+		type: "mdxJsxFlowElement",
+		name: CODE_BLOCK_COMPONENT_NAME,
+		attributes: [
+			makeStringAttr("html", html),
+			makeStringAttr("stepsJson", JSON.stringify(steps)),
+			makeNumericAttr("startAt", startAt),
+			makeStringAttr("source", source),
+		],
+		children: [],
+	};
+}
+
+function makeMagicCodeNode(
+	payload: MagicTokenPayload,
+	stateGroups: StepGroup[],
+	startAt: number,
+	duration: number,
+): MdxJsxFlowElement {
+	return {
+		type: "mdxJsxFlowElement",
+		name: MAGIC_CODE_COMPONENT_NAME,
+		attributes: [
+			makeStringAttr(
+				"lightTokenStatesJson",
+				JSON.stringify(payload.lightTokenStates),
+			),
+			makeStringAttr(
+				"darkTokenStatesJson",
+				JSON.stringify(payload.darkTokenStates),
+			),
+			makeStringAttr(
+				"tokenStateIndexesJson",
+				JSON.stringify(payload.tokenStateIndexes),
+			),
+			makeStringAttr("stepGroupsJson", JSON.stringify(stateGroups)),
+			makeStringAttr("sourcesJson", JSON.stringify(payload.sources)),
+			makeNumericAttr("startAt", startAt),
+			makeNumericAttr("duration", duration),
+		],
+		children: [],
+	};
+}
+
+// ---------------------------------------------------------------------------
 // Plugin
 // ---------------------------------------------------------------------------
 
-const COMPONENT_NAME = "HoneydeckCodeBlock";
-const IMPORT_SOURCE = "@honeydeck/honeydeck/components/code-block";
+const CODE_BLOCK_COMPONENT_NAME = "HoneydeckCodeBlock";
+const MAGIC_CODE_COMPONENT_NAME = "HoneydeckMagicCodeBlock";
+const CODE_BLOCK_IMPORT_SOURCE =
+	"@honeydeck/honeydeck/components/code-block/normal";
+const MAGIC_CODE_IMPORT_SOURCE =
+	"@honeydeck/honeydeck/components/code-block/magic";
 
 /**
  * Async remark plugin that transforms fenced code blocks to `<HoneydeckCodeBlock>`
@@ -239,87 +405,114 @@ const IMPORT_SOURCE = "@honeydeck/honeydeck/components/code-block";
  *
  * Plugin ordering: `[remarkFrontmatter, remarkH1Extract, remarkStepNumbering, remarkShikiCodeBlocks]`
  */
-export const remarkShikiCodeBlocks: Plugin<[], Root> = () => async (tree) => {
-	// Collect code nodes before mutating the tree (avoids iterator invalidation).
-	type CodeEntry = {
-		node: Code;
-		index: number;
-		parent: { children: unknown[] };
-	};
-	const codeEntries: CodeEntry[] = [];
-
-	visit(tree, "code", (node, index, parent) => {
-		if (index !== null && index !== undefined && parent) {
-			codeEntries.push({
-				node: node as unknown as Code,
-				index: index as number,
-				parent: parent as unknown as { children: unknown[] },
-			});
-		}
-	});
-
-	if (codeEntries.length === 0) return;
-
-	const highlighter = await getHighlighter();
-	let didTransform = false;
-
-	for (const { node, index, parent } of codeEntries) {
-		const rawLang = node.lang ?? "text";
-		const meta = node.meta;
-		const steps = parseStepMeta(meta);
-		const startAt: number =
-			((node.data as Record<string, unknown> | undefined)
-				?.honeydeckStartAt as number) ?? 0;
-
-		// Load language grammar (no-op if already cached)
-		const lang = await loadLang(highlighter, rawLang);
-
-		// Highlight with dual themes (CSS variable approach)
-		let html: string;
-		try {
-			html = highlighter.codeToHtml(node.value, {
-				lang,
-				themes: { light: "github-light", dark: "github-dark" },
-				defaultColor: false,
-				transformers: [
-					{
-						line(lineNode, lineNumber) {
-							// Ensure properties bag exists, then stamp data-line
-							if (!lineNode.properties) lineNode.properties = {};
-							lineNode.properties["data-line"] = lineNumber;
-						},
-					},
-				],
-			});
-		} catch {
-			// Fallback: plain pre/code block without syntax colours
-			const escaped = node.value
-				.replace(/&/g, "&amp;")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;");
-			html = `<pre class="honeydeck-code-plain"><code>${escaped}</code></pre>`;
-		}
-
-		// Build <HoneydeckCodeBlock html="..." stepsJson="..." startAt={N} source="..." />
-		const jsxNode: MdxJsxFlowElement = {
-			type: "mdxJsxFlowElement",
-			name: COMPONENT_NAME,
-			attributes: [
-				makeStringAttr("html", html),
-				makeStringAttr("stepsJson", JSON.stringify(steps)),
-				makeNumericAttr("startAt", startAt),
-				makeStringAttr("source", node.value),
-			],
-			children: [],
+export const remarkShikiCodeBlocks: Plugin<
+	[RemarkShikiCodeBlocksOptions?],
+	Root
+> =
+	(options = {}) =>
+	async (tree) => {
+		// Collect code nodes before mutating the tree.
+		type CodeEntry = {
+			node: Code;
+			parent: { children: unknown[] };
 		};
+		const codeEntries: CodeEntry[] = [];
 
-		// Replace code node in-place (1 → 1, so sibling indices stay valid)
-		parent.children.splice(index, 1, jsxNode);
-		didTransform = true;
-	}
+		visit(tree, "code", (node, index, parent) => {
+			if (index !== null && index !== undefined && parent) {
+				codeEntries.push({
+					node: node as unknown as Code,
+					parent: parent as unknown as { children: unknown[] },
+				});
+			}
+		});
 
-	// Inject the import once for the whole slide
-	if (didTransform) {
-		injectImport(tree, COMPONENT_NAME, IMPORT_SOURCE);
-	}
-};
+		if (codeEntries.length === 0) return;
+
+		const highlighter = await getHighlighter();
+		let didTransformCodeBlock = false;
+		let didTransformMagicCode = false;
+
+		for (const { node, parent } of codeEntries) {
+			const currentIndex = parent.children.indexOf(node);
+			if (currentIndex === -1) continue;
+
+			const startAt: number =
+				((node.data as Record<string, unknown> | undefined)
+					?.honeydeckStartAt as number) ?? 0;
+
+			if (isMagicCodeFence(node)) {
+				const fences = parseInnerCodeFences(node.value);
+				const duration = parseMagicCodeDuration(
+					node.meta,
+					options.magicCodeDuration,
+				);
+				if (!duration.ok) throw new Error(duration.message);
+
+				if (fences.length === 0) {
+					parent.children.splice(currentIndex, 1);
+					continue;
+				}
+
+				if (fences.length === 1) {
+					const [fence] = fences;
+					if (!fence) continue;
+					const html = await codeToHighlightedHtml(
+						highlighter,
+						fence.value,
+						fence.lang,
+					);
+					parent.children.splice(
+						currentIndex,
+						1,
+						makeCodeBlockNode(
+							html,
+							parseStepMeta(fence.meta),
+							startAt,
+							fence.value,
+						),
+					);
+					didTransformCodeBlock = true;
+					continue;
+				}
+
+				const states = flattenMagicTimeline(fences);
+				const tokenPayload = await compileMagicTokenPayload(
+					highlighter,
+					states,
+				);
+				parent.children.splice(
+					currentIndex,
+					1,
+					makeMagicCodeNode(
+						tokenPayload,
+						states.map((state) => state.group),
+						startAt,
+						duration.duration,
+					),
+				);
+				didTransformMagicCode = true;
+				continue;
+			}
+
+			const rawLang = node.lang ?? "text";
+			const html = await codeToHighlightedHtml(
+				highlighter,
+				node.value,
+				rawLang,
+			);
+			parent.children.splice(
+				currentIndex,
+				1,
+				makeCodeBlockNode(html, parseStepMeta(node.meta), startAt, node.value),
+			);
+			didTransformCodeBlock = true;
+		}
+
+		if (didTransformCodeBlock) {
+			injectImport(tree, CODE_BLOCK_COMPONENT_NAME, CODE_BLOCK_IMPORT_SOURCE);
+		}
+		if (didTransformMagicCode) {
+			injectImport(tree, MAGIC_CODE_COMPONENT_NAME, MAGIC_CODE_IMPORT_SOURCE);
+		}
+	};

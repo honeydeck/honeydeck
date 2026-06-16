@@ -42,6 +42,12 @@ import type {
 	MdxJsxTextElement,
 } from "mdast-util-mdx-jsx";
 import type { Plugin } from "unified";
+import {
+	countCodeFenceGroups,
+	countCodeFenceSteps,
+	countMagicCodeStates,
+	isMagicCodeFence,
+} from "./code-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Helper: build an `at={n}` attribute node
@@ -185,25 +191,6 @@ function getRevealGroupTargets(el: MdxJsxElement): unknown[] {
 	return targets;
 }
 
-// ---------------------------------------------------------------------------
-// Helper: count groups/steps encoded in a code fence meta string
-//
-// Pattern: `{2|4-5|all}` → 3 groups, 2 timeline steps.
-// The first group is the baseline active highlight. Each later group consumes
-// one timeline step.
-// ---------------------------------------------------------------------------
-
-function countCodeFenceGroups(meta: string | null | undefined): number {
-	if (!meta) return 0;
-	const match = meta.match(/\{([^}]+)\}/);
-	if (!match?.[1]) return 0;
-	return match[1].split("|").filter(Boolean).length;
-}
-
-function countCodeFenceSteps(meta: string | null | undefined): number {
-	return Math.max(0, countCodeFenceGroups(meta) - 1);
-}
-
 function expressionValue(attr: MdxJsxAttribute): unknown {
 	const value = attr.value;
 	if (
@@ -264,6 +251,11 @@ function findNestedStepProducer(node: unknown): string | null {
 
 	if (n.type === "code") {
 		const codeNode = node as Code;
+		if (isMagicCodeFence(codeNode)) {
+			return countMagicCodeStates(codeNode.value) > 1
+				? "Magic Code block"
+				: null;
+		}
 		return countCodeFenceSteps(codeNode.meta) > 0 ? "stepped code fence" : null;
 	}
 
@@ -318,6 +310,25 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 		// ── Code blocks with step-through meta ─────────────────────────────
 		if (n.type === "code") {
 			const codeNode = node as Code;
+
+			if (isMagicCodeFence(codeNode)) {
+				const stateCount = countMagicCodeStates(codeNode.value);
+				const steps = Math.max(0, stateCount - 1);
+				if (stateCount > 0) {
+					if (!(codeNode as unknown as Record<string, unknown>).data) {
+						(codeNode as unknown as Record<string, unknown>).data = {};
+					}
+					(
+						(codeNode as unknown as Record<string, unknown>).data as Record<
+							string,
+							unknown
+						>
+					).honeydeckStartAt = counter;
+				}
+				counter += steps;
+				return;
+			}
+
 			const groupCount = countCodeFenceGroups(codeNode.meta);
 			const steps = Math.max(0, groupCount - 1);
 			if (groupCount > 0) {

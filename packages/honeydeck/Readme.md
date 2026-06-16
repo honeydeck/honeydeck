@@ -22,7 +22,7 @@ Decks are plain MDX files separated into slides with `---`; see the first deck e
 - [Deeper dive](docs/deeper-dive.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills
 - [Slides](docs/slides.md) - separators, multiple files, layouts, and assets
 - [Configuration](docs/configuration.md) - deck-level and slide-level frontmatter
-- [Steps and reveals](docs/steps-and-reveals.md) - timeline, reveal groups, code steps, and PDF behavior
+- [Steps and reveals](docs/steps-and-reveals.md) - timeline, reveal groups, code steps, Magic Code, and PDF behavior
 - [Components](docs/components.md) - core Honeydeck components such as `BrowserFrame` and `Keyboard`
 - [Customization](docs/customization.md) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
 - [Navigation](docs/navigation.md) - keyboard, touch, overview mode, and URL state
