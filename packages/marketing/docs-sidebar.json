@@ -31,27 +31,12 @@
 				"source": "docs/steps-and-reveals.md",
 				"slug": "steps-and-reveals",
 				"title": "Steps and reveals"
-			}
-		]
-	},
-	{
-		"label": "Reference",
-		"items": [
-			{
-				"source": "docs/components.md",
-				"slug": "components",
-				"title": "Components"
 			},
 			{
 				"source": "docs/customization.md",
 				"slug": "customization",
 				"title": "Customization"
-			}
-		]
-	},
-	{
-		"label": "Present",
-		"items": [
+			},
 			{
 				"source": "docs/navigation.md",
 				"slug": "navigation",
@@ -71,6 +56,51 @@
 				"source": "docs/pdf-export.md",
 				"slug": "pdf-export",
 				"title": "PDF export"
+			}
+		]
+	},
+	{
+		"label": "Components",
+		"items": [
+			{
+				"source": "docs/components.md",
+				"slug": "components",
+				"title": "Components"
+			},
+			{
+				"source": "docs/components-reveal.md",
+				"slug": "components-reveal",
+				"title": "Reveal"
+			},
+			{
+				"source": "docs/components-reveal-group.md",
+				"slug": "components-reveal-group",
+				"title": "RevealGroup"
+			},
+			{
+				"source": "docs/components-timeline-steps.md",
+				"slug": "components-timeline-steps",
+				"title": "TimelineSteps"
+			},
+			{
+				"source": "docs/components-list-style.md",
+				"slug": "components-list-style",
+				"title": "ListStyle"
+			},
+			{
+				"source": "docs/components-keyboard.md",
+				"slug": "components-keyboard",
+				"title": "Keyboard"
+			},
+			{
+				"source": "docs/components-browser-frame.md",
+				"slug": "components-browser-frame",
+				"title": "BrowserFrame"
+			},
+			{
+				"source": "docs/components-notes.md",
+				"slug": "components-notes",
+				"title": "Notes"
 			}
 		]
 	},

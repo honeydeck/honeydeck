@@ -253,14 +253,22 @@ input {
 .doc-content table {
 	border-collapse: collapse;
 	display: block;
+	max-width: 100%;
 	overflow-x: auto;
-	width: 100%;
+	width: max-content;
 }
 
 .doc-content th,
 .doc-content td {
 	border: 1px solid var(--honeydeck-color-border);
 	padding: 0.6rem 0.75rem;
+	white-space: nowrap;
+}
+
+.doc-content th code,
+.doc-content td code {
+	overflow-wrap: normal;
+	word-break: normal;
 }
 
 @media (min-width: 640px) {

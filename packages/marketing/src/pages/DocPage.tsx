@@ -35,7 +35,7 @@ export function DocPage() {
 	const articleRef = useRef<HTMLElement | null>(null);
 	const headings = useArticleHeadings(articleRef, doc.slug);
 	return (
-		<main className="mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:px-6 sm:py-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8 lg:py-10 xl:grid-cols-[18rem_minmax(0,1fr)_13rem]">
+		<main className="mx-auto grid gap-6 px-4 py-5 sm:px-6 sm:py-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8 lg:py-10 xl:grid-cols-[18rem_minmax(0,1fr)_13rem]">
 			<DocsSidebar activeSlug={doc.slug} />
 			<section className="min-w-0">
 				<div className="mb-6 grid gap-2 text-sm min-[360px]:grid-cols-2 md:mb-8 md:flex md:flex-wrap md:justify-end">

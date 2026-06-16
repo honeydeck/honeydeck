@@ -1,0 +1,48 @@
+# TimelineSteps
+
+Use `<TimelineSteps>` when an imported React component should control part of a slide timeline.
+
+```mdx
+import { Reveal, TimelineSteps } from '@honeydeck/honeydeck'
+import { AccordionDemo } from './AccordionDemo'
+
+<Reveal>Before the custom component</Reveal>
+
+<TimelineSteps steps={3}>
+  <AccordionDemo />
+</TimelineSteps>
+
+<Reveal>After the custom component</Reveal>
+```
+
+Inside the custom component, read local step state with `useTimelineSteps()`:
+
+```tsx
+import { useTimelineSteps } from '@honeydeck/honeydeck'
+
+export function AccordionDemo() {
+  const { phase, stepIndex, stepCount, isPdfFinalRender } = useTimelineSteps()
+
+  return <div>Step {stepIndex} of {stepCount}</div>
+}
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `steps` | `number` | Required | Literal positive integer number of reserved timeline steps. |
+| `children` | `ReactNode` | — | Custom component content. |
+
+`useTimelineSteps()` returns `{ phase, stepIndex, stepCount, startAt, endAt, isPdfFinalRender }`.
+
+- `phase` is `"before"`, `"active"`, or `"after"`.
+- `stepIndex` is `0` before start, `1..stepCount` while active, and `stepCount` after end.
+- `isPdfFinalRender` is `true` only for one-page final-state PDF export.
+
+## Rules
+
+- `steps` must be a literal positive integer in slide MDX, for example `steps={3}`.
+- `<TimelineSteps>` must appear at the usage site in slide MDX. Imported TSX components cannot register steps by rendering `<TimelineSteps>` internally.
+- Nested Honeydeck timeline producers inside `<TimelineSteps>` are not supported.
+- In `isPdfFinalRender`, allows custom components to controll how they appear in PDFs.

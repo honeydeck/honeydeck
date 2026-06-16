@@ -102,7 +102,7 @@ honeydeck skill               # install optional Honeydeck agent skills
 - [Slides](slides.md) - separators, multiple files, layouts, and assets
 - [Configuration](configuration.md) - deck-level and slide-level frontmatter
 - [Steps and reveals](steps-and-reveals.md) - timeline, reveal groups, code steps, and PDF behavior
-- [Components](components.md) - core Honeydeck components such as `BrowserFrame` and `Keyboard`
+- [Components](components.md) - core Honeydeck components such as `Reveal`, `TimelineSteps`, `BrowserFrame`, and `Keyboard`
 - [Customization](customization.md) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
 - [Navigation](navigation.md) - keyboard, touch, overview mode, and URL state
 - [Mobile and touch](mobile.md) - mobile controls, touch gestures, and pinch zoom
