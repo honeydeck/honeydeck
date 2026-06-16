@@ -1,9 +1,9 @@
 export const demoDecks = [
 	{
-		title: "Showcase deck",
+		title: "Demo Deck",
 		description:
-			"Layouts, steps, code, presenter mode, PDF export, and bee theme ideas.",
-		href: "https://showcase.honeydeck.dev/",
+			"See Honeydeck in action.",
+		href: "https://welcome.honeydeck.dev/",
 	},
 ];
 
