@@ -14,7 +14,7 @@ showSlideNumbers: true
 ---
 
 import './styles.css'
-import { BrowserFrame, ColorModeImage, Keyboard, ListStyle, Notes, Reveal, TimelineSteps } from '@honeydeck/honeydeck'
+import { BrowserFrame, ColorModeImage, Keyboard, ListStyle, Notes, Reveal, TimelineSteps, RevealGroup } from '@honeydeck/honeydeck'
 import { CheckIcon, CircleIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react'
 import { TimelineAccordion } from './TimelineAccordion.tsx'
 import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
@@ -440,6 +440,27 @@ layout: TwoCol
 </ListStyle>
 
 </Right>
+
+---
+
+# ListStyle with RevealGroup
+
+```mdx
+<ListStyle bullets={[<CheckIcon />, "→", "·"]}>
+<RevealGroup>
+```
+
+<ListStyle bullets={[<CheckIcon />, "→", "·"]}>
+<RevealGroup>
+
+- Icon for level one
+  - Arrow for level two
+    - Dot for deeper levels
+- Per-level markers
+
+</RevealGroup>
+</ListStyle>
+
 
 ---
 
