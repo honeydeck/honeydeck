@@ -1,8 +1,7 @@
 export const demoDecks = [
 	{
 		title: "Demo Deck",
-		description:
-			"See Honeydeck in action.",
+		description: "See Honeydeck in action.",
 		href: "https://welcome.honeydeck.dev/",
 	},
 ];
