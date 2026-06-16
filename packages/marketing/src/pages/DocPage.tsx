@@ -188,6 +188,10 @@ function useArticleHeadings(
 	const [headings, setHeadings] = useState<ArticleHeading[]>([]);
 
 	useLayoutEffect(() => {
+		if (!contentKey) {
+			setHeadings([]);
+			return;
+		}
 		const article = articleRef.current;
 		if (!article) {
 			setHeadings([]);
