@@ -9,7 +9,7 @@
 | `↓` / `s` | Next slide |
 | `↑` / `w` | Previous slide |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode (new window) |
+| `p` | Open presenter mode (same tab) |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview / exit fullscreen |
 

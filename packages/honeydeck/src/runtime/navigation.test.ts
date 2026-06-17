@@ -1,17 +1,29 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { afterEach, describe, it } from "node:test";
 import {
 	getDocsWebsiteUrl,
 	getNextSlideRoute,
 	getNextStepRoute,
 	getOverviewRoute,
+	getPresenterRoute,
 	getPreviousSlideRoute,
 	getPreviousStepRoute,
 	getReferenceRoute,
 	getRouteUrl,
 	getSlideRouteFromRoute,
 	getToggleOverviewRoute,
+	openPresenter,
 } from "./navigation.ts";
+
+const originalLocation = Object.getOwnPropertyDescriptor(globalThis, "location");
+
+afterEach(() => {
+	if (originalLocation) {
+		Object.defineProperty(globalThis, "location", originalLocation);
+	} else {
+		Reflect.deleteProperty(globalThis, "location");
+	}
+});
 
 const options = {
 	slideCount: 3,
@@ -69,6 +81,15 @@ describe("navigation route helpers", () => {
 		);
 	});
 
+	it("opens presenter routes in the same tab", () => {
+		assert.deepEqual(getPresenterRoute({ view: "slide", slide: 2, step: 1 }), {
+			view: "presenter",
+			slide: 2,
+			step: 1,
+		});
+		assert.equal(getPresenterRoute({ view: "kit", slide: 1, step: 0, kitTab: "layouts" }), null);
+	});
+
 	it("opens and closes overview routes", () => {
 		assert.deepEqual(getOverviewRoute({ view: "slide", slide: 3, step: 1 }), {
 			view: "overview",
@@ -90,6 +111,32 @@ describe("navigation route helpers", () => {
 			getToggleOverviewRoute({ view: "overview", slide: 2, step: 1 }),
 			{ view: "slide", slide: 2, step: 1 },
 		);
+	});
+
+	it("opens presenter mode by changing the current hash", () => {
+		const location = { href: "https://example.com/deck/index.html", hash: "#/1/0" };
+		Object.defineProperty(globalThis, "location", {
+			value: location,
+			configurable: true,
+			writable: true,
+		});
+
+		openPresenter({ view: "slide", slide: 2, step: 1 });
+
+		assert.equal(location.hash, "#/presenter/2/1");
+	});
+
+	it("ignores reference routes when opening presenter mode", () => {
+		const location = { href: "https://example.com/deck/index.html", hash: "#/1/0" };
+		Object.defineProperty(globalThis, "location", {
+			value: location,
+			configurable: true,
+			writable: true,
+		});
+
+		openPresenter({ view: "kit", slide: 1, step: 0, kitTab: "layouts" });
+
+		assert.equal(location.hash, "#/1/0");
 	});
 
 	it("opens the layouts reference by default", () => {

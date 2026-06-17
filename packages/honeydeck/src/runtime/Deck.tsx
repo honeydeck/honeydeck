@@ -13,7 +13,7 @@
  * - Overlay with `<OverviewView>` when overview mode is toggled
  * - `<NavBar>` always present (auto-hides on desktop, visible on touch)
  * - `useSwipeNav` for touch devices
- * - `useSync` for BroadcastChannel audience-side sync
+ * - `useSync` for BroadcastChannel fallback and `usePresentationReceiverSync` for Presentation API receiver sync
  * - Manual color mode override (system / light / dark) via NavBar
  *
  * ### Viewport scaling
@@ -59,6 +59,7 @@ import {
 	slideData,
 } from "./slideData.ts";
 import { useSync } from "./sync.ts";
+import { usePresentationReceiverSync } from "./presentationApi.ts";
 import { TimelineProvider } from "./TimelineContext.tsx";
 import { useKeyboardNav } from "./useKeyboardNav.ts";
 import { useSwipeNav } from "./useSwipeNav.ts";
@@ -154,10 +155,13 @@ export function Deck() {
 		});
 	}, [route]);
 
-	// ── BroadcastChannel: audience side (listen for presenter navigation) ──
+	// ── Audience sync: BroadcastChannel + Presentation API receiver ──────
 	useSync({
 		enabled: route.view === "slide" || route.view === "overview",
 		isPresenter: false,
+	});
+	usePresentationReceiverSync({
+		enabled: route.view === "slide" || route.view === "overview",
 	});
 
 	const resetZoom = useCallback(() => {

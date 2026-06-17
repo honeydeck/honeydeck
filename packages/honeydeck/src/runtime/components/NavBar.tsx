@@ -13,7 +13,7 @@
  * - Overview grid toggle
  * - Layouts reference
  * - Docs website (opens new window)
- * - Presenter mode (opens new window)
+ * - Presenter mode (opens current tab)
  * - Fullscreen toggle
  * - Mobile slide text selection toggle
  * - Color mode cycle (system → light → dark → system)

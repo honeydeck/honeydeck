@@ -19,9 +19,10 @@
  * `<Notes>` component in that slide pushes its children into a state slot
  * via `setNotes`, which is then displayed in the notes area.
  *
- * ### BroadcastChannel sync
+ * ### Presenter sync
  * PresenterView is the controller: it broadcasts `navigate` messages whenever
- * its route changes.  Audience windows (`Deck`) listen and follow.
+ * its route changes.  Audience windows (`Deck`) listen and follow via
+ * BroadcastChannel fallback or Presentation API receiver messages.
  *
  * ### Keyboard navigation
  * `useKeyboardNav` is wired so that arrow keys advance the presenter route
@@ -45,7 +46,6 @@ import {
 } from "react";
 import { NotesContext } from "../components/Notes.tsx";
 import {
-	getRouteUrl,
 	nextSlide,
 	nextStep,
 	openUrlInNewTab,
@@ -56,8 +56,13 @@ import { useRoute } from "../router.ts";
 import { SlideCanvas } from "../SlideCanvas.tsx";
 import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
 import { useSync } from "../sync.ts";
+import {
+	getPresentationAudienceUrl,
+	usePresentationCast,
+} from "../presentationApi.ts";
 import { useKeyboardNav } from "../useKeyboardNav.ts";
 import { useSwipeNav } from "../useSwipeNav.ts";
+import { PresenterCastButton } from "./PresenterCastButton.tsx";
 import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
 import { getPresenterNextPreview } from "./presenterPreview.ts";
 
@@ -177,6 +182,11 @@ export function PresenterView() {
 		stepCount: currentStepCount,
 		totalSlides,
 	});
+	const presentationCast = usePresentationCast({
+		audienceUrl: getPresentationAudienceUrl({ view: "slide", slide, step }),
+		currentSlide: slide,
+		currentStep: step,
+	});
 
 	// ── Wall clock ─────────────────────────────────────────────────────────
 	useEffect(() => {
@@ -203,7 +213,8 @@ export function PresenterView() {
 
 	// ── Open audience window ────────────────────────────────────────────────
 	function openAudienceView() {
-		openUrlInNewTab(getRouteUrl({ view: "slide", slide, step }));
+		const url = getPresentationAudienceUrl({ view: "slide", slide, step });
+		if (url) openUrlInNewTab(url);
 	}
 
 	// ── Navigate (presenter stays on presenter route) ───────────────────────
@@ -308,6 +319,12 @@ export function PresenterView() {
 						Open audience view
 						<ExternalLinkIcon aria-hidden="true" size={14} />
 					</button>
+					<PresenterCastButton
+						supported={presentationCast.supported}
+						isCasting={presentationCast.isCasting}
+						onStartCasting={presentationCast.startCasting}
+						onStopCasting={presentationCast.stopCasting}
+					/>
 				</div>
 			</div>
 		</div>

@@ -203,9 +203,11 @@ export function openDocsWebsite(): void {
 	openUrlInNewTab(getDocsWebsiteUrl());
 }
 
+export function getPresenterRoute(route: Route): Route | null {
+	if (route.view === "kit") return null;
+	return { view: "presenter", slide: route.slide, step: route.step };
+}
+
 export function openPresenter(route: Route): void {
-	if (route.view === "kit") return;
-	openUrlInNewTab(
-		getRouteUrl({ view: "presenter", slide: route.slide, step: route.step }),
-	);
+	navigateTo(getPresenterRoute(route));
 }

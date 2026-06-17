@@ -126,7 +126,7 @@ Reference page routes intentionally do not encode slide or step. During one brow
 | `↓` / `s` | Next slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `↑` / `w` | Previous slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode (new window) |
+| `p` | Open presenter mode (same tab) |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview; in reference pages, return to slides; browser-native Escape handles fullscreen exit |
 

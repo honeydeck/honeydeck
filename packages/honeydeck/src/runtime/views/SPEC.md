@@ -6,7 +6,7 @@
 
 ### Activation
 
-- Keyboard shortcut `p` (opens in new window/tab using the current deck base path)
+- Keyboard shortcut `p` (opens presenter mode in the current tab)
 - Navigation controls button
 - Direct URL: `/#/presenter/1/0`
 
@@ -36,6 +36,7 @@ Includes:
 - Slide/step counter
 - Clock (wall clock)
 - Button to open audience view in new tab, preserving the current slide/step and deck base path
+- Button to cast the audience view to a secondary display when the Presentation API is supported; unsupported browsers show a disabled hint and active casting can be stopped from the same control
 - Presenter navigation buttons provide previous/next timeline-step navigation and previous/next slide navigation. Timeline keyboard shortcuts (`→`/`←`/`↓`/`↑`, `d`/`a`/`s`/`w`) update the presenter route and keep the window in presenter mode.
 - Presenter navigation uses the shared Honeydeck navigation command abstraction so button, keyboard, and touch inputs share the same semantics as audience view.
 - Presenter notes are scroll-owned regions: wheel, trackpad, touch scroll, and swipe gestures that start in notes scroll notes and never navigate slides, even at scroll boundaries.
@@ -50,15 +51,16 @@ Presenter mode uses a two-column preview area (`Current` larger, `Next` smaller)
 
 ### Audience Sync
 
-Presenter mode and audience view synchronize via `BroadcastChannel`:
+Presenter mode and audience view synchronize via `BroadcastChannel` and the Presentation API:
 
-- Same browser/profile only (no server needed)
+- Same browser/profile BroadcastChannel sync remains available when casting is unsupported or unavailable
 - Presenter mode is the controller
 - Audience view listens for navigation updates
-- Late-opening audience tabs request the current presenter position via a `sync-request` / `sync-response` handshake so they sync immediately instead of waiting for the next presenter move
+- Late-opening audience tabs request the current presenter position via a `sync-request` / `sync-response` handshake as soon as a receiver connection is available, so they sync immediately instead of waiting for the next presenter move
 - Presence messages (`presenter-connected` / `presenter-disconnected`) are broadcast
+- When the Presentation API is supported, presenter mode can cast the audience view to a secondary display; the receiver asks for the current route when a connection becomes available and presenter replies with a `sync-response` so the cast audience resyncs even if it missed the first `navigate` message
 - Audience sync ignores navigation while the audience window is in the docs/reference view
-- If sync unavailable, both still work independently
+- If sync is unavailable, both still work independently
 
 ---
 

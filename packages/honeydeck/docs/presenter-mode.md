@@ -29,6 +29,7 @@ Includes:
 - Slide number / step counter
 - Wall clock
 - Button to open audience view in a new tab/window
+- Button to cast the audience view to a secondary display when supported; the same control becomes a stop button while casting and is disabled with a hint when unsupported
 - Navigation buttons that move through the timeline while staying in presenter mode
 
 ## Speaker Notes
@@ -58,11 +59,11 @@ Content here.
 
 ## Opening Presenter Mode
 
-- Keyboard shortcut `p` from normal presentation → opens in a new window/tab.
+- Keyboard shortcut `p` from normal presentation → opens presenter mode in the current tab.
 - Navigation controls button in normal presentation.
 - Direct URL: `/#/presenter/1/0`
 
-Pressing `p` opens presenter mode in a **new window** so the audience view stays on the projector.
+Pressing `p` opens presenter mode in the **current tab**.
 
 ## Navigation
 
@@ -85,10 +86,12 @@ When no next timeline state exists, the `Next` preview shows an end-of-deck plac
 
 ## Presenter/Audience Sync
 
-Presenter mode and audience view synchronize navigation via `BroadcastChannel` in the same browser/profile.
+Presenter mode and audience view synchronize navigation via `BroadcastChannel` and, when supported, the Presentation API.
 
 - Presenter mode acts as the controller.
 - Audience view (opened from presenter mode) listens for navigation updates.
+- The cast audience sends a `sync-request` as soon as the receiver connection appears; the presenter replies with the current slide/step in a `sync-response` so late connections resync immediately.
+- The cast audience follows presenter navigation through Presentation API receiver messages.
 - No server, internet, WebSocket, or device pairing required.
 - If `BroadcastChannel` is unavailable, both views function independently.
 

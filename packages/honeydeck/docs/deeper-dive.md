@@ -236,7 +236,7 @@ Keyboard shortcuts:
 | `down` / `s` | Next slide |
 | `up` / `w` | Previous slide |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode |
+| `p` | Open presenter mode in the current tab |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview or fullscreen |
 
@@ -259,7 +259,7 @@ Presenter mode opens with `p` and includes:
 - speaker notes from `<Notes>`
 - slide/step counter and wall clock
 - an "Open audience view" button
-- audience sync through `BroadcastChannel`
+- audience sync through `BroadcastChannel`, with Presentation API casting when supported
 
 See [Navigation](navigation.md), [Mobile and touch](mobile.md), [Presenter mode](presenter-mode.md), and [PDF export](pdf-export.md).
 
@@ -351,7 +351,7 @@ Package Markdown guides live on the Honeydeck docs site and in the package `docs
 | Layouts | Runtime dynamic import of the layout map |
 | Tailwind | v4 CSS-first; Honeydeck adds the Vite plugin internally |
 | Shiki | Dual-theme CSS variables with build-time highlighting |
-| Presenter sync | `BroadcastChannel`, unidirectional, no server needed |
+| Presenter sync | `BroadcastChannel` fallback + Presentation API casting, no server needed |
 | Scaling | `transform: scale()` from the configured aspect ratio |
 | Build | `tsc` only, ESM, no bundler |
 | Testing | `node:test` plus fixture files |
