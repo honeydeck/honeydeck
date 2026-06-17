@@ -23,6 +23,8 @@ export type RevealProps = {
 	name?: string;
 	/** Additional CSS class for custom transition overrides. */
 	className?: string;
+	/** Remove hidden content from the DOM/layout instead of reserving space. */
+	ephemeral?: boolean;
 	children?: ReactNode;
 };
 
@@ -35,7 +37,8 @@ export type RevealProps = {
  *
  * Content appears when the slide's current step reaches `at`. Before that it
  * is invisible while still occupying layout space, so reveals do not cause
- * nearby content to jump around.
+ * nearby content to jump around. With `ephemeral`, hidden content is not
+ * rendered and does not reserve layout space.
  *
  * Reveals are cumulative: once visible, they stay visible as the presenter
  * advances. The default transition is a simple opacity fade.
@@ -60,6 +63,7 @@ export function Reveal({
 	at = 1,
 	name,
 	className = "",
+	ephemeral = false,
 	children,
 }: RevealProps) {
 	return (
@@ -67,6 +71,7 @@ export function Reveal({
 			as={as}
 			at={at}
 			className={className}
+			ephemeral={ephemeral}
 			dataAttributes={{
 				"data-honeydeck-reveal-id": name,
 			}}

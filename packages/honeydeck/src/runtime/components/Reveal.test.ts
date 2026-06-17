@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Reveal } from "../../runtime/components/Reveal.tsx";
+import { RevealWith } from "../../runtime/components/RevealWith.tsx";
 import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
 
 function renderReveal({
@@ -15,6 +16,9 @@ function renderReveal({
 	stepCount = 1,
 	showFutureSteps = false,
 	futureStepOpacity,
+	ephemeral = false,
+	target,
+	withTarget = false,
 }: {
 	at?: number;
 	as?: "div" | "span";
@@ -25,8 +29,18 @@ function renderReveal({
 	stepCount?: number;
 	showFutureSteps?: boolean;
 	futureStepOpacity?: number;
+	ephemeral?: boolean;
+	target?: number;
+	withTarget?: boolean;
 } = {}) {
-	const reveal = createElement(Reveal, { at, as, className, name }, children);
+	const props = withTarget
+		? { as, className, ephemeral, ...(target ? { target } : {}) }
+		: { at, as, className, name, ephemeral };
+	const reveal = createElement(
+		withTarget ? RevealWith : Reveal,
+		props,
+		children,
+	);
 
 	return renderToStaticMarkup(
 		createElement(
@@ -94,5 +108,42 @@ describe("<Reveal>", () => {
 		assert.ok(html.includes("visibility:visible"));
 		assert.ok(html.includes("opacity:1"));
 		assert.ok(html.includes("Inline content"));
+	});
+
+	it("returns null when ephemeral content is hidden", () => {
+		const html = renderReveal({ at: 2, stepIndex: 1, ephemeral: true });
+
+		assert.equal(html, "");
+	});
+
+	it("keeps ephemeral ghost previews renderable", () => {
+		const html = renderReveal({
+			at: 2,
+			stepIndex: 1,
+			ephemeral: true,
+			showFutureSteps: true,
+			futureStepOpacity: 0.4,
+		});
+
+		assert.ok(html.includes("opacity:0.4"));
+		assert.ok(html.includes("Revealed content"));
+	});
+});
+
+describe("<RevealWith>", () => {
+	it("uses target as reveal condition", () => {
+		const before = renderReveal({
+			withTarget: true,
+			target: 3,
+			stepIndex: 2,
+		});
+		const after = renderReveal({
+			withTarget: true,
+			target: 3,
+			stepIndex: 3,
+		});
+
+		assert.ok(before.includes("visibility:hidden"));
+		assert.ok(after.includes("visibility:visible"));
 	});
 });

@@ -5,10 +5,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { RevealGroup } from "../../runtime/components/RevealGroup.tsx";
 import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
 
-function renderRevealGroup(stepIndex: number, showFutureSteps = false) {
+function renderRevealGroup(
+	stepIndex: number,
+	showFutureSteps = false,
+	ephemeral = false,
+) {
 	const group = createElement(
 		RevealGroup,
-		{ at: 1 },
+		{ at: 1, ephemeral },
 		createElement(
 			"ul",
 			null,
@@ -101,6 +105,12 @@ describe("<RevealGroup>", () => {
 			html,
 			/<li style="visibility:visible;opacity:0.28;transition:opacity 300ms ease">PDF-ready<\/li>/,
 		);
+	});
+
+	it("omits empty ephemeral list wrappers", () => {
+		const html = renderRevealGroup(0, false, true);
+
+		assert.equal(html, "");
 	});
 
 	it("uses compiler-provided target steps when group children are not consecutive", () => {

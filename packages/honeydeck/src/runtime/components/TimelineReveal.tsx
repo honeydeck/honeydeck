@@ -10,6 +10,8 @@ export type TimelineRevealProps = {
 	as?: TimelineRevealElement;
 	/** Additional CSS class for custom transition overrides. */
 	className?: string;
+	/** Remove hidden content from the DOM/layout instead of reserving space. */
+	ephemeral?: boolean;
 	/** Extra data attributes for debugging/inspection. */
 	dataAttributes?: Record<string, string | undefined>;
 	children?: ReactNode;
@@ -45,10 +47,13 @@ export function TimelineReveal({
 	as: Component = "div",
 	at = 1,
 	className = "",
+	ephemeral = false,
 	dataAttributes,
 	children,
 }: TimelineRevealProps) {
 	const { stepIndex, showFutureSteps, futureStepOpacity } = useTimeline();
+	const visible = stepIndex >= at;
+	const previewFuture = !visible && showFutureSteps;
 	const style = getTimelineRevealStyle({
 		stepIndex,
 		at,
@@ -56,6 +61,8 @@ export function TimelineReveal({
 		futureStepOpacity,
 		display: Component === "span" ? "inline" : "block",
 	});
+
+	if (ephemeral && !visible && !previewFuture) return null;
 
 	return (
 		<Component

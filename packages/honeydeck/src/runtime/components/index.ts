@@ -32,6 +32,12 @@ export {
 	ColorModeCycleButton,
 	getNextColorMode,
 } from "./ColorModeCycleButton.tsx";
+export type { FadeProps } from "./Fade.tsx";
+export { Fade } from "./Fade.tsx";
+export type { FadeGroupProps } from "./FadeGroup.tsx";
+export { FadeGroup } from "./FadeGroup.tsx";
+export type { FadeWithProps } from "./FadeWith.tsx";
+export { FadeWith } from "./FadeWith.tsx";
 export type { KeyboardKey, KeyboardProps } from "./Keyboard.tsx";
 export { Keyboard } from "./Keyboard.tsx";
 export type { ListBullet, ListBullets, ListStyleProps } from "./ListStyle.tsx";

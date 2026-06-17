@@ -28,6 +28,9 @@ describe("component doc crawler", () => {
 			result.docs.map((doc) => doc.componentName),
 			[
 				"BrowserFrame",
+				"Fade",
+				"FadeGroup",
+				"FadeWith",
 				"Keyboard",
 				"ListStyle",
 				"Notes",
@@ -148,15 +151,16 @@ describe("component doc crawler", () => {
 			})),
 			[
 				{ name: "target", required: false, defaultValue: undefined },
-				{ name: "at", required: false, defaultValue: "1" },
+				{ name: "at", required: false, defaultValue: undefined },
 				{ name: "as", required: false, defaultValue: '"div"' },
 				{ name: "className", required: false, defaultValue: '""' },
+				{ name: "ephemeral", required: false, defaultValue: "false" },
 				{ name: "children", required: false, defaultValue: undefined },
 			],
 		);
 		assert.equal(
 			revealWith.props.find((prop) => prop.name === "target")?.type,
-			"string",
+			"string | number",
 		);
 
 		const timelineSteps = getDoc(result, "TimelineSteps");

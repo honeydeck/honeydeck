@@ -7,7 +7,7 @@
 All core components are explicit imports from the `'@honeydeck/honeydeck'` package. They are also exported from `@honeydeck/honeydeck/components`:
 
 ```mdx
-import { Reveal, RevealWith, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, Fade, FadeWith, FadeGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
 ```
 
 Injected fenced code blocks render through `HoneydeckCodeBlock` from the direct `@honeydeck/honeydeck/components/code-block/normal` subpath. Injected Magic Code blocks render through `HoneydeckMagicCodeBlock` from the direct `@honeydeck/honeydeck/components/code-block/magic` subpath. Both implementations share the `CodeBlock` parent frame from `@honeydeck/honeydeck/components/code-block` for wrapper styling and copy-button placement, but generated slides import the concrete implementations directly instead of using a code-block barrel. These components are not part of the public component barrel, but transformed slide code blocks must show syntax-highlighted code and reveal an icon-only copy button on hover or keyboard focus. Copying writes the original fenced source text, or for Magic Code, the currently visible source state. Normal stepped code blocks and Magic Code blocks fade specifically highlighted lines from dimmed opacity to full opacity when those lines become active. Magic Code line highlighting must update correctly in both directions, including transitions from a dimmed state to an `all` highlight state. Magic Code token movement, enter/leave transitions, and container size transitions start together and use Shiki Magic Move's duration so resizing stays synchronized with content movement. Entering tokens fade slowly from transparent to their active line-dimming opacity, and leaving tokens fade slowly to transparent instead of popping in or out. Magic Code uses Honeydeck's centralized effective color-mode context so code blocks do not observe document attributes individually. Magic Code lazily parses only the active theme's precompiled token JSON; duplicated timeline states may reference shared unique token states to keep generated output smaller. Magic Code lets Shiki perform its initial render for the starting state, then waits two animation frames before forwarding timeline state changes so the first user-driven transition diffs from a stable baseline. During PDF export, Magic Code skips that baseline delay and disables Magic Move animation so screenshots capture the requested timeline state instead of an in-progress transition. Magic Code passes Honeydeck's current slide transform scale to Shiki Magic Move so measured positions and inline animation sizes stay in the same coordinate system and the container does not pop when the animation releases its inline size.
@@ -59,18 +59,20 @@ Reveals content at the next timeline step.
 
 Behavior:
 
-- Hidden content **reserves layout space** (`visibility: hidden` + `opacity: 0`, not `display: none`)
+- Hidden content **reserves layout space** by default (`visibility: hidden` + `opacity: 0`, not `display: none`)
+- With `ephemeral`, hidden content renders `null` and does not reserve layout space; future-step previews still render a muted ghost
 - Runtime wrapper matches MDX context: flow/block reveals render a block-level `div`, text/inline reveals render an inline `span`
 - Nested reveals are supported; inline nested reveals inside paragraphs must not create invalid `div`-inside-`p` HTML
 - Default effect: fade in
 - Reveals are **cumulative** (once visible, stays visible)
 - Supports `className` for custom transitions
+- Supports `ephemeral?: boolean`
 - Each authored `<Reveal>` adds one step to the slide timeline
-- Supports `name?: string` as a slide-local reveal target for `<RevealWith target="...">`
+- Supports `name?: string` as a slide-local reveal target for `<RevealWith target="...">` or `<FadeWith target="...">`
 - `name` must be a literal non-empty string when present; dynamic expressions are not supported because target resolution happens at build time
 - Duplicate `name` values on `<Reveal>` components in the same slide are build errors; the same name may be reused on different slides
 - A named reveal renders `data-honeydeck-reveal-id="name"` on its wrapper for debugging/inspection; it does not render a DOM `id`
-- `at?: number` is an internal compiler-injected prop, not a user-facing API; author-authored `at` values are build errors. Use `<RevealWith at={n}>` to sync content with an existing step
+- `at?: number` is an internal compiler-injected prop, not a user-facing API; author-authored `at` values are build errors. Use `<RevealWith at={n}>` or `<FadeWith at={n}>` to sync content with an existing step
 - Supports `as?: "div" | "span"`; Honeydeck injects this during compilation
 - No `effect` prop
 
@@ -88,23 +90,54 @@ console.log(answer)
 ```
 
 <RevealWith at={2}>This appears with the second slide step, such as a code highlight</RevealWith>
+<RevealWith target={3}>This appears with slide step 3</RevealWith>
 ````
 
 Behavior:
 
 - Requires exactly one of `target` or `at`
-- `target` must be a literal non-empty string and resolves to a `<Reveal name="...">` on the same slide
-- `target` supports forward references; the named `<Reveal>` may appear before or after `<RevealWith>` in the same slide
-- Missing targets are build errors; during development Honeydeck should surface a clear terminal and browser diagnostic without killing the dev server
-- `at` must be a literal positive integer and targets an existing 1-based slide-local timeline step
-- Numeric `at` is generic and may sync with a reveal, `RevealGroup` child/list item, code step, Magic Code state, or `TimelineSteps` step
-- `at` values outside the final slide step range are build errors; during development Honeydeck should surface a clear terminal and browser diagnostic without killing the dev server
-- Passing both `target` and `at`, or neither, is a build error
+- String `target` must be a literal non-empty string and resolves to a `<Reveal name="...">` on the same slide
+- Numeric `target={n}` and `at={n}` target an existing 1-based slide-local timeline step
+- String `target` supports forward references; the named `<Reveal>` may appear before or after `<RevealWith>` in the same slide
+- Missing targets and out-of-range step targets are build errors
 - `RevealWith` visibility is cumulative, matching `<Reveal>`: once visible, it stays visible
-- Hidden content reserves layout space and uses the same default fade, future-step preview behavior, wrapper classes, and `className` behavior as `<Reveal>`
+- Hidden content reserves layout space by default; with `ephemeral`, hidden content renders `null` and does not reserve layout space
 - Runtime wrapper matches MDX context: flow/block usages render a block-level `div`, text/inline usages render an inline `span`
-- When `target` is used, the wrapper renders `data-honeydeck-reveal-with="target"` for debugging/inspection
-- `RevealWith` does not support targeting individual `RevealGroup` children by name in v1; use numeric `at` for group child/list-item synchronization
+- When string `target` is used, the wrapper renders `data-honeydeck-reveal-with="target"` for debugging/inspection
+- `RevealWith` must not contain nested timeline producers
+
+### `<Fade>`
+
+Starts visible and fades out at the next timeline step.
+
+```mdx
+<Fade>This disappears at step 1</Fade>
+<Fade>This disappears at step 2</Fade>
+```
+
+Behavior:
+
+- Content is visible while `stepIndex < at`
+- Content is hidden while `stepIndex >= at`
+- Hidden content reserves layout space by default
+- With `ephemeral`, hidden content renders `null` and does not reserve layout space; future-step previews still render a muted ghost
+- Runtime wrapper matches MDX context like `<Reveal>`
+- Supports `className`, `ephemeral?: boolean`, and compiler-injected `as?: "div" | "span"`
+- Authored `at` is a build error because `at` is internal compiler plumbing for step-producing components
+- Must not contain nested timeline producers because a faded parent would hide later nested steps; put fade components inside a reveal target instead
+- Default effect: fade out
+
+### `<FadeWith>`
+
+Fades content out at the same timeline step as an existing reveal or explicit slide-local step. It never creates or consumes timeline steps.
+
+```mdx
+<FadeWith target="left">This disappears with named reveal left</FadeWith>
+<FadeWith target={3}>This disappears when step 3 is active</FadeWith>
+<FadeWith at={2}>This disappears with slide step 2</FadeWith>
+```
+
+Behavior matches `<Fade>` for wrapper selection, `className`, `ephemeral`, previews, and default transition. `<FadeWith>` uses the same `target`/`at` validation rules as `<RevealWith>` and must not contain nested timeline producers.
 
 ### `<RevealGroup>`
 
@@ -118,7 +151,7 @@ Convenience: reveals each meaningful direct child one by one. Whitespace-only te
 </RevealGroup>
 ```
 
-Each list item becomes its own timeline step.
+Each list item becomes its own timeline step. Supports `ephemeral?: boolean`, which is forwarded to generated child reveals.
 
 Nested timeline entries inside a group target are flattened after that target
 and before the following group target:
@@ -138,6 +171,20 @@ Timeline:
 1. Parent item appears
 2. Nested detail appears
 3. Sibling item appears
+
+### `<FadeGroup>`
+
+Convenience: fades each meaningful direct child out one by one. Whitespace-only text children are ignored. Direct Markdown/HTML/JSX lists are preserved and each list item fades out one after another. Empty groups currently consume one timeline step.
+
+```mdx
+<FadeGroup>
+  - First point
+  - Second point
+  - Third point
+</FadeGroup>
+```
+
+Each list item becomes its own timeline step. Supports `ephemeral?: boolean`, which is forwarded to generated child fades. Fade group targets must not contain nested timeline producers because a faded parent would hide later nested steps; put fade components inside a reveal/reveal-group target instead.
 
 ### `<ListStyle>`
 

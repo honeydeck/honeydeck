@@ -10,14 +10,11 @@ import {
 
 export type RevealWithProps = {
 	/**
-	 * Slide-local reveal target name. Authored as `target="name"` and resolved
-	 * by the compiler to an internal `at` value.
+	 * Slide-local reveal target name or existing slide-local timeline step.
+	 * String targets are resolved by the compiler to an internal `at` value.
 	 */
-	target?: string;
-	/**
-	 * Existing slide-local timeline step to reveal with. Authored for numeric
-	 * step sync or injected by the compiler when `target` is used.
-	 */
+	target?: string | number;
+	/** Existing slide-local timeline step to reveal with. */
 	at?: number;
 	/**
 	 * Wrapper element. Injected by the compiler from MDX context:
@@ -26,8 +23,10 @@ export type RevealWithProps = {
 	as?: TimelineRevealElement;
 	/** Additional CSS class for custom transition overrides. */
 	className?: string;
+	/** Remove hidden content from the DOM/layout instead of reserving space. */
+	ephemeral?: boolean;
 	children?: ReactNode;
-} & ({ target: string; at?: never } | { target?: never; at: number });
+};
 
 // ---------------------------------------------------------------------------
 // Component
@@ -36,43 +35,26 @@ export type RevealWithProps = {
 /**
  * Reveals content at the same timeline step as an existing reveal or explicit
  * slide-local step, without creating a new step.
- *
- * Use `target` to sync with a named `<Reveal name="...">`, or `at` to sync
- * with any existing slide-local timeline step such as a code highlight,
- * `RevealGroup` item, Magic Code state, or `TimelineSteps` state.
- *
- * ```mdx
- * import { Reveal, RevealWith } from '@honeydeck/honeydeck'
- *
- * <Reveal name="intro">Intro appears first</Reveal>
- * <RevealWith target="intro">This appears with the intro reveal</RevealWith>
- *
- * ```ts {1|2|3}
- * const answer = 42
- * console.log(answer)
- * ```
- *
- * <RevealWith at={2}>This appears with step 2</RevealWith>
- * ```
- *
- * Honeydeck resolves `target` and validates `at` during MDX compilation. The
- * component shares the same cumulative fade and future-step preview behavior as
- * `<Reveal>`.
  */
 export function RevealWith({
 	as = "div",
-	at = 1,
+	at,
 	target,
 	className = "",
+	ephemeral = false,
 	children,
 }: RevealWithProps) {
+	const revealAt = typeof target === "number" ? target : (at ?? 1);
+
 	return (
 		<TimelineReveal
 			as={as}
-			at={at}
+			at={revealAt}
 			className={className}
+			ephemeral={ephemeral}
 			dataAttributes={{
-				"data-honeydeck-reveal-with": target,
+				"data-honeydeck-reveal-with":
+					typeof target === "string" ? target : undefined,
 			}}
 		>
 			{children}

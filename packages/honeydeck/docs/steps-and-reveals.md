@@ -1,18 +1,17 @@
 # Steps & Reveals
 
-Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup` components, `RevealWith` synchronized content, custom component step blocks, code highlight ranges, and Magic Code states, counted in document order.
+Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup`/`Fade`/`FadeGroup` components, `RevealWith`/`FadeWith` synchronized content, custom component step blocks, code highlight ranges, and Magic Code states, counted in document order.
 
 ## Timeline Model
 
 - Slides start at **step 0** — no reveals or custom component steps active.
 - Stepped code blocks show their first highlight group immediately whenever the block is visible.
 - Magic Code blocks show their first inner code fence and first highlight group immediately whenever the block is visible.
-- Each `Reveal`, `RevealGroup` child, `TimelineSteps` block, code highlight group after the first, or Magic Code state after the first adds a step.
-- `RevealWith` adds no step. It reveals with an existing step by `target` or numeric `at`.
+- Each `Reveal`, `Fade`, `RevealGroup`/`FadeGroup` child, `TimelineSteps` block, code highlight group after the first, or Magic Code state after the first adds a step.
+- `RevealWith` and `FadeWith` add no steps. They watch existing steps by `target` or numeric `at`.
 - All step-producing elements share one slide-local timeline.
-- Nested step-producing elements are flattened into that same timeline. A parent
-  reveal target appears first; nested reveals, reveal groups, and code highlight
-  ranges appear after the parent and before the next sibling target.
+- Nested step-producing elements are flattened into that same timeline for reveal targets. A parent reveal target appears first; nested reveal/fade groups and code highlight ranges appear after the parent and before the next sibling target.
+- Fade targets must not contain nested timeline producers because a faded parent would hide later nested steps. Put fades inside reveals instead.
 
 ## Reveal
 
@@ -33,7 +32,8 @@ import { Reveal } from '@honeydeck/honeydeck'
 ### Behavior
 
 - **Cumulative** — once visible, content stays visible for the rest of the slide.
-- **Layout-stable** — hidden content reserves space (`opacity: 0` / `visibility: hidden`, not `display: none`).
+- **Layout-stable by default** — hidden content reserves space (`opacity: 0` / `visibility: hidden`, not `display: none`).
+- **Ephemeral when requested** — add `ephemeral` to render hidden content as `null`, so it reserves no layout space. Presenter previews still show a muted ghost.
 - **Default effect** — fade-in. Customize with `className` and Tailwind/CSS.
 - Optional `name="..."` gives a reveal a slide-local target for `RevealWith`.
 
@@ -64,6 +64,38 @@ Rules:
 - `at` is a 1-based slide-local step and can target any existing timeline step.
 - `name`, `target`, and `at` must be literal values so Honeydeck can validate them at build time.
 
+## Fade
+
+`Fade` is the inverse of `Reveal`: content starts visible and fades out at its timeline step.
+
+```mdx
+import { Fade } from '@honeydeck/honeydeck'
+
+<Fade>Visible at step 0, gone at step 1</Fade>
+<Fade ephemeral>Gone at step 2 and no longer reserves space</Fade>
+```
+
+Behavior:
+
+- Visible while `stepIndex < at`.
+- Hidden while `stepIndex >= at`.
+- Hidden content reserves layout space by default.
+- With `ephemeral`, hidden content renders `null` and reserves no layout space.
+- Fade content must not contain nested timeline producers. Put `Fade` inside `Reveal`, not `Reveal` inside `Fade`.
+
+## FadeWith
+
+Use `FadeWith` for a fade-out controlled by an explicit target step or named reveal target without adding its own timeline step:
+
+```mdx
+import { FadeWith } from '@honeydeck/honeydeck'
+
+<FadeWith target={3}>Disappears when step 3 is active</FadeWith>
+<FadeWith at={2}>Disappears with slide step 2</FadeWith>
+```
+
+`FadeWith` never increments the slide step count. It uses the same `target`/`at` validation rules as `RevealWith`.
+
 ## RevealGroup
 
 Reveals each direct child as its own step. If a direct child is a list, each
@@ -79,7 +111,7 @@ import { RevealGroup } from '@honeydeck/honeydeck'
 </RevealGroup>
 ```
 
-To reveal multiple elements together, wrap them in a single `Reveal` instead.
+To reveal multiple elements together, wrap them in a single `Reveal` instead. Add `ephemeral` to the group when hidden generated children should not reserve layout space.
 
 Nested reveals and code walkthroughs work inside group items:
 
@@ -105,6 +137,20 @@ Timeline:
 2. Nested detail appears
 3. Code item appears with line 1 highlighted
 4. Code highlights line 2
+
+## FadeGroup
+
+`FadeGroup` is the inverse of `RevealGroup`: each meaningful direct child starts visible and fades out one by one. Direct lists are preserved, and each list item gets its own fade-out step. Fade group targets must not contain nested timeline producers.
+
+```mdx
+import { FadeGroup } from '@honeydeck/honeydeck'
+
+<FadeGroup ephemeral>
+  - Remove this at step 1
+  - Remove this at step 2
+  - Remove this at step 3
+</FadeGroup>
+```
 
 ## Custom Component Steps
 

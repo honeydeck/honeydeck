@@ -4,13 +4,14 @@
  *
  * ### What it does
  * Walks the MDAST (including MDX JSX nodes) in document order and:
- *  1. Assigns `at={n}` to each `<Reveal>` element (starting at 1) and
- *     injects `as="div"`/`as="span"` from the MDX flow/text context.
- *  2. Assigns `at={n}` to each `<RevealGroup>` element using the starting
- *     index of the group and adds internal per-target step numbers for group
- *     children/list items.
+ *  1. Assigns `at={n}` to each `<Reveal>`/`<Fade>` element (starting at 1)
+ *     and injects `as="div"`/`as="span"` from the MDX flow/text context.
+ *  2. Assigns `at={n}` to each `<RevealGroup>`/`<FadeGroup>` element using
+ *     the starting index of the group and adds internal per-target step numbers
+ *     for group children/list items.
  *  3. Collects literal `<Reveal name="...">` targets and resolves
- *     `<RevealWith target="...">`/`<RevealWith at={n}>` without adding steps.
+ *     `<RevealWith target="...">`, numeric `target={n}`, and `at={n}`
+ *     sync props for `<RevealWith>`/`<FadeWith>` without adding steps.
  *  4. Assigns `at={n}` to each `<TimelineSteps steps={n}>` element and
  *     advances the timeline by its literal static step count.
  *  5. Counts timeline steps from code fence `|`-separated groups after the
@@ -25,15 +26,19 @@
  * ### Internal `at` props
  * Honeydeck injects `at` props during compilation to connect timeline-driven
  * components to their assigned slide-local steps. `at` is internal compiler
- * plumbing for `<Reveal>` and `<RevealGroup>`, and a validated sync target for
- * `<RevealWith>`. `<Reveal>` and `<RevealWith>` still receive compiler `as`
- * props when missing, so inline usages remain valid HTML.
+ * plumbing for `<Reveal>`, `<Fade>`, `<RevealGroup>`, and `<FadeGroup>`, and a
+ * validated sync target for `<RevealWith>`/`<FadeWith>`. Timeline-aware
+ * elements still receive compiler `as` props when missing, so inline usages
+ * remain valid HTML.
  *
  * ### Recursion
- * Nested step producers are flattened into the same slide-local timeline.
- * Parent reveal targets consume their step first, then nested reveals, groups,
- * RevealWith children, and code walkthrough steps after the first baseline
- * highlight consume later steps before the next sibling target.
+ * Nested step producers are flattened into the same slide-local timeline for
+ * reveal targets. Parent reveal targets consume their step first, then nested
+ * reveal/fade elements, reveal groups, and code walkthrough steps after the
+ * first baseline highlight consume later steps before the next sibling target.
+ * With components cannot contain nested timeline producers because they do not
+ * create timeline steps. Fade targets cannot contain nested timeline producers
+ * because a faded parent would hide later nested steps.
  */
 
 import type { Program } from "estree";
@@ -118,6 +123,22 @@ function hasAttribute(el: MdxJsxElement, name: string): boolean {
 	);
 }
 
+function isStepElementName(name: string | null | undefined): boolean {
+	return name === "Reveal" || name === "Fade";
+}
+
+function isWithElementName(name: string | null | undefined): boolean {
+	return name === "RevealWith" || name === "FadeWith";
+}
+
+function isGroupElementName(name: string | null | undefined): boolean {
+	return name === "RevealGroup" || name === "FadeGroup";
+}
+
+function isFadeElementName(name: string | null | undefined): boolean {
+	return name === "Fade";
+}
+
 function getAttribute(
 	el: MdxJsxElement,
 	name: string,
@@ -148,7 +169,7 @@ function setStringAttribute(
 	el.attributes.push(makeStringAttribute(name, value));
 }
 
-function injectRevealWrapperElement(el: MdxJsxElement): void {
+function injectTimelineWrapperElement(el: MdxJsxElement): void {
 	if (getAttribute(el, "as")) return;
 
 	el.attributes.push(
@@ -313,8 +334,8 @@ function findNestedStepProducer(node: unknown): string | null {
 
 	if (isJsxElement(node)) {
 		if (
-			node.name === "Reveal" ||
-			node.name === "RevealGroup" ||
+			isStepElementName(node.name) ||
+			isGroupElementName(node.name) ||
 			node.name === "TimelineSteps"
 		) {
 			return `<${node.name}>`;
@@ -347,8 +368,8 @@ function findNestedStepProducer(node: unknown): string | null {
 export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 	let counter = 1; // next `at` value to assign; 1-based
 	const namedReveals = new Map<string, number>();
-	const revealWithTargets: MdxJsxElement[] = [];
-	const revealWithNumericTargets: Array<{ el: MdxJsxElement; at: number }> = [];
+	const withStringTargets: Array<{ el: MdxJsxElement; target: string }> = [];
+	const withNumericTargets: Array<{ el: MdxJsxElement; at: number }> = [];
 
 	function visitChildren(node: unknown): void {
 		const n = node as { children?: unknown[] };
@@ -441,62 +462,116 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 				return;
 			}
 
-			if (el.name === "Reveal") {
+			if (isStepElementName(el.name)) {
 				if (hasAtProp(el)) {
 					throw new Error(
-						"Honeydeck <Reveal> `at` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> to sync content with an existing step.",
+						`Honeydeck <${el.name}> \`at\` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> or <FadeWith at={n}> to sync content with an existing step.`,
 					);
 				}
 
-				const revealAt = counter;
-				injectRevealWrapperElement(el);
-				setAtAttribute(el, revealAt);
-				recordRevealName(el, revealAt);
+				if (isFadeElementName(el.name)) {
+					const nestedProducer = findNestedStepProducer({
+						type: "honeydeckFadeChildren",
+						children: el.children,
+					});
+
+					if (nestedProducer) {
+						throw new Error(
+							`Honeydeck <${el.name}> cannot contain nested timeline producers (${nestedProducer}). Put fade components inside a Reveal instead of putting reveal/timeline components inside a Fade.`,
+						);
+					}
+				}
+
+				const stepAt = counter;
+				injectTimelineWrapperElement(el);
+				setAtAttribute(el, stepAt);
+				if (el.name === "Reveal") {
+					recordRevealName(el, stepAt);
+				}
 				counter++;
-				visitChildren(el);
+				if (!isFadeElementName(el.name)) {
+					visitChildren(el);
+				}
 				return;
 			}
 
-			if (el.name === "RevealWith") {
-				injectRevealWrapperElement(el);
+			if (isWithElementName(el.name)) {
+				injectTimelineWrapperElement(el);
+
+				const nestedProducer = findNestedStepProducer({
+					type: "honeydeckWithChildren",
+					children: el.children,
+				});
+
+				if (nestedProducer) {
+					throw new Error(
+						`Honeydeck <${el.name}> cannot contain nested timeline producers (${nestedProducer}). With components do not create timeline steps; target them at sibling timeline steps instead.`,
+					);
+				}
 
 				const hasTarget = hasAttribute(el, "target");
 				const hasAt = hasAtProp(el);
 				if (hasTarget === hasAt) {
 					throw new Error(
-						"Honeydeck <RevealWith> requires exactly one of `target` or `at`.",
+						`Honeydeck <${el.name}> requires exactly one of \`target\` or \`at\`.`,
 					);
 				}
 
 				if (hasTarget) {
 					const targetAttr = getAttribute(el, "target");
 					if (!targetAttr) return;
-					readNonEmptyStringLiteral(targetAttr, "<RevealWith> `target`");
-					revealWithTargets.push(el);
+					const targetValue = expressionValue(targetAttr);
+					if (typeof targetValue === "number") {
+						const at = parsePositiveIntegerLiteral(targetAttr);
+						if (at === null) {
+							throw new Error(
+								`Honeydeck <${el.name}> \`target\` must be a literal positive integer or non-empty string.`,
+							);
+						}
+						withNumericTargets.push({ el, at });
+					} else {
+						const target = readNonEmptyStringLiteral(
+							targetAttr,
+							`<${el.name}> \`target\``,
+						);
+						withStringTargets.push({ el, target });
+					}
 				} else {
 					const atAttr = getAttribute(el, "at");
 					const at = atAttr ? parsePositiveIntegerLiteral(atAttr) : null;
 					if (at === null) {
 						throw new Error(
-							"Honeydeck <RevealWith> `at` must be a literal positive integer, for example at={2}. Dynamic expressions are not supported because RevealWith steps are resolved at build time.",
+							`Honeydeck <${el.name}> \`at\` must be a literal positive integer, for example at={2}. Dynamic expressions are not supported because With steps are resolved at build time.`,
 						);
 					}
 					setAtAttribute(el, at);
-					revealWithNumericTargets.push({ el, at });
+					withNumericTargets.push({ el, at });
 				}
 
-				visitChildren(el);
 				return;
 			}
 
-			if (el.name === "RevealGroup") {
+			if (isGroupElementName(el.name)) {
 				if (hasAtProp(el)) {
 					throw new Error(
-						"Honeydeck <RevealGroup> `at` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> to sync content with an existing group step.",
+						`Honeydeck <${el.name}> \`at\` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> or <FadeWith at={n}> to sync content with an existing group step.`,
 					);
 				}
 
 				const targets = getRevealGroupTargets(el);
+
+				if (el.name === "FadeGroup") {
+					for (const target of targets) {
+						const nestedProducer = findNestedStepProducer(target);
+
+						if (nestedProducer) {
+							throw new Error(
+								`Honeydeck <FadeGroup> targets cannot contain nested timeline producers (${nestedProducer}). Put fade components inside a RevealGroup/Reveal target instead of nesting timeline components inside a FadeGroup target.`,
+							);
+						}
+					}
+				}
+
 				const targetSteps: number[] = [];
 
 				setAtAttribute(el, counter);
@@ -509,7 +584,9 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 				for (const target of targets) {
 					targetSteps.push(counter);
 					counter++;
-					visitNode(target);
+					if (el.name !== "FadeGroup") {
+						visitNode(target);
+					}
 				}
 
 				setStringAttribute(el, "targetStepsJson", JSON.stringify(targetSteps));
@@ -524,26 +601,20 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 
 	const stepCount = counter - 1; // counter started at 1
 
-	for (const el of revealWithTargets) {
-		const targetAttr = getAttribute(el, "target");
-		if (!targetAttr) continue;
-		const target = readNonEmptyStringLiteral(
-			targetAttr,
-			"<RevealWith> `target`",
-		);
+	for (const { el, target } of withStringTargets) {
 		const at = namedReveals.get(target);
 		if (at === undefined) {
 			throw new Error(
-				`Honeydeck <RevealWith target="${target}"> could not find a same-slide <Reveal name="${target}"> target.`,
+				`Honeydeck <${el.name} target="${target}"> could not find a same-slide <Reveal name="${target}"> target.`,
 			);
 		}
 		setAtAttribute(el, at);
 	}
 
-	for (const { at } of revealWithNumericTargets) {
+	for (const { el, at } of withNumericTargets) {
 		if (at > stepCount) {
 			throw new Error(
-				`Honeydeck <RevealWith at={${at}}> targets step ${at}, but this slide only has ${stepCount} timeline step${stepCount === 1 ? "" : "s"}.`,
+				`Honeydeck <${el.name} at={${at}}> targets step ${at}, but this slide only has ${stepCount} timeline step${stepCount === 1 ? "" : "s"}.`,
 			);
 		}
 	}

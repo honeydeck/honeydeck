@@ -50,7 +50,9 @@ Syntax:
 - Each active code group highlights only the specified lines (non-cumulative)
 - Non-highlighted lines are dimmed (`--honeydeck-code-line-dim-opacity`)
 - Dimming is applied by Honeydeck runtime markup/styles independently of Tailwind utility generation
-- Code steps participate in the same slide timeline as `Reveal` components
+- Code steps participate in the same slide timeline as `Reveal`, `Fade`, `RevealGroup`, and `FadeGroup` components
+- `RevealWith` and `FadeWith` never add timeline steps; they only watch existing steps through `target`
+- `RevealWith`, `FadeWith`, `Fade`, and `FadeGroup` targets reject nested timeline producers
 - Unsupported/failed languages render as plain code using Honeydeck CSS tokens
 - Code blocks expose a hover/focus copy control that copies the original fenced code text, not the highlighted HTML
 

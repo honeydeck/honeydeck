@@ -306,6 +306,91 @@ import { Reveal, RevealWith } from '@honeydeck/honeydeck'
 });
 
 // ---------------------------------------------------------------------------
+// <Fade> / <FadeWith> numbering
+// ---------------------------------------------------------------------------
+
+describe("remarkStepNumbering — fade/with elements", () => {
+	it("Fade participates in the same timeline as Reveal", async () => {
+		const { js, data } = await compileMdx(`
+import { Fade, Reveal } from '@honeydeck/honeydeck'
+
+<Fade>Gone first</Fade>
+
+<Reveal>Then appears</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 2);
+		assert.deepEqual(collectAtValues(js), [1, 2]);
+	});
+
+	it("FadeWith preserves numeric target props without adding timeline steps", async () => {
+		const { js, data } = await compileMdx(`
+import { FadeWith, Reveal } from '@honeydeck/honeydeck'
+
+<Reveal>Step one</Reveal>
+
+<FadeWith target={1}>Fades with target</FadeWith>
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.deepEqual(collectAtValues(js), [1]);
+		assert.match(js, /target:\s*1/);
+	});
+
+	it("injects span wrapper for inline Fade", async () => {
+		const { js, data } = await compileMdx(`
+import { Fade } from '@honeydeck/honeydeck'
+
+Text before <Fade>inline fade</Fade> text after.
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.match(js, /Fade,[\s\S]*?as:\s*"span"/);
+	});
+
+	it("allows Fade inside Reveal", async () => {
+		const { js, data } = await compileMdx(`
+import { Fade, Reveal } from '@honeydeck/honeydeck'
+
+<Reveal>
+  Parent appears
+  <Fade>Then fades</Fade>
+</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 2);
+		assert.deepEqual(collectAtValues(js), [1, 2]);
+	});
+
+	it("rejects nested timeline producers inside Fade", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { Fade, Reveal } from '@honeydeck/honeydeck'
+
+<Fade>
+  <Reveal>Nested reveal</Reveal>
+</Fade>
+    `),
+			/cannot contain nested timeline producers \(<Reveal>\)/,
+		);
+	});
+
+	it("rejects nested timeline producers inside FadeWith", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { FadeWith, Reveal } from '@honeydeck/honeydeck'
+
+<Reveal>Step one</Reveal>
+<FadeWith target={1}>
+  <Reveal>Nested reveal</Reveal>
+</FadeWith>
+    `),
+			/With components do not create timeline steps/,
+		);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // <RevealGroup> numbering
 // ---------------------------------------------------------------------------
 
@@ -419,6 +504,62 @@ import { RevealGroup } from '@honeydeck/honeydeck'
 </RevealGroup>
     `),
 			/<RevealGroup> `at` is internal compiler plumbing/,
+		);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// <FadeGroup> numbering
+// ---------------------------------------------------------------------------
+
+describe("remarkStepNumbering — <FadeGroup> elements", () => {
+	it("FadeGroup with 3 children: at={1} and stepCount=3", async () => {
+		const { js, data } = await compileMdx(`
+import { FadeGroup } from '@honeydeck/honeydeck'
+
+<FadeGroup>
+  <div>Child A</div>
+  <div>Child B</div>
+  <div>Child C</div>
+</FadeGroup>
+    `);
+
+		assert.equal(data.stepCount, 3);
+		assert.deepEqual(collectAtValues(js), [1]);
+	});
+
+	it("FadeGroup with a JSX list advances the next Reveal past every list item", async () => {
+		const { js, data } = await compileMdx(`
+import { FadeGroup, Reveal } from '@honeydeck/honeydeck'
+
+<FadeGroup>
+  <ul>
+    <li>Markdown-first</li>
+    <li>React-powered</li>
+    <li>PDF-ready</li>
+  </ul>
+</FadeGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 4);
+		assert.deepEqual(collectAtValues(js), [1, 4]);
+	});
+
+	it("rejects nested timeline producers inside FadeGroup targets", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { FadeGroup, Reveal } from '@honeydeck/honeydeck'
+
+<FadeGroup>
+  <div>
+    Parent item
+    <Reveal>Nested reveal</Reveal>
+  </div>
+</FadeGroup>
+    `),
+			/FadeGroup> targets cannot contain nested timeline producers \(<Reveal>\)/,
 		);
 	});
 });

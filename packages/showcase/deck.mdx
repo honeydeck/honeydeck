@@ -14,7 +14,7 @@ showSlideNumbers: true
 ---
 
 import './styles.css'
-import { BrowserFrame, ColorModeImage, Keyboard, ListStyle, Notes, Reveal, RevealWith, TimelineSteps, RevealGroup } from '@honeydeck/honeydeck'
+import { BrowserFrame, ColorModeImage, Fade, FadeGroup, FadeWith, Keyboard, ListStyle, Notes, Reveal, RevealGroup, RevealWith, TimelineSteps } from '@honeydeck/honeydeck'
 import { CheckIcon, CircleIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react'
 import { TimelineAccordion } from './TimelineAccordion.tsx'
 import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
@@ -618,6 +618,68 @@ function Hello() {
 </Reveal>
 
 <Reveal>Then this text appears after the code walk-through.</Reveal>
+
+---
+layout: TwoCol
+---
+
+# Reveal, Fade & Ephemeral
+
+<Left>
+
+## Reveal grows content
+
+<Reveal ephemeral>This appears at step 1 pushes things down.</Reveal>
+
+<Reveal>This appears at step 2 and reserves space before.</Reveal>
+
+This is some content
+
+</Left>
+
+<Right>
+
+## Fade removes content
+
+<Fade ephemeral>This starts visible, fades out at step 3, then frees its space.</Fade>
+
+<Fade>This starts visible and fades out at step 4.</Fade>
+
+Some content
+
+</Right>
+
+---
+layout: TwoCol
+---
+
+# Groups & Explicit Targets
+
+<Left>
+
+## Grouped steps
+
+<RevealGroup ephemeral>
+  - Step in
+  - Stay cumulative
+</RevealGroup>
+
+<FadeGroup ephemeral>
+  - Step out
+  - Free space
+</FadeGroup>
+
+</Left>
+
+<Right>
+
+## Targeted steps
+
+<RevealWith target={3}>This reveal watches slide step 3 without adding a step.</RevealWith>
+
+<FadeWith target={4}>This fade watches slide step 4 without adding a step.</FadeWith>
+
+</Right>
 
 ---
 

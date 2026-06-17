@@ -57,7 +57,7 @@ The Honeydeck specification is distributed:
 | Deck loading / frontmatter | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md) | deck entry, slide separators, MDX imports, assets, Markdown features, frontmatter |
 | Remark transforms | [`src/remark/SPEC.md`](src/remark/SPEC.md) | timeline annotation, code highlighting, step-through code metadata, and Magic Code syntax |
 | Runtime | [`src/runtime/SPEC.md`](src/runtime/SPEC.md) | timeline semantics, keyboard/touch navigation, SPA/build behavior, runtime errors |
-| Runtime components | [`src/runtime/components/SPEC.md`](src/runtime/components/SPEC.md) | `Reveal`, `RevealWith`, `RevealGroup`, `TimelineSteps`, `ListStyle`, `Keyboard`, `BrowserFrame`, `Notes` |
+| Runtime components | [`src/runtime/components/SPEC.md`](src/runtime/components/SPEC.md) | `Reveal`, `RevealWith`, `RevealGroup`, `Fade`, `FadeWith`, `FadeGroup`, `TimelineSteps`, `ListStyle`, `Keyboard`, `BrowserFrame`, `Notes` |
 | Runtime views | [`src/runtime/views/SPEC.md`](src/runtime/views/SPEC.md) | presenter mode, overview mode, theme/layout/component reference pages |
 | Layouts and customization | [`src/layouts/SPEC.md`](src/layouts/SPEC.md) | custom theme/layout/component model, built-in layouts, layout props, demos, layout resolution |
 | Theme | [`src/theme/SPEC.md`](src/theme/SPEC.md) | design tokens, base theme CSS, Tailwind mapping, color mode behavior |

@@ -8,7 +8,7 @@
 
 ```ts
 // Core components
-import { Reveal, RevealWith, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes, ColorModeImage } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, Fade, FadeWith, FadeGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes, ColorModeImage } from '@honeydeck/honeydeck'
 
 // Types for kit authors
 import type { LayoutProps, LayoutMap, LayoutDemo } from '@honeydeck/honeydeck/types'
@@ -47,6 +47,9 @@ import {
   Reveal as BarrelReveal,
   RevealWith as BarrelRevealWith,
   RevealGroup as BarrelRevealGroup,
+  Fade as BarrelFade,
+  FadeWith as BarrelFadeWith,
+  FadeGroup as BarrelFadeGroup,
   TimelineSteps as BarrelTimelineSteps,
   ListStyle as BarrelListStyle,
   Keyboard as BarrelKeyboard,
