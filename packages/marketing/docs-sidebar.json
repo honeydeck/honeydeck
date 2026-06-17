@@ -73,6 +73,11 @@
 				"title": "Reveal"
 			},
 			{
+				"source": "docs/components-reveal-with.md",
+				"slug": "components-reveal-with",
+				"title": "RevealWith"
+			},
+			{
 				"source": "docs/components-reveal-group.md",
 				"slug": "components-reveal-group",
 				"title": "RevealGroup"

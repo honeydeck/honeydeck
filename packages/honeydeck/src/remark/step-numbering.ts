@@ -1,6 +1,6 @@
 /**
- * Remark plugin: assign `at` props to `<Reveal>` and `<RevealGroup>` elements
- * and count total timeline steps per slide.
+ * Remark plugin: assign `at` props to timeline-aware MDX elements and count
+ * total timeline steps per slide.
  *
  * ### What it does
  * Walks the MDAST (including MDX JSX nodes) in document order and:
@@ -9,28 +9,31 @@
  *  2. Assigns `at={n}` to each `<RevealGroup>` element using the starting
  *     index of the group and adds internal per-target step numbers for group
  *     children/list items.
- *  3. Assigns `at={n}` to each `<TimelineSteps steps={n}>` element and
+ *  3. Collects literal `<Reveal name="...">` targets and resolves
+ *     `<RevealWith target="...">`/`<RevealWith at={n}>` without adding steps.
+ *  4. Assigns `at={n}` to each `<TimelineSteps steps={n}>` element and
  *     advances the timeline by its literal static step count.
- *  4. Counts timeline steps from code fence `|`-separated groups after the
+ *  5. Counts timeline steps from code fence `|`-separated groups after the
  *     first baseline group (counted here so `stepCount` is already accurate).
- *  5. Writes the total step count to `vfile.data.stepCount`.
+ *  6. Writes the total step count to `vfile.data.stepCount`.
  *
  * ### `at` prop injection
  * Numeric JSX props require an ESTree expression node. We construct a minimal
  * `Program` → `ExpressionStatement` → `Literal` subtree so that `@mdx-js/mdx`
  * generates `at={<number>}` (not `at="<string>"`).
  *
- * ### Existing `at` props
- * If a `<Reveal>` or `<RevealGroup>` already has an explicit `at` prop, this
- * plugin leaves it untouched. Future V2 may expose `<Reveal at={2}>` as a
- * public API for out-of-order reveals. `<Reveal>` still receives a compiler
- * `as` prop when missing, so manually numbered inline reveals remain valid HTML.
+ * ### Internal `at` props
+ * Honeydeck injects `at` props during compilation to connect timeline-driven
+ * components to their assigned slide-local steps. `at` is internal compiler
+ * plumbing for `<Reveal>` and `<RevealGroup>`, and a validated sync target for
+ * `<RevealWith>`. `<Reveal>` and `<RevealWith>` still receive compiler `as`
+ * props when missing, so inline usages remain valid HTML.
  *
  * ### Recursion
  * Nested step producers are flattened into the same slide-local timeline.
  * Parent reveal targets consume their step first, then nested reveals, groups,
- * and code walkthrough steps after the first baseline highlight consume later
- * steps before the next sibling target.
+ * RevealWith children, and code walkthrough steps after the first baseline
+ * highlight consume later steps before the next sibling target.
  */
 
 import type { Program } from "estree";
@@ -109,6 +112,12 @@ function hasAtProp(el: MdxJsxElement): boolean {
 	);
 }
 
+function hasAttribute(el: MdxJsxElement, name: string): boolean {
+	return el.attributes.some(
+		(a) => a.type === "mdxJsxAttribute" && a.name === name,
+	);
+}
+
 function getAttribute(
 	el: MdxJsxElement,
 	name: string,
@@ -117,6 +126,26 @@ function getAttribute(
 		(a): a is MdxJsxAttribute =>
 			a.type === "mdxJsxAttribute" && a.name === name,
 	);
+}
+
+function removeAttribute(el: MdxJsxElement, name: string): void {
+	el.attributes = el.attributes.filter(
+		(a) => !(a.type === "mdxJsxAttribute" && a.name === name),
+	);
+}
+
+function setAtAttribute(el: MdxJsxElement, at: number): void {
+	removeAttribute(el, "at");
+	el.attributes.push(makeAtAttribute(at));
+}
+
+function setStringAttribute(
+	el: MdxJsxElement,
+	name: string,
+	value: string,
+): void {
+	removeAttribute(el, name);
+	el.attributes.push(makeStringAttribute(name, value));
 }
 
 function injectRevealWrapperElement(el: MdxJsxElement): void {
@@ -210,6 +239,29 @@ function expressionValue(attr: MdxJsxAttribute): unknown {
 	return expression.value;
 }
 
+function stringLiteralValue(attr: MdxJsxAttribute): string | null {
+	if (typeof attr.value === "string") return attr.value;
+
+	const value = expressionValue(attr);
+	return typeof value === "string" ? value : null;
+}
+
+function readNonEmptyStringLiteral(
+	attr: MdxJsxAttribute,
+	description: string,
+): string {
+	const value = stringLiteralValue(attr);
+	if (value === null) {
+		throw new Error(
+			`Honeydeck ${description} must be a literal string. Dynamic expressions are not supported because RevealWith targets are resolved at build time.`,
+		);
+	}
+	if (value.length === 0) {
+		throw new Error(`Honeydeck ${description} must not be empty.`);
+	}
+	return value;
+}
+
 function parsePositiveIntegerLiteral(attr: MdxJsxAttribute): number | null {
 	if (typeof attr.value === "string") {
 		if (!/^[1-9]\d*$/.test(attr.value)) return null;
@@ -284,8 +336,8 @@ function findNestedStepProducer(node: unknown): string | null {
 // ---------------------------------------------------------------------------
 
 /**
- * Remark plugin that numbers `<Reveal>` and `<RevealGroup>` elements with
- * sequential `at` props and stores the total step count in `vfile.data`.
+ * Remark plugin that numbers timeline-aware MDX elements with sequential `at`
+ * props and stores the total step count in `vfile.data`.
  *
  * Usage (in Vite plugin config):
  * ```ts
@@ -294,6 +346,9 @@ function findNestedStepProducer(node: unknown): string | null {
  */
 export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 	let counter = 1; // next `at` value to assign; 1-based
+	const namedReveals = new Map<string, number>();
+	const revealWithTargets: MdxJsxElement[] = [];
+	const revealWithNumericTargets: Array<{ el: MdxJsxElement; at: number }> = [];
 
 	function visitChildren(node: unknown): void {
 		const n = node as { children?: unknown[] };
@@ -302,6 +357,19 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 		for (const child of n.children) {
 			visitNode(child);
 		}
+	}
+
+	function recordRevealName(el: MdxJsxElement, at: number): void {
+		const nameAttr = getAttribute(el, "name");
+		if (!nameAttr) return;
+
+		const name = readNonEmptyStringLiteral(nameAttr, "<Reveal> `name`");
+		if (namedReveals.has(name)) {
+			throw new Error(
+				`Honeydeck <Reveal> name "${name}" is duplicated on this slide. Reveal names must be unique per slide for <RevealWith target="..."> resolution.`,
+			);
+		}
+		namedReveals.set(name, at);
 	}
 
 	function visitNode(node: unknown): void {
@@ -367,35 +435,73 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 					);
 				}
 
-				if (!hasAtProp(el)) {
-					el.attributes.push(makeAtAttribute(counter));
-				}
-
+				setAtAttribute(el, counter);
 				counter += steps;
+				visitChildren(el);
 				return;
 			}
 
 			if (el.name === "Reveal") {
+				if (hasAtProp(el)) {
+					throw new Error(
+						"Honeydeck <Reveal> `at` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> to sync content with an existing step.",
+					);
+				}
+
+				const revealAt = counter;
+				injectRevealWrapperElement(el);
+				setAtAttribute(el, revealAt);
+				recordRevealName(el, revealAt);
+				counter++;
+				visitChildren(el);
+				return;
+			}
+
+			if (el.name === "RevealWith") {
 				injectRevealWrapperElement(el);
 
-				if (!hasAtProp(el)) {
-					el.attributes.push(makeAtAttribute(counter));
-					counter++;
-					visitChildren(el);
+				const hasTarget = hasAttribute(el, "target");
+				const hasAt = hasAtProp(el);
+				if (hasTarget === hasAt) {
+					throw new Error(
+						"Honeydeck <RevealWith> requires exactly one of `target` or `at`.",
+					);
 				}
+
+				if (hasTarget) {
+					const targetAttr = getAttribute(el, "target");
+					if (!targetAttr) return;
+					readNonEmptyStringLiteral(targetAttr, "<RevealWith> `target`");
+					revealWithTargets.push(el);
+				} else {
+					const atAttr = getAttribute(el, "at");
+					const at = atAttr ? parsePositiveIntegerLiteral(atAttr) : null;
+					if (at === null) {
+						throw new Error(
+							"Honeydeck <RevealWith> `at` must be a literal positive integer, for example at={2}. Dynamic expressions are not supported because RevealWith steps are resolved at build time.",
+						);
+					}
+					setAtAttribute(el, at);
+					revealWithNumericTargets.push({ el, at });
+				}
+
+				visitChildren(el);
 				return;
 			}
 
 			if (el.name === "RevealGroup") {
 				if (hasAtProp(el)) {
-					return;
+					throw new Error(
+						"Honeydeck <RevealGroup> `at` is internal compiler plumbing and cannot be authored. Use <RevealWith at={n}> to sync content with an existing group step.",
+					);
 				}
 
 				const targets = getRevealGroupTargets(el);
 				const targetSteps: number[] = [];
 
-				el.attributes.push(makeAtAttribute(counter));
+				setAtAttribute(el, counter);
 				if (targets.length === 0) {
+					removeAttribute(el, "targetStepsJson");
 					counter++;
 					return;
 				}
@@ -406,9 +512,7 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 					visitNode(target);
 				}
 
-				el.attributes.push(
-					makeStringAttribute("targetStepsJson", JSON.stringify(targetSteps)),
-				);
+				setStringAttribute(el, "targetStepsJson", JSON.stringify(targetSteps));
 				return;
 			}
 		}
@@ -418,6 +522,32 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 
 	visitChildren(tree);
 
+	const stepCount = counter - 1; // counter started at 1
+
+	for (const el of revealWithTargets) {
+		const targetAttr = getAttribute(el, "target");
+		if (!targetAttr) continue;
+		const target = readNonEmptyStringLiteral(
+			targetAttr,
+			"<RevealWith> `target`",
+		);
+		const at = namedReveals.get(target);
+		if (at === undefined) {
+			throw new Error(
+				`Honeydeck <RevealWith target="${target}"> could not find a same-slide <Reveal name="${target}"> target.`,
+			);
+		}
+		setAtAttribute(el, at);
+	}
+
+	for (const { at } of revealWithNumericTargets) {
+		if (at > stepCount) {
+			throw new Error(
+				`Honeydeck <RevealWith at={${at}}> targets step ${at}, but this slide only has ${stepCount} timeline step${stepCount === 1 ? "" : "s"}.`,
+			);
+		}
+	}
+
 	// Store total step count on the vfile for the virtual modules plugin to read.
-	vfile.data.stepCount = counter - 1; // counter started at 1
+	vfile.data.stepCount = stepCount;
 };

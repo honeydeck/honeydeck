@@ -3,7 +3,7 @@
  *
  * This is what end-users import in their MDX slides:
  * ```mdx
- * import { Reveal, RevealGroup, Notes } from '@honeydeck/honeydeck'
+ * import { Reveal, RevealWith, RevealGroup, Notes } from '@honeydeck/honeydeck'
  * ```
  */
 
@@ -25,6 +25,8 @@ export type { RevealProps } from "./components/Reveal.tsx";
 export { Reveal } from "./components/Reveal.tsx";
 export type { RevealGroupProps } from "./components/RevealGroup.tsx";
 export { RevealGroup } from "./components/RevealGroup.tsx";
+export type { RevealWithProps } from "./components/RevealWith.tsx";
+export { RevealWith } from "./components/RevealWith.tsx";
 export type {
 	TimelineStepsPhase,
 	TimelineStepsProps,

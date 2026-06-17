@@ -33,6 +33,7 @@ describe("component doc crawler", () => {
 				"Notes",
 				"Reveal",
 				"RevealGroup",
+				"RevealWith",
 				"TimelineSteps",
 			],
 		);
@@ -47,6 +48,10 @@ describe("component doc crawler", () => {
 		assert.match(
 			getDoc(result, "Keyboard").markdown,
 			/```mdx\nimport { Keyboard } from '@honeydeck\/honeydeck'/,
+		);
+		assert.match(
+			getDoc(result, "RevealWith").markdown,
+			/Reveals content at the same timeline step as an existing reveal/,
 		);
 		assert.equal(
 			getDoc(result, "TimelineSteps").publicModuleSpecifier,
@@ -132,6 +137,26 @@ describe("component doc crawler", () => {
 		assert.equal(
 			keyboard.props.find((prop) => prop.name === "keys")?.description,
 			"Key label or ordered shortcut key labels.",
+		);
+
+		const revealWith = getDoc(result, "RevealWith");
+		assert.deepEqual(
+			revealWith.props.map((prop) => ({
+				name: prop.name,
+				required: prop.required,
+				defaultValue: prop.defaultValue,
+			})),
+			[
+				{ name: "target", required: false, defaultValue: undefined },
+				{ name: "at", required: false, defaultValue: "1" },
+				{ name: "as", required: false, defaultValue: '"div"' },
+				{ name: "className", required: false, defaultValue: '""' },
+				{ name: "children", required: false, defaultValue: undefined },
+			],
+		);
+		assert.equal(
+			revealWith.props.find((prop) => prop.name === "target")?.type,
+			"string",
 		);
 
 		const timelineSteps = getDoc(result, "TimelineSteps");

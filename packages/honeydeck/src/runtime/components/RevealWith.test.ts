@@ -2,15 +2,18 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Reveal } from "../../runtime/components/Reveal.tsx";
+import {
+	RevealWith,
+	type RevealWithProps,
+} from "../../runtime/components/RevealWith.tsx";
 import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
 
-function renderReveal({
+function renderRevealWith({
 	at = 1,
 	as,
+	target,
 	className = "",
 	children = "Revealed content",
-	name,
 	stepIndex = 1,
 	stepCount = 1,
 	showFutureSteps = false,
@@ -18,15 +21,16 @@ function renderReveal({
 }: {
 	at?: number;
 	as?: "div" | "span";
+	target?: string;
 	className?: string;
 	children?: string;
-	name?: string;
 	stepIndex?: number;
 	stepCount?: number;
 	showFutureSteps?: boolean;
 	futureStepOpacity?: number;
 } = {}) {
-	const reveal = createElement(Reveal, { at, as, className, name }, children);
+	const props = { at, as, target, className } as RevealWithProps;
+	const reveal = createElement(RevealWith, props, children);
 
 	return renderToStaticMarkup(
 		createElement(
@@ -42,27 +46,27 @@ function renderReveal({
 	);
 }
 
-describe("<Reveal>", () => {
+describe("<RevealWith>", () => {
 	it("keeps author classes and renders block reveals by default", () => {
-		const html = renderReveal({ className: "custom-fade" });
+		const html = renderRevealWith({ className: "custom-sync" });
 
-		assert.match(html, /class="[^"]*\bhoneydeck-reveal\b[^"]*\bcustom-fade\b/);
+		assert.match(html, /class="[^"]*\bhoneydeck-reveal\b[^"]*\bcustom-sync\b/);
 		assert.ok(html.includes("display:block"));
 	});
 
-	it("marks named reveals with a Honeydeck data attribute", () => {
-		const html = renderReveal({ name: "intro" });
+	it("renders target debug data without a DOM id", () => {
+		const html = renderRevealWith({ target: "intro" });
 
-		assert.match(html, /data-honeydeck-reveal-id="intro"/);
+		assert.match(html, /data-honeydeck-reveal-with="intro"/);
 		assert.doesNotMatch(html, /\sid="intro"/);
 	});
 
-	it("shows future reveals as muted previews when requested", () => {
-		const html = renderReveal({
-			at: 2,
+	it("shows future synced content as muted previews when requested", () => {
+		const html = renderRevealWith({
+			at: 3,
 			children: "Future content",
 			stepIndex: 1,
-			stepCount: 2,
+			stepCount: 3,
 			showFutureSteps: true,
 			futureStepOpacity: 0.4,
 		});
@@ -72,12 +76,12 @@ describe("<Reveal>", () => {
 		assert.ok(html.includes("Future content"));
 	});
 
-	it("hides future reveals when previews are disabled", () => {
-		const html = renderReveal({
-			at: 2,
+	it("hides future synced content when previews are disabled", () => {
+		const html = renderRevealWith({
+			at: 3,
 			children: "Hidden content",
 			stepIndex: 1,
-			stepCount: 2,
+			stepCount: 3,
 		});
 
 		assert.ok(html.includes("visibility:hidden"));
@@ -85,8 +89,8 @@ describe("<Reveal>", () => {
 		assert.ok(html.includes("Hidden content"));
 	});
 
-	it("renders inline reveals as spans", () => {
-		const html = renderReveal({ as: "span", children: "Inline content" });
+	it("renders inline synced reveals as spans", () => {
+		const html = renderRevealWith({ as: "span", children: "Inline content" });
 
 		assert.match(html, /^<span\b/);
 		assert.ok(html.includes("honeydeck-reveal"));

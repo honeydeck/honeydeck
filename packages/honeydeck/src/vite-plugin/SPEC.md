@@ -67,6 +67,21 @@ Static files live in the project `public/` directory and are served from the web
 
 React components and built-in layouts may also import image assets through Vite (`webp`, `png`, `jpg`, `jpeg`, `svg`, `gif`). The built-in `Image` layout uses this for its bundled placeholder image.
 
+### Timeline-aware MDX Components
+
+Honeydeck's MDX compilation assigns slide-local timeline steps to built-in timeline components.
+
+Rules:
+
+- `<Reveal>` adds one step to the slide timeline and receives an internal `at` prop during compilation.
+- `<Reveal name="...">` exposes that reveal step as a same-slide target for `<RevealWith target="...">`.
+- Reveal names must be literal non-empty strings. Dynamic `name` expressions are unsupported.
+- Duplicate reveal names within one slide are compile errors. The same name may be reused on different slides.
+- `<RevealWith>` does not add a step. It requires exactly one literal prop: `target="name"` or `at={n}`.
+- `<RevealWith target="name">` may reference a named `<Reveal>` before or after it on the same slide. Missing targets are compile errors.
+- `<RevealWith at={n}>` targets an existing 1-based step on the same slide. Non-literal, non-positive, and out-of-range values are compile errors.
+- In development, invalid timeline component usage is surfaced with clear terminal and browser diagnostics without permanently killing the dev server. Production builds fail.
+
 ### Markdown Features
 
 Slide MDX supports GitHub-flavored Markdown pipe tables. Pipe tables render as real HTML tables in slides. The base theme styles slide tables with compact, full-width, token-based horizontal rules, bold headers, and light horizontal cell spacing so table Markdown is presentation-ready without custom CSS.

@@ -1,6 +1,6 @@
 # Steps & Reveals
 
-Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup` components, custom component step blocks, code highlight ranges, and Magic Code states, counted in document order.
+Honeydeck has a first-class step concept. Each slide has a timeline built from `Reveal`/`RevealGroup` components, `RevealWith` synchronized content, custom component step blocks, code highlight ranges, and Magic Code states, counted in document order.
 
 ## Timeline Model
 
@@ -8,6 +8,7 @@ Honeydeck has a first-class step concept. Each slide has a timeline built from `
 - Stepped code blocks show their first highlight group immediately whenever the block is visible.
 - Magic Code blocks show their first inner code fence and first highlight group immediately whenever the block is visible.
 - Each `Reveal`, `RevealGroup` child, `TimelineSteps` block, code highlight group after the first, or Magic Code state after the first adds a step.
+- `RevealWith` adds no step. It reveals with an existing step by `target` or numeric `at`.
 - All step-producing elements share one slide-local timeline.
 - Nested step-producing elements are flattened into that same timeline. A parent
   reveal target appears first; nested reveals, reveal groups, and code highlight
@@ -34,6 +35,34 @@ import { Reveal } from '@honeydeck/honeydeck'
 - **Cumulative** — once visible, content stays visible for the rest of the slide.
 - **Layout-stable** — hidden content reserves space (`opacity: 0` / `visibility: hidden`, not `display: none`).
 - **Default effect** — fade-in. Customize with `className` and Tailwind/CSS.
+- Optional `name="..."` gives a reveal a slide-local target for `RevealWith`.
+
+## RevealWith
+
+Use `RevealWith` when content should appear at the same step as another reveal,
+code highlight, group item, Magic Code state, or custom `TimelineSteps` state.
+It never adds a new step.
+
+````mdx
+import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+
+<Reveal name="headline">Headline appears first</Reveal>
+<RevealWith target="headline">Supporting detail appears with it</RevealWith>
+
+```ts {1|2|3}
+const answer = 42
+console.log(answer)
+```
+
+<RevealWith at={2}>This appears with the second slide step</RevealWith>
+````
+
+Rules:
+
+- Use exactly one of `target="name"` or `at={n}`.
+- `target` points to a same-slide `<Reveal name="name">`; forward references work.
+- `at` is a 1-based slide-local step and can target any existing timeline step.
+- `name`, `target`, and `at` must be literal values so Honeydeck can validate them at build time.
 
 ## RevealGroup
 

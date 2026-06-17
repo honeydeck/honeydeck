@@ -1,6 +1,22 @@
 # Honeydeck Remark Transform Specification
 
-> Observable behavior for code highlighting transforms.
+> Observable behavior for timeline annotation and code highlighting transforms.
+
+## Timeline Step Annotation
+
+Honeydeck's remark pipeline assigns slide-local timeline metadata to built-in components before MDX is compiled.
+
+Behavior:
+
+- `<Reveal>` consumes one timeline step in document order and receives an internal `at` prop for runtime visibility. Author-authored `at` on `<Reveal>` is a compile error; use `<RevealWith at={n}>` for same-step synchronization.
+- `<RevealGroup>` consumes one step per meaningful direct child/list item, including nested timeline gaps, and receives internal `at`/target metadata for runtime visibility. Author-authored `at` on `<RevealGroup>` is a compile error; use `<RevealWith at={n}>` for same-step synchronization.
+- `<RevealWith>` consumes no timeline steps. It receives an internal resolved `at` prop based on either a same-slide `<Reveal name="...">` target or a literal numeric `at={n}` target.
+- Named reveal targets are slide-local. Duplicate `<Reveal name="...">` values on the same slide are compile errors; reuse across slides is allowed.
+- `<RevealWith target="...">` supports forward references to named reveals anywhere on the same slide.
+- `<RevealWith>` requires exactly one of `target` or `at`; both and neither are compile errors.
+- `Reveal` `name`, `RevealWith` `target`, and `RevealWith` `at` must be literal values. Empty names/targets, non-positive numeric `at`, and numeric `at` values greater than the slide's final step count are compile errors.
+- `RevealWith at={n}` can target any existing slide timeline step, including code, Magic Code, `RevealGroup`, and `TimelineSteps` steps.
+- Flow/block usages of `<Reveal>` and `<RevealWith>` receive an internal block wrapper marker; text/inline usages receive an internal inline wrapper marker so compiled HTML remains valid.
 
 ## Code Highlighting
 

@@ -364,8 +364,8 @@ export function honeydeckPlugin(
 		mdx({
 			// remarkFrontmatter strips YAML front-matter blocks so they don't
 			// appear as raw text in the rendered output.
-			// remarkStepNumbering assigns at={n} props to <Reveal>/<RevealGroup>
-			// and records vfile.data.stepCount for each slide.
+			// remarkStepNumbering assigns timeline metadata to built-in MDX
+			// timeline components and records vfile.data.stepCount for each slide.
 			remarkPlugins: [
 				remarkFrontmatter,
 				remarkGfm,

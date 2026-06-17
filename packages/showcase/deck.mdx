@@ -14,7 +14,7 @@ showSlideNumbers: true
 ---
 
 import './styles.css'
-import { BrowserFrame, ColorModeImage, Keyboard, ListStyle, Notes, Reveal, TimelineSteps, RevealGroup } from '@honeydeck/honeydeck'
+import { BrowserFrame, ColorModeImage, Keyboard, ListStyle, Notes, Reveal, RevealWith, TimelineSteps, RevealGroup } from '@honeydeck/honeydeck'
 import { CheckIcon, CircleIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react'
 import { TimelineAccordion } from './TimelineAccordion.tsx'
 import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
@@ -618,6 +618,29 @@ function Hello() {
 </Reveal>
 
 <Reveal>Then this text appears after the code walk-through.</Reveal>
+
+---
+
+# RevealWith Sync 🔗
+
+<Reveal name="setup">Name a reveal to make it a same-step target.</Reveal>
+
+<RevealWith target="setup">
+  <div className="rounded-honeydeck border border-accent bg-accent/10 p-4 text-accent">
+    This callout appears with the named reveal, without adding a step.
+  </div>
+</RevealWith>
+
+```tsx {0|2-3|all}
+function BeeCard() {
+  const name = 'Dex'
+  return <strong>{name}</strong>
+}
+```
+
+<RevealWith at={2}>
+  This note appears with the first code highlight step via <code>at={2}</code>.
+</RevealWith>
 
 ---
 

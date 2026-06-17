@@ -16,6 +16,7 @@
 - The package-local layout map extends `@honeydeck/honeydeck/layouts/bee` and adds `Poster` plus an unused `UnusedShowcase` layout for the layout reference page.
 - `imported-slides.mdx` is imported by the root deck and expands a slide group at the import location.
 - `TimelineAccordion.tsx` demonstrates custom component-controlled timeline steps through `useTimelineSteps`.
+- `deck.mdx` includes a `RevealWith` slide that syncs supporting content with both a named reveal target and an existing numeric timeline step.
 - `deck.mdx` includes a Magic Code slide using `md magic-code` with inner TypeScript fences, line-highlight states, and an explicit duration override.
 
 ## Scripts

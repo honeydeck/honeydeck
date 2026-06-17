@@ -128,7 +128,7 @@ For the full reference, see [Configuration](configuration.md).
 Core runtime components are explicit imports from `honeydeck`.
 
 ```mdx
-import { Reveal, RevealGroup, TimelineSteps, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, TimelineSteps, BrowserFrame, Notes } from '@honeydeck/honeydeck'
 ```
 
 ### Reveal steps
@@ -136,8 +136,15 @@ import { Reveal, RevealGroup, TimelineSteps, BrowserFrame, Notes } from '@honeyd
 `<Reveal>` reveals content at the next timeline step. Hidden content keeps its layout space so the slide does not jump.
 
 ```mdx
-<Reveal>Appears at step 1</Reveal>
+<Reveal name="first">Appears at step 1</Reveal>
 <Reveal>Appears at step 2</Reveal>
+```
+
+`<RevealWith>` syncs extra content to an existing step without adding a step:
+
+```mdx
+<RevealWith target="first">Appears with step 1</RevealWith>
+<RevealWith at={2}>Appears with step 2</RevealWith>
 ```
 
 `<RevealGroup>` wraps each direct child in a reveal step. Markdown and HTML lists are special: each list item reveals one after another.
@@ -352,7 +359,7 @@ Package Markdown guides live on the Honeydeck docs site and in the package `docs
 ## Types and exports
 
 ```ts
-import { Reveal, RevealGroup, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, Notes } from '@honeydeck/honeydeck'
 import type { LayoutProps, LayoutMap, LayoutDemo } from '@honeydeck/honeydeck/types'
 
 import defaultLayouts from '@honeydeck/honeydeck/layouts'

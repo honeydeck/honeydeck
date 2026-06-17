@@ -1,5 +1,8 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import type { ReactNode } from "react";
+import {
+	TimelineReveal,
+	type TimelineRevealElement,
+} from "./TimelineReveal.tsx";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,7 +18,9 @@ export type RevealProps = {
 	 * Wrapper element. Injected by the compiler from MDX context:
 	 * flow/block reveals use `div`, text/inline reveals use `span`.
 	 */
-	as?: "div" | "span";
+	as?: TimelineRevealElement;
+	/** Slide-local target name for <RevealWith target="..."> synchronization. */
+	name?: string;
 	/** Additional CSS class for custom transition overrides. */
 	className?: string;
 	children?: ReactNode;
@@ -40,43 +45,33 @@ export type RevealProps = {
  *
  * Visible from the start.
  *
- * <Reveal>This appears at step 1.</Reveal>
+ * <Reveal name="intro">This appears at step 1.</Reveal>
  *
  * <Reveal>This appears at step 2.</Reveal>
  * ```
  *
  * Honeydeck normally injects `at` during MDX compilation. It also injects `as`
  * from the MDX context so block reveals render as `div` and inline reveals
- * render as `span`.
+ * render as `span`. Optional `name` values are slide-local targets for
+ * `<RevealWith target="...">`.
  */
 export function Reveal({
-	as: Component = "div",
+	as = "div",
 	at = 1,
+	name,
 	className = "",
 	children,
 }: RevealProps) {
-	const { stepIndex, showFutureSteps, futureStepOpacity } = useTimeline();
-	const visible = stepIndex >= at;
-	const previewFuture = !visible && showFutureSteps;
-
-	const style: CSSProperties = {
-		display: Component === "span" ? "inline" : "block",
-		visibility: visible || previewFuture ? "visible" : "hidden",
-		opacity: visible ? 1 : previewFuture ? futureStepOpacity : 0,
-		transition: "opacity 300ms ease",
-	};
-
 	return (
-		<Component
-			className={[
-				"honeydeck-reveal mb-[0.75em] text-[length:var(--honeydeck-font-size-body)] leading-[1.6] [&>:last-child]:mb-0",
-				className,
-			]
-				.filter(Boolean)
-				.join(" ")}
-			style={style}
+		<TimelineReveal
+			as={as}
+			at={at}
+			className={className}
+			dataAttributes={{
+				"data-honeydeck-reveal-id": name,
+			}}
 		>
 			{children}
-		</Component>
+		</TimelineReveal>
 	);
 }

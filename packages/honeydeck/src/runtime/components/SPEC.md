@@ -7,7 +7,7 @@
 All core components are explicit imports from the `'@honeydeck/honeydeck'` package. They are also exported from `@honeydeck/honeydeck/components`:
 
 ```mdx
-import { Reveal, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
 ```
 
 Injected fenced code blocks render through `HoneydeckCodeBlock` from the direct `@honeydeck/honeydeck/components/code-block/normal` subpath. Injected Magic Code blocks render through `HoneydeckMagicCodeBlock` from the direct `@honeydeck/honeydeck/components/code-block/magic` subpath. Both implementations share the `CodeBlock` parent frame from `@honeydeck/honeydeck/components/code-block` for wrapper styling and copy-button placement, but generated slides import the concrete implementations directly instead of using a code-block barrel. These components are not part of the public component barrel, but transformed slide code blocks must show syntax-highlighted code and reveal an icon-only copy button on hover or keyboard focus. Copying writes the original fenced source text, or for Magic Code, the currently visible source state. Normal stepped code blocks and Magic Code blocks fade specifically highlighted lines from dimmed opacity to full opacity when those lines become active. Magic Code line highlighting must update correctly in both directions, including transitions from a dimmed state to an `all` highlight state. Magic Code token movement, enter/leave transitions, and container size transitions start together and use Shiki Magic Move's duration so resizing stays synchronized with content movement. Entering tokens fade slowly from transparent to their active line-dimming opacity, and leaving tokens fade slowly to transparent instead of popping in or out. Magic Code uses Honeydeck's centralized effective color-mode context so code blocks do not observe document attributes individually. Magic Code lazily parses only the active theme's precompiled token JSON; duplicated timeline states may reference shared unique token states to keep generated output smaller. Magic Code lets Shiki perform its initial render for the starting state, then waits two animation frames before forwarding timeline state changes so the first user-driven transition diffs from a stable baseline. During PDF export, Magic Code skips that baseline delay and disables Magic Move animation so screenshots capture the requested timeline state instead of an in-progress transition. Magic Code passes Honeydeck's current slide transform scale to Shiki Magic Move so measured positions and inline animation sizes stay in the same coordinate system and the container does not pop when the animation releases its inline size.
@@ -54,6 +54,7 @@ Reveals content at the next timeline step.
 ```mdx
 <Reveal>This appears at step 1</Reveal>
 <Reveal>This appears at step 2</Reveal>
+<Reveal name="summary">This named reveal appears at step 3</Reveal>
 ```
 
 Behavior:
@@ -64,9 +65,46 @@ Behavior:
 - Default effect: fade in
 - Reveals are **cumulative** (once visible, stays visible)
 - Supports `className` for custom transitions
-- Supports `at?: number`; Honeydeck injects this during compilation and manual use works as an escape hatch
-- Supports `as?: "div" | "span"`; Honeydeck injects this during compilation and manual use works as an escape hatch
+- Each authored `<Reveal>` adds one step to the slide timeline
+- Supports `name?: string` as a slide-local reveal target for `<RevealWith target="...">`
+- `name` must be a literal non-empty string when present; dynamic expressions are not supported because target resolution happens at build time
+- Duplicate `name` values on `<Reveal>` components in the same slide are build errors; the same name may be reused on different slides
+- A named reveal renders `data-honeydeck-reveal-id="name"` on its wrapper for debugging/inspection; it does not render a DOM `id`
+- `at?: number` is an internal compiler-injected prop, not a user-facing API; author-authored `at` values are build errors. Use `<RevealWith at={n}>` to sync content with an existing step
+- Supports `as?: "div" | "span"`; Honeydeck injects this during compilation
 - No `effect` prop
+
+### `<RevealWith>`
+
+Reveals content at the same timeline step as an existing reveal or explicit slide-local step. It never creates or consumes timeline steps.
+
+````mdx
+<Reveal name="left">Left column appears first</Reveal>
+<RevealWith target="left">Right column appears with the left column</RevealWith>
+
+```ts {1|2|3}
+const answer = 42
+console.log(answer)
+```
+
+<RevealWith at={2}>This appears with the second slide step, such as a code highlight</RevealWith>
+````
+
+Behavior:
+
+- Requires exactly one of `target` or `at`
+- `target` must be a literal non-empty string and resolves to a `<Reveal name="...">` on the same slide
+- `target` supports forward references; the named `<Reveal>` may appear before or after `<RevealWith>` in the same slide
+- Missing targets are build errors; during development Honeydeck should surface a clear terminal and browser diagnostic without killing the dev server
+- `at` must be a literal positive integer and targets an existing 1-based slide-local timeline step
+- Numeric `at` is generic and may sync with a reveal, `RevealGroup` child/list item, code step, Magic Code state, or `TimelineSteps` step
+- `at` values outside the final slide step range are build errors; during development Honeydeck should surface a clear terminal and browser diagnostic without killing the dev server
+- Passing both `target` and `at`, or neither, is a build error
+- `RevealWith` visibility is cumulative, matching `<Reveal>`: once visible, it stays visible
+- Hidden content reserves layout space and uses the same default fade, future-step preview behavior, wrapper classes, and `className` behavior as `<Reveal>`
+- Runtime wrapper matches MDX context: flow/block usages render a block-level `div`, text/inline usages render an inline `span`
+- When `target` is used, the wrapper renders `data-honeydeck-reveal-with="target"` for debugging/inspection
+- `RevealWith` does not support targeting individual `RevealGroup` children by name in v1; use numeric `at` for group child/list-item synchronization
 
 ### `<RevealGroup>`
 

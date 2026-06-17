@@ -51,7 +51,7 @@ Honeydeck builds an ordered capture plan before taking screenshots. The final PD
 
 When `pdfSteps: all`:
 
-- Each `Reveal`/`RevealGroup` step becomes a separate page.
+- Each `Reveal`/`RevealGroup` step becomes a separate page. `RevealWith` appears on the page for its target step and adds no extra page.
 - Stepped code blocks show their first highlight group on the baseline page; each later code highlight group becomes a separate page.
 - Magic Code blocks show their first inner code fence on the baseline page; later line-highlight states and code morph states become separate pages according to the same timeline.
 - Reveals, stepped code blocks, Magic Code, and custom `TimelineSteps` blocks use the same underlying timeline.

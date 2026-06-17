@@ -3,7 +3,7 @@
 Honeydeck core components are explicit imports from `@honeydeck/honeydeck`. They are also exported from `@honeydeck/honeydeck/components`.
 
 ```mdx
-import { Reveal, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
 ```
 
 Use these pages as the component reference:
@@ -11,6 +11,7 @@ Use these pages as the component reference:
 | Component | Use it for |
 | --- | --- |
 | [`Reveal`](components-reveal.md) | Show content at a specific slide timeline step. |
+| [`RevealWith`](components-reveal-with.md) | Show content with an existing reveal or numeric slide step without adding another step. |
 | [`RevealGroup`](components-reveal-group.md) | Reveal each direct child or list item one after another. |
 | [`TimelineSteps`](components-timeline-steps.md) | Reserve timeline steps for an imported custom React component. |
 | [`ListStyle`](components-list-style.md) | Style Markdown, HTML, or JSX lists with no markers or custom markers. |

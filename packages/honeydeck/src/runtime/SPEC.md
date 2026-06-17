@@ -20,10 +20,12 @@ Magic Code blocks join the same timeline. Each inner code fence contributes its 
 - First reveal/custom timeline entry activates at `stepIndex = 1`
 - For code walkthroughs and Magic Code inner code states, the second and later metadata groups activate at their assigned timeline steps
 - Timeline entries are determined by document order (top-to-bottom)
-- Compiler-injected or manually-authored `<Reveal at={n}>` is preserved and excluded from automatic step counting
+- Each authored `<Reveal>` adds one step to the slide timeline. Honeydeck injects an internal `at={n}` prop during compilation to connect each reveal to its assigned timeline step; `at` is not a user-facing API, and author-authored `at` values are build errors.
+- `<Reveal name="...">` may name that reveal's assigned step for same-slide `<RevealWith target="...">` synchronization. Reveal names are slide-local, literal, non-empty strings.
+- `<RevealWith>` never adds a timeline step. It reveals cumulatively at an existing step resolved either from `target="name"` on a same-slide `<Reveal>` or from literal numeric `at={n}` targeting an existing 1-based slide-local step.
 - Timeline entries are flat within each slide, even when authored with nested
   components. A parent `<Reveal>` or `<RevealGroup>` target consumes its step
-  first, then any nested `<Reveal>`, `<RevealGroup>`, or code walkthrough steps
+  first, then any nested `<Reveal>`, `<RevealGroup>`, `<RevealWith>`, or code walkthrough steps
   inside it are appended to the same slide timeline before the next sibling
   timeline target.
 - Custom React components can participate by wrapping their usage in

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useTimeline } from "../TimelineContext.tsx";
 import { Reveal } from "./Reveal.tsx";
+import { getTimelineRevealStyle } from "./TimelineReveal.tsx";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -70,14 +71,12 @@ function revealStyle(
 	showFutureSteps: boolean,
 	futureStepOpacity: number,
 ): CSSProperties {
-	const visible = stepIndex >= at;
-	const previewFuture = !visible && showFutureSteps;
-
-	return {
-		visibility: visible || previewFuture ? "visible" : "hidden",
-		opacity: visible ? 1 : previewFuture ? futureStepOpacity : 0,
-		transition: "opacity 300ms ease",
-	};
+	return getTimelineRevealStyle({
+		stepIndex,
+		at,
+		showFutureSteps,
+		futureStepOpacity,
+	});
 }
 
 function parseTargetSteps(targetStepsJson: string | undefined): number[] {

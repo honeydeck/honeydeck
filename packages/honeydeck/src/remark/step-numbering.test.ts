@@ -59,19 +59,15 @@ import { Reveal } from '@honeydeck/honeydeck'
 		assert.deepEqual(collectAtValues(js), [1, 2]);
 	});
 
-	it("existing at prop on Reveal is left untouched", async () => {
-		const { js, data } = await compileMdx(`
+	it("rejects authored at prop on Reveal", async () => {
+		await assert.rejects(
+			compileMdx(`
 import { Reveal } from '@honeydeck/honeydeck'
 
 <Reveal at={5}>Pre-numbered</Reveal>
-    `);
-
-		assert.equal(
-			data.stepCount,
-			0,
-			"pre-existing at should not advance the counter",
+    `),
+			/<Reveal> `at` is internal compiler plumbing/,
 		);
-		assert.deepEqual(collectAtValues(js), [5]);
 	});
 
 	it("injects span wrapper for inline nested Reveal inside paragraph text", async () => {
@@ -106,20 +102,206 @@ Parent
 		assert.match(js, /Reveal,[\s\S]*?as:\s*"div"[\s\S]*?at:\s*2/);
 	});
 
-	it("injects span wrapper for manually numbered inline Reveal", async () => {
-		const { js, data } = await compileMdx(`
+	it("rejects authored at prop on inline Reveal", async () => {
+		await assert.rejects(
+			compileMdx(`
 import { Reveal } from '@honeydeck/honeydeck'
 
-Text before <Reveal at={5}>manual inline</Reveal> text after.
-    `);
-
-		assert.equal(data.stepCount, 0, "manual at remains excluded from counting");
-		assert.match(js, /Reveal,[\s\S]*?at:\s*5[\s\S]*?as:\s*"span"/);
+Text before <Reveal at={5}>inline reveal</Reveal> text after.
+    `),
+			/<Reveal> `at` is internal compiler plumbing/,
+		);
 	});
 
 	it("plain text MDX produces stepCount=0", async () => {
 		const { data } = await compileMdx(`Just some text.`);
 		assert.equal(data.stepCount, 0);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// <RevealWith> resolution
+// ---------------------------------------------------------------------------
+
+describe("remarkStepNumbering — <RevealWith> elements", () => {
+	it("resolves target references to an earlier named Reveal without adding steps", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+
+<Reveal name="intro">Intro</Reveal>
+<RevealWith target="intro">Synced detail</RevealWith>
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.deepEqual(collectAtValues(js), [1, 1]);
+		assert.match(js, /RevealWith,[\s\S]*?target:\s*"intro"[\s\S]*?at:\s*1/);
+	});
+
+	it("supports forward target references to a later named Reveal", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith target="later">Synced detail</RevealWith>
+<Reveal name="later">Later reveal</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.deepEqual(collectAtValues(js), [1, 1]);
+	});
+
+	it("keeps numeric at targets and does not increment the timeline", async () => {
+		const { js, data } = await compileMdx(`
+import { RevealGroup, RevealWith, TimelineSteps } from '@honeydeck/honeydeck'
+
+\`\`\`ts {1|2}
+const a = 1
+const b = 2
+\`\`\`
+
+<RevealGroup>
+  <div>Group A</div>
+  <div>Group B</div>
+</RevealGroup>
+
+<TimelineSteps steps={2}>
+  <div />
+</TimelineSteps>
+
+<RevealWith at={4}>Custom step sync</RevealWith>
+    `);
+
+		assert.equal(data.stepCount, 5);
+		assert.deepEqual(collectAtValues(js), [2, 4, 4]);
+	});
+
+	it("injects span wrapper for inline RevealWith", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+
+<Reveal name="inline-target">Target</Reveal>
+Text before <RevealWith target="inline-target">inline detail</RevealWith> text after.
+    `);
+
+		assert.equal(data.stepCount, 1);
+		assert.match(
+			js,
+			/RevealWith,[\s\S]*?target:\s*"inline-target"[\s\S]*?as:\s*"span"[\s\S]*?at:\s*1/,
+		);
+	});
+
+	it("rejects duplicate Reveal names on the same slide", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { Reveal } from '@honeydeck/honeydeck'
+
+<Reveal name="dup">First</Reveal>
+<Reveal name="dup">Second</Reveal>
+      `),
+			/duplicated on this slide/,
+		);
+	});
+
+	it("rejects missing RevealWith targets", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith target="missing">No target</RevealWith>
+      `),
+			/could not find a same-slide <Reveal name="missing">/,
+		);
+	});
+
+	it("rejects empty and dynamic Reveal names and targets", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { Reveal } from '@honeydeck/honeydeck'
+
+<Reveal name="">Empty name</Reveal>
+      `),
+			/<Reveal> `name` must not be empty/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { Reveal } from '@honeydeck/honeydeck'
+
+export const revealName = 'dynamic';
+
+<Reveal name={revealName}>Dynamic name</Reveal>
+      `),
+			/<Reveal> `name` must be a literal string/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith target="">Empty target</RevealWith>
+      `),
+			/<RevealWith> `target` must not be empty/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+export const target = 'dynamic';
+
+<RevealWith target={target}>Dynamic target</RevealWith>
+      `),
+			/<RevealWith> `target` must be a literal string/,
+		);
+	});
+
+	it("rejects invalid RevealWith prop combinations and numeric at values", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith>Missing props</RevealWith>
+      `),
+			/requires exactly one of `target` or `at`/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith target="x" at={1}>Both props</RevealWith>
+      `),
+			/requires exactly one of `target` or `at`/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+<RevealWith at={0}>Zero</RevealWith>
+      `),
+			/`at` must be a literal positive integer/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { RevealWith } from '@honeydeck/honeydeck'
+
+export const step = 1;
+
+<RevealWith at={step}>Dynamic</RevealWith>
+      `),
+			/`at` must be a literal positive integer/,
+		);
+
+		await assert.rejects(
+			compileMdx(`
+import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+
+<Reveal>Only step</Reveal>
+<RevealWith at={2}>Out of range</RevealWith>
+      `),
+			/targets step 2, but this slide only has 1 timeline step/,
+		);
 	});
 });
 
@@ -227,21 +409,17 @@ import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
 		assert.deepEqual(collectAtValues(js), [1, 3]);
 	});
 
-	it("existing at prop on RevealGroup is left untouched", async () => {
-		const { js, data } = await compileMdx(`
+	it("rejects authored at prop on RevealGroup", async () => {
+		await assert.rejects(
+			compileMdx(`
 import { RevealGroup } from '@honeydeck/honeydeck'
 
 <RevealGroup at={10}>
   <div>A</div>
 </RevealGroup>
-    `);
-
-		assert.equal(
-			data.stepCount,
-			0,
-			"pre-existing at should not advance the counter",
+    `),
+			/<RevealGroup> `at` is internal compiler plumbing/,
 		);
-		assert.deepEqual(collectAtValues(js), [10]);
 	});
 });
 
@@ -359,6 +537,21 @@ import { Reveal, TimelineSteps } from '@honeydeck/honeydeck'
       `),
 			/cannot contain nested timeline producers \(<Reveal>\)/,
 		);
+	});
+
+	it("TimelineSteps validates nested RevealWith without adding steps", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealWith, TimelineSteps } from '@honeydeck/honeydeck'
+
+<Reveal name="outside">Outside reveal</Reveal>
+
+<TimelineSteps steps={2}>
+  <RevealWith target="outside">Nested synced reveal</RevealWith>
+</TimelineSteps>
+      `);
+
+		assert.equal(data.stepCount, 3, "Reveal(1) + TimelineSteps(2)");
+		assert.deepEqual(collectAtValues(js), [1, 2, 1]);
 	});
 
 	it("TimelineSteps rejects nested stepped code fences", async () => {
