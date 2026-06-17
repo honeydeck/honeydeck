@@ -141,7 +141,9 @@ Behavior matches `<Fade>` for wrapper selection, `className`, `ephemeral`, previ
 
 ### `<RevealGroup>`
 
-Convenience: reveals each meaningful direct child one by one. Whitespace-only text children are ignored. As a special case, when a direct child is a Markdown/HTML/JSX list, each item in that list is revealed one after another while preserving the list container. Empty groups currently consume one timeline step.
+Convenience: reveals each meaningful direct child one by one. Whitespace-only text children are ignored. As a special case, when a direct child is a Markdown/HTML/JSX list, each top-level item in that list is revealed one after another while preserving the list container. Empty groups currently consume one timeline step.
+
+`listRevealMode?: "direct" | "nested"` controls list flattening. The default `"direct"` preserves existing behavior and reveals only top-level items of a direct child list. `"nested"` makes every nested list item in direct child lists a reveal target in depth-first document order while preserving the nested list structure. Because this prop changes compile-time step counting, authored MDX must use a static literal value.
 
 ```mdx
 <RevealGroup>
@@ -151,7 +153,7 @@ Convenience: reveals each meaningful direct child one by one. Whitespace-only te
 </RevealGroup>
 ```
 
-Each list item becomes its own timeline step. Supports `ephemeral?: boolean`, which is forwarded to generated child reveals.
+Each top-level list item becomes its own timeline step. Supports `ephemeral?: boolean`, which is forwarded to generated child reveals.
 
 Nested timeline entries inside a group target are flattened after that target
 and before the following group target:
@@ -171,6 +173,24 @@ Timeline:
 1. Parent item appears
 2. Nested detail appears
 3. Sibling item appears
+
+Nested list items can be revealed separately with `listRevealMode="nested"`:
+
+```mdx
+<RevealGroup listRevealMode="nested">
+  - Parent
+    - Child A
+    - Child B
+  - Sibling
+</RevealGroup>
+```
+
+Timeline:
+
+1. Parent appears
+2. Child A appears
+3. Child B appears
+4. Sibling appears
 
 ### `<FadeGroup>`
 

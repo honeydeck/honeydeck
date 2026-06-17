@@ -147,7 +147,7 @@ import { Reveal, RevealWith, RevealGroup, TimelineSteps, BrowserFrame, Notes } f
 <RevealWith at={2}>Appears with step 2</RevealWith>
 ```
 
-`<RevealGroup>` wraps each direct child in a reveal step. Markdown and HTML lists are special: each list item reveals one after another.
+`<RevealGroup>` wraps each direct child in a reveal step. Markdown and HTML lists are special: each top-level list item reveals one after another. Use `listRevealMode="nested"` to reveal nested list items depth-first.
 
 ```mdx
 <RevealGroup>

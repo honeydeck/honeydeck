@@ -99,7 +99,7 @@ import { FadeWith } from '@honeydeck/honeydeck'
 ## RevealGroup
 
 Reveals each direct child as its own step. If a direct child is a list, each
-list item is revealed as its own step:
+top-level list item is revealed as its own step:
 
 ```mdx
 import { RevealGroup } from '@honeydeck/honeydeck'
@@ -110,6 +110,19 @@ import { RevealGroup } from '@honeydeck/honeydeck'
   - PDF-ready
 </RevealGroup>
 ```
+
+Set `listRevealMode="nested"` to reveal nested list items depth-first:
+
+```mdx
+<RevealGroup listRevealMode="nested">
+  - Parent
+    - Child A
+    - Child B
+  - Sibling
+</RevealGroup>
+```
+
+Timeline: parent → child A → child B → sibling. The default `"direct"` mode keeps nested items grouped with their parent.
 
 To reveal multiple elements together, wrap them in a single `Reveal` instead. Add `ephemeral` to the group when hidden generated children should not reserve layout space.
 

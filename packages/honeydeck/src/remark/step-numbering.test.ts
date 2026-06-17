@@ -478,6 +478,114 @@ import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
 		assert.deepEqual(collectAtValues(js), [1, 4]);
 	});
 
+	it("RevealGroup keeps nested Markdown list items grouped by default", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup>
+
+- Parent
+  - Child A
+  - Child B
+- Sibling
+
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 3, "top-level list items(2) + Reveal(1)");
+		assert.deepEqual(collectAtValues(js), [1, 3]);
+	});
+
+	it("RevealGroup listRevealMode nested counts nested Markdown list items", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nested">
+
+- Parent
+  - Child A
+  - Child B
+- Sibling
+
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 5, "nested list items(4) + Reveal(1)");
+		assert.deepEqual(collectAtValues(js), [1, 5]);
+	});
+
+	it("RevealGroup listRevealMode nested counts nested JSX list items", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nested">
+  <ul>
+    <li>
+      Parent
+      <ul>
+        <li>Child A</li>
+        <li>Child B</li>
+      </ul>
+    </li>
+    <li>Sibling</li>
+  </ul>
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 5, "nested list items(4) + Reveal(1)");
+		assert.deepEqual(collectAtValues(js), [1, 5]);
+	});
+
+	it("RevealGroup listRevealMode nested counts deeply nested Markdown list items", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nested">
+
+- Parent
+  - Child
+    - Grandchild
+- Sibling
+
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 5, "deep list items(4) + Reveal(1)");
+		assert.deepEqual(collectAtValues(js), [1, 5]);
+	});
+
+	it("RevealGroup listRevealMode nested counts nested JSX list items through fragments", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nested">
+  <ul>
+    <li>
+      Parent
+      <>
+        <ul>
+          <li>Fragment child</li>
+        </ul>
+      </>
+    </li>
+  </ul>
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(data.stepCount, 3, "parent + fragment child + Reveal(1)");
+		assert.deepEqual(collectAtValues(js), [1, 3]);
+	});
+
 	it("RevealGroup advances counter so subsequent Reveal starts after the group", async () => {
 		const { js, data } = await compileMdx(`
 import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
@@ -560,6 +668,34 @@ import { FadeGroup, Reveal } from '@honeydeck/honeydeck'
 </FadeGroup>
     `),
 			/FadeGroup> targets cannot contain nested timeline producers \(<Reveal>\)/,
+		);
+	});
+
+	it("rejects non-literal RevealGroup listRevealMode", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { RevealGroup } from '@honeydeck/honeydeck'
+
+export const mode = "nested"
+
+<RevealGroup listRevealMode={mode}>
+  <div>A</div>
+</RevealGroup>
+    `),
+			/listRevealMode.*literal string/,
+		);
+	});
+
+	it("rejects invalid literal RevealGroup listRevealMode", async () => {
+		await assert.rejects(
+			compileMdx(`
+import { RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nestedd">
+  <div>A</div>
+</RevealGroup>
+    `),
+			/listRevealMode.*literal string/,
 		);
 	});
 });
@@ -978,6 +1114,36 @@ import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
 			"list item + nested reveal + sibling list item",
 		);
 		assert.deepEqual(collectAtValues(js), [1, 2]);
+	});
+
+	it("flattens nested steps inside nested RevealGroup list items", async () => {
+		const { js, data } = await compileMdx(`
+import { Reveal, RevealGroup } from '@honeydeck/honeydeck'
+
+<RevealGroup listRevealMode="nested">
+  <ul>
+    <li>
+      Parent list item
+      <ul>
+        <li>
+          Child list item
+          <Reveal>Nested child detail</Reveal>
+        </li>
+      </ul>
+    </li>
+    <li>Sibling list item</li>
+  </ul>
+</RevealGroup>
+
+<Reveal>After list</Reveal>
+    `);
+
+		assert.equal(
+			data.stepCount,
+			5,
+			"parent item + child item + nested reveal + sibling item + after reveal",
+		);
+		assert.deepEqual(collectAtValues(js), [1, 3, 5]);
 	});
 
 	it("flattens nested code steps inside RevealGroup children", async () => {

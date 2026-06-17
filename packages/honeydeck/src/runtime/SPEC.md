@@ -29,7 +29,9 @@ Magic Code blocks join the same timeline. Each inner code fence contributes its 
   components. A parent `<Reveal>` or `<RevealGroup>` target consumes its step
   first, then any nested reveal/fade group, reveal/fade, or code walkthrough
   steps inside it are appended to the same slide timeline before the next
-  sibling timeline target.
+  sibling timeline target. `<RevealGroup listRevealMode="nested">` also treats
+  nested list items in direct child lists as timeline targets in depth-first
+  document order.
 - `<RevealWith>` and `<FadeWith>` must not contain nested timeline producers because they do not add steps themselves. Target them at sibling timeline steps instead.
 - `<Fade>` and `<FadeGroup>` targets must not contain nested timeline producers
   because a faded parent would hide later nested steps. Put fade components

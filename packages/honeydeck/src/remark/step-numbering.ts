@@ -8,7 +8,8 @@
  *     and injects `as="div"`/`as="span"` from the MDX flow/text context.
  *  2. Assigns `at={n}` to each `<RevealGroup>`/`<FadeGroup>` element using
  *     the starting index of the group and adds internal per-target step numbers
- *     for group children/list items.
+ *     for group children/list items. `listRevealMode="nested"` makes nested
+ *     RevealGroup list items step targets too.
  *  3. Collects literal `<Reveal name="...">` targets and resolves
  *     `<RevealWith target="...">`, numeric `target={n}`, and `at={n}`
  *     sync props for `<RevealWith>`/`<FadeWith>` without adding steps.
@@ -181,28 +182,7 @@ function injectTimelineWrapperElement(el: MdxJsxElement): void {
 // Helper: count reveal steps produced by a RevealGroup child
 // ---------------------------------------------------------------------------
 
-function countListItems(node: unknown): number | null {
-	const n = node as { type?: string; children?: unknown[] };
-
-	if (n.type === "list") {
-		return (n.children ?? []).filter((child) => {
-			const c = child as { type?: string };
-			return c.type === "listItem";
-		}).length;
-	}
-
-	if (isJsxElement(node) && (node.name === "ul" || node.name === "ol")) {
-		return node.children.filter((child) => {
-			const c = child as { type?: string; value?: string };
-			if (c.type === "text") {
-				return (c.value ?? "").trim().length > 0;
-			}
-			return true;
-		}).length;
-	}
-
-	return null;
-}
+type RevealGroupListRevealMode = "direct" | "nested";
 
 function getMeaningfulChildren(children: unknown[]): unknown[] {
 	return children.filter((child) => {
@@ -214,24 +194,54 @@ function getMeaningfulChildren(children: unknown[]): unknown[] {
 	});
 }
 
-function getRevealGroupTargets(el: MdxJsxElement): unknown[] {
+function isMarkdownList(node: unknown): boolean {
+	return (node as { type?: string }).type === "list";
+}
+
+function isMarkdownListItem(node: unknown): boolean {
+	return (node as { type?: string }).type === "listItem";
+}
+
+function isJsxListElement(node: unknown): node is MdxJsxElement {
+	return isJsxElement(node) && (node.name === "ul" || node.name === "ol");
+}
+
+function isJsxListItemElement(node: unknown): node is MdxJsxElement {
+	return isJsxElement(node) && node.name === "li";
+}
+
+function isHtmlJsxElement(node: unknown): node is MdxJsxElement {
+	return isJsxElement(node) && /^[a-z]/.test(node.name ?? "");
+}
+
+function isJsxFragmentElement(node: unknown): node is MdxJsxElement {
+	return isJsxElement(node) && !node.name;
+}
+
+function isListElement(node: unknown): boolean {
+	return isMarkdownList(node) || isJsxListElement(node);
+}
+
+function getListChildren(node: unknown): unknown[] {
+	const n = node as { type?: string; children?: unknown[] };
+
+	if (n.type === "list") {
+		return (n.children ?? []).filter(isMarkdownListItem);
+	}
+
+	if (isJsxListElement(node)) {
+		return getMeaningfulChildren(node.children);
+	}
+
+	return [];
+}
+
+function getDirectRevealGroupTargets(el: MdxJsxElement): unknown[] {
 	const targets: unknown[] = [];
 
 	for (const child of getMeaningfulChildren(el.children)) {
-		const listItemCount = countListItems(child);
-		const c = child as { type?: string; children?: unknown[] };
-
-		if (listItemCount !== null && Array.isArray(c.children)) {
-			if (c.type === "list") {
-				targets.push(
-					...c.children.filter((item) => {
-						const i = item as { type?: string };
-						return i.type === "listItem";
-					}),
-				);
-			} else {
-				targets.push(...getMeaningfulChildren(c.children));
-			}
+		if (isListElement(child)) {
+			targets.push(...getListChildren(child));
 			continue;
 		}
 
@@ -301,6 +311,24 @@ function parsePositiveIntegerLiteral(attr: MdxJsxAttribute): number | null {
 	return null;
 }
 
+function readRevealGroupListRevealMode(
+	el: MdxJsxElement,
+): RevealGroupListRevealMode {
+	const attr = getAttribute(el, "listRevealMode");
+	if (!attr) return "direct";
+
+	const value =
+		typeof attr.value === "string" ? attr.value : expressionValue(attr);
+
+	if (value === "direct" || value === "nested") {
+		return value;
+	}
+
+	throw new Error(
+		'Honeydeck <RevealGroup> `listRevealMode` must be the literal string "direct" or "nested" because timeline steps are counted at build time.',
+	);
+}
+
 function readTimelineSteps(el: MdxJsxElement): number {
 	const attr = getAttribute(el, "steps");
 	if (!attr || attr.value === null) {
@@ -367,6 +395,7 @@ function findNestedStepProducer(node: unknown): string | null {
  */
 export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 	let counter = 1; // next `at` value to assign; 1-based
+	let activeRevealGroupTargetSteps: number[] = [];
 	const namedReveals = new Map<string, number>();
 	const withStringTargets: Array<{ el: MdxJsxElement; target: string }> = [];
 	const withNumericTargets: Array<{ el: MdxJsxElement; at: number }> = [];
@@ -377,6 +406,54 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 
 		for (const child of n.children) {
 			visitNode(child);
+		}
+	}
+
+	function pushRevealGroupTarget(
+		targetSteps: number[],
+		target: unknown,
+		visitContent: boolean,
+	): void {
+		targetSteps.push(counter);
+		counter++;
+		if (visitContent) visitNode(target);
+	}
+
+	function visitRevealGroupNestedListContent(node: unknown): void {
+		if (isListElement(node)) {
+			visitRevealGroupNestedList(node);
+			return;
+		}
+
+		if (isHtmlJsxElement(node) || isJsxFragmentElement(node)) {
+			for (const child of getMeaningfulChildren(node.children)) {
+				visitRevealGroupNestedListContent(child);
+			}
+			return;
+		}
+
+		visitNode(node);
+	}
+
+	function visitRevealGroupNestedListItemContent(item: unknown): void {
+		if (!isMarkdownListItem(item) && !isJsxListItemElement(item)) {
+			visitNode(item);
+			return;
+		}
+
+		const i = item as { children?: unknown[] };
+		for (const child of getMeaningfulChildren(i.children ?? [])) {
+			visitRevealGroupNestedListContent(child);
+		}
+	}
+
+	function visitRevealGroupNestedList(
+		list: unknown,
+		targetSteps: number[] = activeRevealGroupTargetSteps,
+	): void {
+		for (const item of getListChildren(list)) {
+			pushRevealGroupTarget(targetSteps, item, false);
+			visitRevealGroupNestedListItemContent(item);
 		}
 	}
 
@@ -558,35 +635,49 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 					);
 				}
 
-				const targets = getRevealGroupTargets(el);
-
-				if (el.name === "FadeGroup") {
-					for (const target of targets) {
-						const nestedProducer = findNestedStepProducer(target);
-
-						if (nestedProducer) {
-							throw new Error(
-								`Honeydeck <FadeGroup> targets cannot contain nested timeline producers (${nestedProducer}). Put fade components inside a RevealGroup/Reveal target instead of nesting timeline components inside a FadeGroup target.`,
-							);
-						}
-					}
-				}
-
+				const listRevealMode =
+					el.name === "RevealGroup" ? readRevealGroupListRevealMode(el) : "direct";
 				const targetSteps: number[] = [];
 
 				setAtAttribute(el, counter);
-				if (targets.length === 0) {
+
+				if (listRevealMode === "nested") {
+					const previousTargetSteps = activeRevealGroupTargetSteps;
+					activeRevealGroupTargetSteps = targetSteps;
+
+					for (const child of getMeaningfulChildren(el.children)) {
+						if (isListElement(child)) {
+							visitRevealGroupNestedList(child);
+						} else {
+							pushRevealGroupTarget(targetSteps, child, true);
+						}
+					}
+
+					activeRevealGroupTargetSteps = previousTargetSteps;
+				} else {
+					const targets = getDirectRevealGroupTargets(el);
+
+					if (el.name === "FadeGroup") {
+						for (const target of targets) {
+							const nestedProducer = findNestedStepProducer(target);
+
+							if (nestedProducer) {
+								throw new Error(
+									`Honeydeck <FadeGroup> targets cannot contain nested timeline producers (${nestedProducer}). Put fade components inside a RevealGroup/Reveal target instead of nesting timeline components inside a FadeGroup target.`,
+								);
+							}
+						}
+					}
+
+					for (const target of targets) {
+						pushRevealGroupTarget(targetSteps, target, el.name !== "FadeGroup");
+					}
+				}
+
+				if (targetSteps.length === 0) {
 					removeAttribute(el, "targetStepsJson");
 					counter++;
 					return;
-				}
-
-				for (const target of targets) {
-					targetSteps.push(counter);
-					counter++;
-					if (el.name !== "FadeGroup") {
-						visitNode(target);
-					}
 				}
 
 				setStringAttribute(el, "targetStepsJson", JSON.stringify(targetSteps));

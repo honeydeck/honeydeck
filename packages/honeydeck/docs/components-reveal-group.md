@@ -12,7 +12,20 @@ import { RevealGroup } from '@honeydeck/honeydeck'
 </RevealGroup>
 ```
 
-Each meaningful direct child becomes one timeline step. Whitespace-only text children are ignored. Markdown, HTML, and JSX lists are special: each list item is revealed one after another while preserving the list container.
+Each meaningful direct child becomes one timeline step. Whitespace-only text children are ignored. Markdown, HTML, and JSX lists are special: each top-level list item is revealed one after another while preserving the list container.
+
+Use `listRevealMode="nested"` when nested list items should also become individual steps:
+
+```mdx
+<RevealGroup listRevealMode="nested">
+  - Parent
+    - Child A
+    - Child B
+  - Sibling
+</RevealGroup>
+```
+
+Timeline: parent → child A → child B → sibling. The default mode is `"direct"`, which keeps nested items grouped with their parent.
 
 To reveal multiple elements together, wrap them in one direct child:
 

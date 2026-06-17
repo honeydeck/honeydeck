@@ -142,6 +142,22 @@ describe("component doc crawler", () => {
 			"Key label or ordered shortcut key labels.",
 		);
 
+		const revealGroup = getDoc(result, "RevealGroup");
+		assert.equal(
+			revealGroup.props.find((prop) => prop.name === "listRevealMode")?.type,
+			"RevealGroupListRevealMode",
+		);
+		assert.equal(
+			revealGroup.props.find((prop) => prop.name === "listRevealMode")
+				?.defaultValue,
+			'"direct"',
+		);
+		assert.match(
+			revealGroup.props.find((prop) => prop.name === "listRevealMode")
+				?.description ?? "",
+			/reveals nested list items depth-first/,
+		);
+
 		const revealWith = getDoc(result, "RevealWith");
 		assert.deepEqual(
 			revealWith.props.map((prop) => ({

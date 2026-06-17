@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createElement } from "react";
+import { createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { RevealGroup } from "../../runtime/components/RevealGroup.tsx";
 import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
@@ -75,6 +75,80 @@ function renderRevealGroupWithInvalidTargetSteps(stepIndex: number) {
 	);
 }
 
+function renderRevealGroupWithNestedListMode(
+	stepIndex: number,
+	showFutureSteps = false,
+) {
+	const group = createElement(
+		RevealGroup,
+		{ at: 1, listRevealMode: "nested" },
+		createElement(
+			"ul",
+			null,
+			createElement(
+				"li",
+				null,
+				"Parent",
+				createElement(
+					"ul",
+					null,
+					createElement("li", null, "Child A"),
+					createElement("li", null, "Child B"),
+				),
+			),
+			createElement("li", null, "Sibling"),
+		),
+	);
+
+	return renderToStaticMarkup(
+		createElement(
+			TimelineProvider,
+			{
+				stepIndex,
+				stepCount: 4,
+				showFutureSteps,
+			},
+			group,
+		),
+	);
+}
+
+function renderRevealGroupWithFragmentNestedList(stepIndex: number) {
+	const group = createElement(
+		RevealGroup,
+		{ at: 1, listRevealMode: "nested" },
+		createElement(
+			"ul",
+			null,
+			createElement(
+				"li",
+				null,
+				"Parent",
+				createElement(
+					Fragment,
+					null,
+					createElement(
+						"ul",
+						null,
+						createElement("li", null, "Fragment child"),
+					),
+				),
+			),
+		),
+	);
+
+	return renderToStaticMarkup(
+		createElement(
+			TimelineProvider,
+			{
+				stepIndex,
+				stepCount: 2,
+			},
+			group,
+		),
+	);
+}
+
 describe("<RevealGroup>", () => {
 	it("reveals direct list children in order", () => {
 		const html = renderRevealGroup(2);
@@ -136,6 +210,42 @@ describe("<RevealGroup>", () => {
 		assert.match(
 			html,
 			/<div[^>]*style="display:block;visibility:visible;opacity:1;transition:opacity 300ms ease"><div>Sibling item<\/div><\/div>/,
+		);
+	});
+
+	it("reveals nested list items depth-first when requested", () => {
+		const html = renderRevealGroupWithNestedListMode(2);
+
+		assert.doesNotMatch(html, /<ul><div/);
+		assert.match(
+			html,
+			/<li style="visibility:visible;opacity:1;transition:opacity 300ms ease">Parent<ul><li style="visibility:visible;opacity:1;transition:opacity 300ms ease">Child A<\/li><li style="visibility:hidden;opacity:0;transition:opacity 300ms ease">Child B<\/li><\/ul><\/li>/,
+		);
+		assert.match(
+			html,
+			/<li style="visibility:hidden;opacity:0;transition:opacity 300ms ease">Sibling<\/li>/,
+		);
+	});
+
+	it("shows future nested list items as muted previews when requested", () => {
+		const html = renderRevealGroupWithNestedListMode(2, true);
+
+		assert.match(
+			html,
+			/<li style="visibility:visible;opacity:0.28;transition:opacity 300ms ease">Child B<\/li>/,
+		);
+		assert.match(
+			html,
+			/<li style="visibility:visible;opacity:0.28;transition:opacity 300ms ease">Sibling<\/li>/,
+		);
+	});
+
+	it("reveals nested list items through fragments", () => {
+		const html = renderRevealGroupWithFragmentNestedList(1);
+
+		assert.match(
+			html,
+			/<li style="visibility:visible;opacity:1;transition:opacity 300ms ease">Parent<ul><li style="visibility:hidden;opacity:0;transition:opacity 300ms ease">Fragment child<\/li><\/ul><\/li>/,
 		);
 	});
 });
