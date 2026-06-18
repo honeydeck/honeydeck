@@ -9,7 +9,10 @@ import {
 } from "./presentationApi.ts";
 
 const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
-const originalLocation = Object.getOwnPropertyDescriptor(globalThis, "location");
+const originalLocation = Object.getOwnPropertyDescriptor(
+	globalThis,
+	"location",
+);
 
 function setGlobalProperty(name: string, value: unknown) {
 	Object.defineProperty(globalThis, name, {
@@ -25,7 +28,10 @@ function parseSentMessage(message: unknown) {
 }
 
 function createConnection() {
-	const listeners = new Map<string, Set<(event: MessageEvent<unknown>) => void>>();
+	const listeners = new Map<
+		string,
+		Set<(event: MessageEvent<unknown>) => void>
+	>();
 	const connection = {
 		sent: [] as unknown[],
 		closeCalls: 0,
@@ -41,12 +47,18 @@ function createConnection() {
 			connection.terminateCalls += 1;
 			connection.emit("terminate");
 		},
-		addEventListener(type: string, listener: (event: MessageEvent<unknown>) => void) {
+		addEventListener(
+			type: string,
+			listener: (event: MessageEvent<unknown>) => void,
+		) {
 			const bucket = listeners.get(type) ?? new Set();
 			bucket.add(listener);
 			listeners.set(type, bucket);
 		},
-		removeEventListener(type: string, listener: (event: MessageEvent<unknown>) => void) {
+		removeEventListener(
+			type: string,
+			listener: (event: MessageEvent<unknown>) => void,
+		) {
 			listeners.get(type)?.delete(listener);
 		},
 		emit(type: string, event: { data?: unknown } = {}) {
@@ -89,7 +101,9 @@ describe("presentation API helpers", () => {
 	});
 
 	it("builds audience URLs from slide routes", () => {
-		setGlobalProperty("location", { href: "https://example.com/deck/index.html" });
+		setGlobalProperty("location", {
+			href: "https://example.com/deck/index.html",
+		});
 
 		assert.equal(
 			getPresentationAudienceUrl({ view: "slide", slide: 4, step: 2 }),
@@ -100,7 +114,12 @@ describe("presentation API helpers", () => {
 			"https://example.com/deck/index.html#/4/2",
 		);
 		assert.equal(
-			getPresentationAudienceUrl({ view: "kit", slide: 1, step: 0, kitTab: "layouts" }),
+			getPresentationAudienceUrl({
+				view: "kit",
+				slide: 1,
+				step: 0,
+				kitTab: "layouts",
+			}),
 			null,
 		);
 	});
@@ -110,7 +129,9 @@ describe("presentation API helpers", () => {
 
 		sendPresentationSyncRequest(connection);
 
-		assert.deepEqual(connection.sent.map(parseSentMessage), [{ type: "sync-request" }]);
+		assert.deepEqual(connection.sent.map(parseSentMessage), [
+			{ type: "sync-request" },
+		]);
 	});
 
 	it("starts casting, answers sync requests, and stops cleanly", async () => {
@@ -147,18 +168,34 @@ describe("presentation API helpers", () => {
 			},
 		});
 
-		assert.deepEqual(requestUrls, [["https://example.com/deck/index.html#/4/2"]]);
+		assert.deepEqual(requestUrls, [
+			["https://example.com/deck/index.html#/4/2"],
+		]);
 		assert.equal(isCasting, true);
 		assert.equal(connectionRef.current, connection);
-		assert.deepEqual(parseSentMessage(connection.sent[0]), { type: "navigate", slide: 4, step: 2 });
+		assert.deepEqual(parseSentMessage(connection.sent[0]), {
+			type: "navigate",
+			slide: 4,
+			step: 2,
+		});
 
 		routeRef.current = { slide: 7, step: 1 };
-		connection.emit("message", { data: JSON.stringify({ type: "sync-request" }) });
-		assert.deepEqual(parseSentMessage(connection.sent[1]), { type: "sync-response", slide: 7, step: 1 });
+		connection.emit("message", {
+			data: JSON.stringify({ type: "sync-request" }),
+		});
+		assert.deepEqual(parseSentMessage(connection.sent[1]), {
+			type: "sync-response",
+			slide: 7,
+			step: 1,
+		});
 
-		stopPresentationCast(connectionRef, (next) => {
-			isCasting = next;
-		}, castGenerationRef);
+		stopPresentationCast(
+			connectionRef,
+			(next) => {
+				isCasting = next;
+			},
+			castGenerationRef,
+		);
 
 		assert.equal(connection.closeCalls, 0);
 		assert.equal(connection.terminateCalls, 1);
@@ -213,7 +250,6 @@ describe("presentation API helpers", () => {
 			resolveStart = resolve;
 		});
 		class FakeRequest {
-			constructor() {}
 			async start() {
 				return startPromise;
 			}
@@ -240,9 +276,13 @@ describe("presentation API helpers", () => {
 		});
 
 		assert.equal(startInFlightRef.current, true);
-		stopPresentationCast(connectionRef, (next) => {
-			isCasting = next;
-		}, castGenerationRef);
+		stopPresentationCast(
+			connectionRef,
+			(next) => {
+				isCasting = next;
+			},
+			castGenerationRef,
+		);
 		resolveStart(connection);
 		await startCast;
 

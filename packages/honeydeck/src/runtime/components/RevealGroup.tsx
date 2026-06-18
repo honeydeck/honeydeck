@@ -252,9 +252,7 @@ export function RevealGroup({
 		});
 	}
 
-	function renderListElement(
-		listElement: ElementWithCommonProps,
-	): ReactNode {
+	function renderListElement(listElement: ElementWithCommonProps): ReactNode {
 		const listItems = toMeaningfulArray(listElement.props.children);
 		const listKey = childKey(listElement, `reveal-list-${at}-${targetIndex}`);
 		const renderedListItems = listItems.map((listItem) =>
@@ -277,7 +275,7 @@ export function RevealGroup({
 		<>
 			{revealTargets.map((child) => {
 				if (isListElement(child)) {
-return renderListElement(child);
+					return renderListElement(child);
 				}
 
 				const childAt = nextTargetAt();

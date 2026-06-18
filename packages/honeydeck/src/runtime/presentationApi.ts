@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { navigate, parseHash, type Route } from "./router.ts";
 import { getRouteUrl } from "./navigation.ts";
+import { navigate, parseHash, type Route } from "./router.ts";
 import {
 	createSyncResponseMessage,
 	resolveAudienceRouteFromSyncMessage,
@@ -24,7 +24,9 @@ export type PresentationConnectionLike = {
 	) => void;
 };
 
-type PresentationRequestLike = new (presentationUrls: string[]) => {
+type PresentationRequestLike = new (
+	presentationUrls: string[],
+) => {
 	start: () => Promise<PresentationConnectionLike>;
 };
 
@@ -44,7 +46,9 @@ type PresentationReceiverConnectionListLike = {
 		type: string,
 		listener: (event: { connection?: PresentationConnectionLike }) => void,
 	) => void;
-	onconnectionavailable?: (event: { connection?: PresentationConnectionLike }) => void;
+	onconnectionavailable?: (event: {
+		connection?: PresentationConnectionLike;
+	}) => void;
 };
 
 type PresentationNavigatorLike = {
@@ -139,7 +143,10 @@ function sendPresentationSyncResponse(
 	slide: number,
 	step: number,
 ): void {
-	sendPresentationMessage(connection, createSyncResponseMessage({ slide, step }));
+	sendPresentationMessage(
+		connection,
+		createSyncResponseMessage({ slide, step }),
+	);
 }
 
 type PresentationRouteRef = {
@@ -227,11 +234,7 @@ export async function startPresentationCast({
 		connection.addEventListener?.("terminate", onClose);
 		connection.addEventListener?.("statechange", onStateChange);
 
-		sendPresentationRouteToConnection(
-			connection,
-			currentSlide,
-			currentStep,
-		);
+		sendPresentationRouteToConnection(connection, currentSlide, currentStep);
 	} catch {
 		if (castGeneration !== castGenerationRef.current) {
 			return;
@@ -254,7 +257,9 @@ export function stopPresentationCast(
 	setIsCasting(false);
 }
 
-function getConnectionFromEvent(event: { connection?: PresentationConnectionLike }) {
+function getConnectionFromEvent(event: {
+	connection?: PresentationConnectionLike;
+}) {
 	return event.connection ?? null;
 }
 
@@ -266,7 +271,8 @@ export function usePresentationReceiverSync({
 	useEffect(() => {
 		if (!enabled) return;
 
-		const presentationNavigator = getPresentationWindow()?.navigator.presentation;
+		const presentationNavigator =
+			getPresentationWindow()?.navigator.presentation;
 		const receiver = presentationNavigator?.receiver;
 		if (!receiver?.connectionList) return;
 
@@ -278,7 +284,10 @@ export function usePresentationReceiverSync({
 			const message = parsePresentationMessage(event.data);
 			if (cancelled || !isSyncMessage(message)) return;
 			const currentRoute = parseHash(location.hash);
-			const nextRoute = resolveAudienceRouteFromSyncMessage(currentRoute, message);
+			const nextRoute = resolveAudienceRouteFromSyncMessage(
+				currentRoute,
+				message,
+			);
 			if (nextRoute) {
 				navigate(nextRoute);
 			}
@@ -294,7 +303,9 @@ export function usePresentationReceiverSync({
 			});
 		}
 
-		function handleConnectionEvent(event: { connection?: PresentationConnectionLike }) {
+		function handleConnectionEvent(event: {
+			connection?: PresentationConnectionLike;
+		}) {
 			attachConnection(getConnectionFromEvent(event));
 		}
 
@@ -312,11 +323,13 @@ export function usePresentationReceiverSync({
 						handleConnectionEvent,
 					);
 				});
-				const previousOnConnectionAvailable = connectionList.onconnectionavailable;
+				const previousOnConnectionAvailable =
+					connectionList.onconnectionavailable;
 				connectionList.onconnectionavailable = handleConnectionEvent;
 				cleanupTasks.push(() => {
 					if (connectionList.onconnectionavailable === handleConnectionEvent) {
-						connectionList.onconnectionavailable = previousOnConnectionAvailable;
+						connectionList.onconnectionavailable =
+							previousOnConnectionAvailable;
 					}
 				});
 			})
@@ -324,7 +337,9 @@ export function usePresentationReceiverSync({
 
 		return () => {
 			cancelled = true;
-			cleanupTasks.splice(0).forEach((cleanup) => cleanup());
+			cleanupTasks.splice(0).forEach((cleanup) => {
+				cleanup();
+			});
 			connections.clear();
 		};
 	}, [enabled]);
@@ -364,16 +379,13 @@ export function usePresentationCast({
 		};
 	}, [currentSlide, currentStep]);
 
-	const setCastingState = useCallback(
-		(next: boolean) => {
-			if (isMountedRef.current) setIsCasting(next);
-		},
-		[setIsCasting],
-	);
+	const setCastingState = useCallback((next: boolean) => {
+		if (isMountedRef.current) setIsCasting(next);
+	}, []);
 
 	const stopCasting = useCallback(() => {
 		stopPresentationCast(connectionRef, setCastingState, castGenerationRef);
-	}, [castGenerationRef, setCastingState]);
+	}, [setCastingState]);
 
 	const startCasting = useCallback(async () => {
 		await startPresentationCast({
@@ -395,10 +407,7 @@ export function usePresentationCast({
 		currentStep,
 		enabled,
 		supported,
-		connectionRef,
-		startInFlightRef,
 		setCastingState,
-		routeRef,
 	]);
 
 	useEffect(() => {
@@ -430,7 +439,9 @@ function isSyncRequestMessage(value: unknown): value is SyncRequestMessage {
 	return (value as SyncMessage).type === "sync-request";
 }
 
-function isSyncMessage(value: unknown): value is SyncNavigateMessage | SyncResponseMessage {
+function isSyncMessage(
+	value: unknown,
+): value is SyncNavigateMessage | SyncResponseMessage {
 	if (typeof value !== "object" || value === null) return false;
 	if (!("type" in value)) return false;
 	const type = (value as SyncMessage).type;

@@ -15,7 +15,10 @@ import {
 	openPresenter,
 } from "./navigation.ts";
 
-const originalLocation = Object.getOwnPropertyDescriptor(globalThis, "location");
+const originalLocation = Object.getOwnPropertyDescriptor(
+	globalThis,
+	"location",
+);
 
 afterEach(() => {
 	if (originalLocation) {
@@ -87,7 +90,10 @@ describe("navigation route helpers", () => {
 			slide: 2,
 			step: 1,
 		});
-		assert.equal(getPresenterRoute({ view: "kit", slide: 1, step: 0, kitTab: "layouts" }), null);
+		assert.equal(
+			getPresenterRoute({ view: "kit", slide: 1, step: 0, kitTab: "layouts" }),
+			null,
+		);
 	});
 
 	it("opens and closes overview routes", () => {
@@ -114,7 +120,10 @@ describe("navigation route helpers", () => {
 	});
 
 	it("opens presenter mode by changing the current hash", () => {
-		const location = { href: "https://example.com/deck/index.html", hash: "#/1/0" };
+		const location = {
+			href: "https://example.com/deck/index.html",
+			hash: "#/1/0",
+		};
 		Object.defineProperty(globalThis, "location", {
 			value: location,
 			configurable: true,
@@ -127,7 +136,10 @@ describe("navigation route helpers", () => {
 	});
 
 	it("ignores reference routes when opening presenter mode", () => {
-		const location = { href: "https://example.com/deck/index.html", hash: "#/1/0" };
+		const location = {
+			href: "https://example.com/deck/index.html",
+			hash: "#/1/0",
+		};
 		Object.defineProperty(globalThis, "location", {
 			value: location,
 			configurable: true,

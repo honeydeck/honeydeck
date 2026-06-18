@@ -50,6 +50,7 @@ import {
 	closeOverview,
 	toggleOverview as toggleOverviewRoute,
 } from "./navigation.ts";
+import { usePresentationReceiverSync } from "./presentationApi.ts";
 import { useRoute } from "./router.ts";
 import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
@@ -59,7 +60,6 @@ import {
 	slideData,
 } from "./slideData.ts";
 import { useSync } from "./sync.ts";
-import { usePresentationReceiverSync } from "./presentationApi.ts";
 import { TimelineProvider } from "./TimelineContext.tsx";
 import { useKeyboardNav } from "./useKeyboardNav.ts";
 import { useSwipeNav } from "./useSwipeNav.ts";

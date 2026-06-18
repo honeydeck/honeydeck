@@ -636,7 +636,9 @@ export const remarkStepNumbering: Plugin<[], Root> = () => (tree, vfile) => {
 				}
 
 				const listRevealMode =
-					el.name === "RevealGroup" ? readRevealGroupListRevealMode(el) : "direct";
+					el.name === "RevealGroup"
+						? readRevealGroupListRevealMode(el)
+						: "direct";
 				const targetSteps: number[] = [];
 
 				setAtAttribute(el, counter);

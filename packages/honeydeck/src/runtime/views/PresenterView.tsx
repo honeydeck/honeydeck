@@ -52,14 +52,14 @@ import {
 	previousSlide,
 	previousStep,
 } from "../navigation.ts";
-import { useRoute } from "../router.ts";
-import { SlideCanvas } from "../SlideCanvas.tsx";
-import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
-import { useSync } from "../sync.ts";
 import {
 	getPresentationAudienceUrl,
 	usePresentationCast,
 } from "../presentationApi.ts";
+import { useRoute } from "../router.ts";
+import { SlideCanvas } from "../SlideCanvas.tsx";
+import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
+import { useSync } from "../sync.ts";
 import { useKeyboardNav } from "../useKeyboardNav.ts";
 import { useSwipeNav } from "../useSwipeNav.ts";
 import { PresenterCastButton } from "./PresenterCastButton.tsx";

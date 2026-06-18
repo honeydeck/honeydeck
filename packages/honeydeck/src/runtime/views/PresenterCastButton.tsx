@@ -12,7 +12,8 @@ export function PresenterCastButton({
 	onStopCasting: () => void;
 }) {
 	const label = isCasting ? "Stop casting" : "Cast audience view";
-	const unsupportedHint = "Presentation casting is not supported in this browser";
+	const unsupportedHint =
+		"Presentation casting is not supported in this browser";
 
 	return (
 		<button
