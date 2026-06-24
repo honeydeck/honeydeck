@@ -2,6 +2,8 @@
 
 Use `<BrowserFrame>` to show a live iframe inside a macOS-style browser window.
 
+<BrowserFramePlayground />
+
 ```mdx
 import { BrowserFrame } from '@honeydeck/honeydeck'
 

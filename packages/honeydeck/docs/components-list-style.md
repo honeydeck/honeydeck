@@ -2,6 +2,8 @@
 
 Use `<ListStyle>` to style Markdown, HTML, or JSX lists inside a wrapper.
 
+<ListStylePlayground />
+
 By default it removes native markers:
 
 ```mdx

@@ -2,6 +2,8 @@
 
 Use `<Notes>` to add presenter-only speaker notes to a slide.
 
+<NotesPlayground />
+
 ```mdx
 import { Notes } from '@honeydeck/honeydeck'
 

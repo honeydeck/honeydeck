@@ -19,6 +19,13 @@ import { docComponent, docs, docsByGroup } from "../docs.js";
 import { marketingImages } from "../marketingContent.js";
 import { docsNavLinkClass, smallButtonClass } from "../ui/styles.js";
 
+const docsOnlyComponentPlaceholders = {
+	BrowserFramePlayground: DocsOnlyPlaygroundPlaceholder,
+	KeyboardPlayground: DocsOnlyPlaygroundPlaceholder,
+	ListStylePlayground: DocsOnlyPlaygroundPlaceholder,
+	NotesPlayground: DocsOnlyPlaygroundPlaceholder,
+};
+
 export function DocPage() {
 	const { slug = "getting-started" } = useParams();
 	const doc = docs.find((entry) => entry.slug === slug) ?? docs[0];
@@ -60,7 +67,7 @@ export function DocPage() {
 						/>
 					) : null}
 					{Component ? (
-						<MDXProvider>
+						<MDXProvider components={docsOnlyComponentPlaceholders}>
 							<Component />
 						</MDXProvider>
 					) : (
@@ -71,6 +78,10 @@ export function DocPage() {
 			<PageHeadingsNav headings={headings} />
 		</main>
 	);
+}
+
+function DocsOnlyPlaygroundPlaceholder() {
+	return null;
 }
 
 function DocsSidebar({ activeSlug }: { activeSlug?: string }) {

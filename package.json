@@ -5,6 +5,7 @@
 	"workspaces": [
 		"packages/honeydeck",
 		"packages/marketing",
+		"packages/docs",
 		"packages/showcase",
 		"packages/welcome-deck"
 	],
@@ -14,7 +15,7 @@
 	"scripts": {
 		"build": "npm --workspaces --if-present run build",
 		"deps:update": "npm update --workspaces --include-workspace-root",
-		"dev": "npm -w @honeydeck/showcase run dev & npm -w @honeydeck/marketing run dev & wait",
+		"dev": "npm -w @honeydeck/showcase run dev & npm -w @honeydeck/marketing run dev & npm -w @honeydeck/docs run dev & wait",
 		"format": "biome check --write .",
 		"lint": "biome check .",
 		"pack:dry-run": "npm --workspaces --if-present run pack:dry-run",

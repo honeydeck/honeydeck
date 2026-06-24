@@ -2,6 +2,8 @@
 
 Use `<Keyboard>` to show one key or a shortcut in slide prose.
 
+<KeyboardPlayground />
+
 ```mdx
 import { Keyboard } from '@honeydeck/honeydeck'
 
