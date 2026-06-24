@@ -7,8 +7,7 @@ This repository is an npm workspace monorepo.
 ```txt
 packages/
   honeydeck/    public scoped Honeydeck CLI/runtime package and shared UI primitives
-  marketing/    private marketing/docs site package
-  docs/         private standalone Fumadocs/Next documentation site package
+  docs/         private Fumadocs/Next documentation site package
   showcase/     private feature showcase deck package
   welcome-deck/ private compact welcome deck package
 ```
@@ -25,7 +24,7 @@ npm install
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Run package dev servers together: showcase deck, marketing/docs site, and Fumadocs docs site |
+| `npm run dev` | Run package dev servers together: showcase deck and Fumadocs docs site |
 | `npm run lint` | Biome validation for the monorepo |
 | `npm run typecheck` | Typecheck all workspaces |
 | `npm test` | Run workspace test suites |
@@ -45,9 +44,6 @@ npm -w @honeydeck/showcase run pdf:steps
 npm -w @honeydeck/welcome-deck run dev
 npm -w @honeydeck/welcome-deck run build
 npm -w @honeydeck/welcome-deck run pdf
-npm -w @honeydeck/marketing run dev
-npm -w @honeydeck/marketing run docs:sync
-npm -w @honeydeck/marketing run build
 npm -w @honeydeck/docs run dev
 npm -w @honeydeck/docs run docs:sync
 npm -w @honeydeck/docs run build
@@ -55,14 +51,13 @@ npm -w @honeydeck/docs run build
 
 ## Docs flow
 
-Canonical Honeydeck docs live in `packages/honeydeck` and are shipped with the public npm package. The marketing and Fumadocs docs packages sync selected canonical docs before dev/build:
+Canonical Honeydeck docs live in `packages/honeydeck` and are shipped with the public npm package. The Fumadocs docs package syncs selected canonical docs before dev/build:
 
 ```bash
-npm -w @honeydeck/marketing run docs:sync
 npm -w @honeydeck/docs run docs:sync
 ```
 
-Do not manually edit `packages/marketing/src/content/docs/generated/*` or `packages/docs/content/docs/*`.
+Do not manually edit `packages/docs/content/docs/*`.
 
 ## Release flow
 

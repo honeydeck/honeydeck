@@ -1,6 +1,6 @@
 # Honeydeck Fumadocs Site Specification
 
-`@honeydeck/docs` is a private, standalone Fumadocs/Next documentation site for Honeydeck. It is intentionally separate from the Vite-based `@honeydeck/marketing` package.
+`@honeydeck/docs` is the private Fumadocs/Next documentation site for Honeydeck and the monorepo's public docs web surface.
 
 ## Routes
 
@@ -49,7 +49,7 @@ Wide docs pages must show the Fumadocs sidebar on the left and the in-page table
 
 ## Visual design
 
-The start page should borrow the warm Honeydeck marketing mood without depending on the marketing React implementation:
+The start page should use the warm Honeydeck docs mood:
 
 - bee/Dex visual treatment using local static assets
 - primary command CTA: `npx @honeydeck/honeydeck init`
@@ -59,6 +59,5 @@ The start page should borrow the warm Honeydeck marketing mood without depending
 
 ## Out of scope
 
-- Replacing the existing marketing site.
 - Analytics.
 - Custom MDX renderer outside Fumadocs unless needed for compatibility.

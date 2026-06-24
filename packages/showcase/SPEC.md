@@ -27,4 +27,4 @@
 - `npm -w @honeydeck/showcase run build` builds the showcase into `packages/showcase/dist`.
 - `npm -w @honeydeck/showcase run pdf` exports the final-state showcase PDF.
 - `npm -w @honeydeck/showcase run pdf:steps` exports all timeline steps.
-- Root `npm run dev` runs this showcase package together with the marketing/docs site.
+- Root `npm run dev` runs this showcase package together with the docs site.

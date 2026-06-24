@@ -16,7 +16,7 @@ Docs discovery order:
 1. Current project dependency docs: `node_modules/@honeydeck/honeydeck/Readme.md`, `node_modules/@honeydeck/honeydeck/SPEC.md`, and `node_modules/@honeydeck/honeydeck/docs/*.md`.
 2. Monorepo checkout docs: `packages/honeydeck/Readme.md`, `packages/honeydeck/SPEC.md`, and `packages/honeydeck/docs/*.md`.
 3. Fresh app or package-root docs: `Readme.md`, `SPEC.md`, and `docs/*.md`.
-4. Public docs URL when local docs are unavailable: `/docs` on the Honeydeck marketing site.
+4. Public docs URL when local docs are unavailable: `/docs` on the Honeydeck docs site.
 
 Important docs:
 

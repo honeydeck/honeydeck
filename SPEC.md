@@ -1,25 +1,23 @@
 # Honeydeck Monorepo Specification
 
-Honeydeck is an npm workspace for an MDX + React presentation framework, its public marketing/docs site, and a standalone Fumadocs documentation experiment.
+Honeydeck is an npm workspace for an MDX + React presentation framework and its public Fumadocs documentation site.
 
 This root spec is the monorepo overview and navigation map. Detailed observable behavior lives in colocated `SPEC.md` files near the package/folder that owns it.
 
 ## Product model
 
 - **Honeydeck runtime/CLI**: public scoped npm package `@honeydeck/honeydeck`, optimized for `npx @honeydeck/honeydeck init` and `@honeydeck/honeydeck/...` imports. It owns runtime components plus token-based UI primitives shared with private monorepo surfaces through public `@honeydeck/honeydeck/components` imports.
-- **Marketing/docs site**: private package `@honeydeck/marketing`, optimized for developer activation, public docs, search, SEO/social basics, and AI/LLM discoverability.
-- **Fumadocs docs site**: private package `@honeydeck/docs`, optimized for exploring a standalone Fumadocs/Next documentation experience over the same canonical Honeydeck docs.
+- **Fumadocs docs site**: private package `@honeydeck/docs`, optimized for developer activation, public docs, search, SEO/social basics, AI/LLM discoverability, and Fumadocs/Next documentation over the canonical Honeydeck docs.
 - **Showcase deck**: private package `@honeydeck/showcase`, optimized for local demoing and smoke-testing Honeydeck features with a real MDX deck.
 - **Welcome deck**: private package `@honeydeck/welcome-deck`, optimized for a compact first-impression demo deck and layout-reference smoke testing.
-- **Canonical docs**: source-of-truth docs live with `packages/honeydeck` and are synced into the marketing site and standalone Fumadocs docs site at build/dev time.
+- **Canonical docs**: source-of-truth docs live with `packages/honeydeck` and are synced into the Fumadocs docs site at build/dev time.
 
 ## Workspace packages
 
 | Package | Path | Public? | Owns |
 |---|---|---:|---|
 | `@honeydeck/honeydeck` | `packages/honeydeck` | Yes | CLI, runtime, layouts, themes, Vite plugin, bundled skills, canonical docs, runtime reference pages, shared UI primitives exposed through `@honeydeck/honeydeck/components` |
-| `@honeydeck/marketing` | `packages/marketing` | No | Landing page, audience pages, generated docs site, markdown siblings, search, SEO/social/LLM files |
-| `@honeydeck/docs` | `packages/docs` | No | Standalone Fumadocs/Next documentation site generated from canonical Honeydeck package docs |
+| `@honeydeck/docs` | `packages/docs` | No | Public Fumadocs/Next documentation site generated from canonical Honeydeck package docs, start page, search, SEO/social/LLM files |
 | `@honeydeck/showcase` | `packages/showcase` | No | Feature showcase deck, package-local demo layouts/components, build/PDF smoke tests |
 | `@honeydeck/welcome-deck` | `packages/welcome-deck` | No | Compact welcome deck, package-local demo layouts, build/PDF smoke tests |
 
@@ -27,8 +25,8 @@ This root spec is the monorepo overview and navigation map. Detailed observable 
 
 - `@honeydeck/honeydeck` is the public npm package; the installed CLI binary remains `honeydeck`.
 - First-run installation uses `npx @honeydeck/honeydeck init`; generated projects use `@honeydeck/honeydeck/...` imports.
-- The marketing site uses custom Vite/React/Tailwind routing and docs rendering, not Starlight.
-- The primary marketing CTA is `npx @honeydeck/honeydeck init`.
+- The public docs site uses Fumadocs/Next for documentation rendering and developer activation pages.
+- The primary docs CTA is `npx @honeydeck/honeydeck init`.
 - Honeydeck is positioned as **AI-friendly**, not as an AI slide generator.
 - No analytics are required for launch.
 - Accessibility matters: keyboard navigation, visible focus states, reduced motion, color contrast, semantic route entrypoint HTML, and useful alt/labels are required.
@@ -42,8 +40,7 @@ This root spec is the monorepo overview and navigation map. Detailed observable 
 | Honeydeck CLI/runtime implementation | [`packages/honeydeck/src/cli/SPEC.md`](packages/honeydeck/src/cli/SPEC.md), [`packages/honeydeck/src/runtime/SPEC.md`](packages/honeydeck/src/runtime/SPEC.md), [`packages/honeydeck/src/vite-plugin/SPEC.md`](packages/honeydeck/src/vite-plugin/SPEC.md) | Deck building, serving, PDF export, runtime routes, virtual modules |
 | Honeydeck runtime reference behavior | [`packages/honeydeck/src/runtime/views/SPEC.md`](packages/honeydeck/src/runtime/views/SPEC.md) | Theme, layout, and component reference pages |
 | Honeydeck package skills | [`packages/honeydeck/skills/SPEC.md`](packages/honeydeck/skills/SPEC.md) | Bundled installable skills |
-| Marketing/docs site | [`packages/marketing/SPEC.md`](packages/marketing/SPEC.md) | Landing, audience pages, docs generation, search, SEO/social/LLM files |
-| Fumadocs docs site | [`packages/docs/SPEC.md`](packages/docs/SPEC.md) | Standalone Fumadocs docs shell, canonical docs sync, start page, search/LLM routes |
+| Fumadocs docs site | [`packages/docs/SPEC.md`](packages/docs/SPEC.md) | Public docs shell, canonical docs sync, start page, search, SEO/social/LLM routes |
 | Showcase deck | [`packages/showcase/SPEC.md`](packages/showcase/SPEC.md) | Feature showcase deck behavior and package-local demo layouts/components |
 | Welcome deck | [`packages/welcome-deck/SPEC.md`](packages/welcome-deck/SPEC.md) | Compact welcome deck behavior and package-local demo layouts |
 | Release governance | [`.github/SPEC.md`](.github/SPEC.md) | CI checks, PR title contract, npm publishing for `honeydeck` |

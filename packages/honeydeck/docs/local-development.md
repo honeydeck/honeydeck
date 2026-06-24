@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Root `npm run dev` starts the private showcase deck package and the marketing/docs site together.
+Root `npm run dev` starts the private showcase deck package and the docs site together.
 
 To run only the showcase deck:
 

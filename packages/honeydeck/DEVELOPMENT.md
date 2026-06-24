@@ -171,7 +171,7 @@ Important implications:
 Published package contents must include:
 
 - `src/` for CLI, runtime, layouts, themes, Vite plugin, and assets
-- `Readme.md` as the compact package README, `docs/getting-started.md` as the first-run guide, and `docs/*.md` for package docs and marketing-site sync
+- `Readme.md` as the compact package README, `docs/getting-started.md` as the first-run guide, and `docs/*.md` for package docs and docs-site sync
 - Root `SPEC.md` plus colocated `SPEC.md` files so AI agents and maintainers can inspect expected behavior from an installed package
 - `DEVELOPMENT.md` so maintainers can inspect development workflow, internal architecture, testing, and release expectations from an installed package
 - `skills/` so `honeydeck skill`, `npx skills add <honeydeck-repo-url> --copy`, and explicit `npx skills add <honeydeck-repo-url> --copy --skill <skill-name>` can install Honeydeck agent skills
@@ -498,7 +498,7 @@ honeydeck/
     theme/                  Base, clean, and bee CSS theme layers and colocated theme tests
     defaults.ts             Shared defaults such as default deck entry
     assets.d.ts             Static asset type declarations
-  docs/                     Canonical Markdown docs synced into the marketing docs site
+  docs/                     Canonical Markdown docs synced into the docs site
   skills/                   Bundled installable agent skills
   Readme.md                 Compact package README and documentation index
   SPEC.md                   Overview and navigation map for behavior specs
