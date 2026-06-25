@@ -8,6 +8,7 @@
 		"start": "next start",
 		"prebuild": "npm run search:index",
 		"build": "next build",
+		"export:package-docs": "node ./scripts/export-package-docs.mjs",
 		"search:index": "node ./scripts/build-search-index.mjs",
 		"pretypecheck": "npm run search:index",
 		"typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",

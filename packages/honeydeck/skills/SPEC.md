@@ -13,8 +13,8 @@ Honeydeck ships installable agent skills:
 Expected behavior:
 
 - All skills are discoverable by the `skills` CLI when users run `npx skills add <honeydeck-repo-url> --copy` or explicit `npx skills add <honeydeck-repo-url> --copy --skill honeydeck` / `--skill presentation-writing` / `--skill slidev-migration`.
-- The `honeydeck` skill instructs agents to use Honeydeck documentation (`Readme.md` for package overview, `packages/docs/content/docs` for monorepo public docs content, package/root `SPEC.md`, linked colocated `SPEC.md` files, and the public docs site) as the source of truth when available.
-- The `honeydeck` skill documents a local docs discovery order: monorepo docs content and package specs, current project's `node_modules/@honeydeck/honeydeck` specs, package-root checkout specs, then the public docs URL.
+- The `honeydeck` skill instructs agents to use installed Honeydeck package documentation (`node_modules/@honeydeck/honeydeck/docs/*.md`, `node_modules/@honeydeck/honeydeck/docs/index.json`, `Readme.md`, package `SPEC.md`, linked colocated `SPEC.md` files, and the public docs site) as the source of truth when available.
+- The `honeydeck` skill documents a consumer-focused local docs discovery order: current project's `node_modules/@honeydeck/honeydeck/docs` package docs first, then installed package specs, then package-root checkout docs/specs, then the public docs URL. It must not require monorepo-only `packages/docs` paths for normal installed-package use.
 - The `presentation-writing` skill is framework-agnostic enough to help with presentation quality, while still working well alongside the Honeydeck skill.
 - The `slidev-migration` skill instructs agents to inspect existing Slidev projects, preserve source files until the user approves cleanup, initialize or merge Honeydeck starter files, migrate common Slidev syntax to Honeydeck MDX/React, rewrite `md magic-move` blocks to Honeydeck's canonical `md magic-code` syntax, and document unsupported or approximated features.
 - `honeydeck init` should offer to open the interactive skills installer for the generated project and make clear that accepting runs `npx skills add`.

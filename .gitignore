@@ -9,3 +9,5 @@ packages/docs/.source
 packages/docs/.tmp-tests
 packages/docs/tsconfig.tsbuildinfo
 packages/docs/public/search-index.json
+packages/honeydeck/docs
+packages/honeydeck/.tmp-docs-tests
