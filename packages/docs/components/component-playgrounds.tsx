@@ -13,11 +13,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
-
-const panelClass =
-	"not-prose my-6 overflow-hidden rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] shadow-sm";
-const tabClass =
-	"rounded-lg border border-[color:var(--honeydeck-color-border)] px-3 py-2 text-sm font-black transition-colors hover:border-[color:color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]";
+import { Button } from "@/components/Button";
 
 function Playground({
 	title,
@@ -31,7 +27,7 @@ function Playground({
 	code: string;
 }) {
 	return (
-		<section className={panelClass}>
+		<section className="not-prose my-6 overflow-hidden rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] shadow-sm">
 			<div className="border-[color:var(--honeydeck-color-border)] border-b p-4 sm:p-5">
 				<p className="text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
 					Playground
@@ -70,15 +66,16 @@ export function KeyboardPlayground() {
 			<div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
 				<div className="flex flex-wrap gap-2">
 					{shortcuts.map((item, index) => (
-						<button
-							className={tabClass}
+						<Button
+							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
 							data-active={active === index}
 							key={item.label}
 							onClick={() => setActive(index)}
+							size="sm"
 							type="button"
 						>
 							{item.label}
-						</button>
+						</Button>
 					))}
 				</div>
 				<p className="text-2xl font-black leading-10">
@@ -110,15 +107,16 @@ export function ListStylePlayground() {
 			<div className="flex h-full flex-col gap-5 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
 				<div className="flex flex-wrap gap-2">
 					{modes.map((item, index) => (
-						<button
-							className={tabClass}
+						<Button
+							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
 							data-active={active === index}
 							key={item.label}
 							onClick={() => setActive(index)}
+							size="sm"
 							type="button"
 						>
 							{item.label}
-						</button>
+						</Button>
 					))}
 				</div>
 				<ListStyle bullets={mode.bullets} className="text-lg leading-8">
@@ -167,15 +165,16 @@ export function BrowserFramePlayground() {
 			<div className="flex h-full flex-col gap-4">
 				<div className="flex flex-wrap gap-2">
 					{pages.map((item, index) => (
-						<button
-							className={tabClass}
+						<Button
+							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
 							data-active={active === index}
 							key={item.label}
 							onClick={() => setActive(index)}
+							size="sm"
 							type="button"
 						>
 							{item.label}
-						</button>
+						</Button>
 					))}
 				</div>
 				<div className="h-72 text-[28px]">

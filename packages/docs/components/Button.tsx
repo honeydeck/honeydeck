@@ -2,24 +2,21 @@ import type { ComponentPropsWithoutRef, ElementType } from "react";
 import { cn } from "@/lib/cn";
 
 export type ButtonVariant = "primary" | "secondary";
-export type ButtonSize = "default" | "icon";
+export type ButtonSize = "default" | "icon" | "sm";
 
-const transitionClass =
-	"transition-[background-color,border-color,color,box-shadow] duration-150";
-const hoverBorderClass =
-	"hover:border-[color:color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]";
+function getVariantClass(variant: ButtonVariant) {
+	if (variant === "primary") {
+		return "border border-[color:color-mix(in_oklab,#000_10%,var(--honeydeck-color-primary))] bg-[color:var(--honeydeck-color-primary)] text-[color:var(--honeydeck-color-primary-foreground)] shadow-[0_14px_30px_color-mix(in_oklab,var(--honeydeck-color-primary)_26%,transparent)]";
+	}
 
-const variantClass: Record<ButtonVariant, string> = {
-	primary:
-		"border border-[color:color-mix(in_oklab,#000_10%,var(--honeydeck-color-primary))] bg-[color:var(--honeydeck-color-primary)] text-[color:var(--honeydeck-color-primary-foreground)] shadow-[0_14px_30px_color-mix(in_oklab,var(--honeydeck-color-primary)_26%,transparent)]",
-	secondary:
-		"border border-transparent bg-transparent text-[color:inherit] shadow-none",
-};
+	return "border border-transparent bg-transparent text-[color:inherit] shadow-none";
+}
 
-const sizeClass: Record<ButtonSize, string> = {
-	default: "px-4 py-3",
-	icon: "size-9 p-0",
-};
+function getSizeClass(size: ButtonSize) {
+	if (size === "icon") return "size-9 p-0";
+	if (size === "sm") return "px-3 py-2 text-sm";
+	return "px-4 py-3";
+}
 
 export function buttonClassName({
 	className,
@@ -32,10 +29,10 @@ export function buttonClassName({
 } = {}) {
 	return cn(
 		"inline-flex items-center justify-center gap-2.5 rounded-lg font-black no-underline",
-		transitionClass,
-		hoverBorderClass,
-		variantClass[variant],
-		sizeClass[size],
+		"transition-[background-color,border-color,color,box-shadow] duration-150",
+		"hover:border-[color:color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]",
+		getVariantClass(variant),
+		getSizeClass(size),
 		className,
 	);
 }
