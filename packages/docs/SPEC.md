@@ -14,25 +14,23 @@
 | `/llms-full.txt` | Fumadocs-generated full docs corpus |
 | `/search-index.json` | Static prebuilt Orama search index loaded by the client-side Cmd+K search dialog |
 
-## Canonical docs sync
+## Canonical docs content
 
-Canonical documentation content remains in `packages/honeydeck/docs`. The docs site uses `docs-sidebar.json` to define the curated sidebar groups, item order, slugs, titles, and source files.
+Canonical documentation content lives in `packages/docs/content/docs` as authored MDX. The docs package is the source of truth for public prose docs and interactive docs-only examples.
 
-Before dev, typecheck, and build, `npm run docs:sync` must generate Fumadocs content into `content/docs` from the canonical sources. Generated Fumadocs content must include:
+Authored docs content must include:
 
-- one MDX file per sidebar item using the configured slug
-- frontmatter title, description, slug, and `copiedFrom`
-- a `meta.json` file whose `pages` array uses Fumadocs separators for the configured groups
+- one MDX file per docs page
+- frontmatter title, description, and slug
+- Fumadocs `meta.json` files that define curated sidebar groups, item order, and group labels
 
-Generated content is build output and must not be manually edited.
+Docs content is tracked source and may use docs-package MDX components such as interactive playgrounds. Do not put public docs pages in the published `@honeydeck/honeydeck` package.
 
-Docs sync must reject absolute or traversal sidebar sources, unsafe slugs, duplicate slugs/sources, and any resolved read/write path that escapes `packages/honeydeck` or the docs package output directories.
-
-Local Markdown links to sidebar-managed docs sources must be rewritten to `/docs/:slug` routes in generated content. Source docs keep package-relative Markdown links.
+When a docs page explains behavior owned by `packages/honeydeck`, update the owning Honeydeck colocated `SPEC.md` first, then update the docs page. Specs remain the closest source for observable implementation behavior; `packages/docs/content/docs` owns reader-facing guides, examples, and playgrounds.
 
 ## Search
 
-Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from the generated Fumadocs content using `npm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. The docs site must not use a server-side search API route.
+Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from authored Fumadocs content using `npm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. The docs site must not use a server-side search API route.
 
 ## Fumadocs layout
 

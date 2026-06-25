@@ -4,15 +4,8 @@ dist
 packages/showcase/dist
 packages/showcase/*.pdf
 code-review-report.html
-packages/marketing/src/content/docs/generated
-packages/marketing/public/docs
-packages/marketing/public/llms.txt
-packages/marketing/public/llms-full.txt
-packages/marketing/public/robots.txt
-packages/marketing/public/sitemap.xml
 packages/docs/.next
 packages/docs/.source
-packages/docs/content/docs
 packages/docs/.tmp-tests
 packages/docs/tsconfig.tsbuildinfo
 packages/docs/public/search-index.json

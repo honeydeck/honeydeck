@@ -14,24 +14,24 @@ npm run dev
 
 Open the local URL printed by the dev server, edit `deck.mdx`, and your slides update instantly.
 
-Decks are plain MDX files separated into slides with `---`; see the first deck example in [Getting started](docs/getting-started.md).
+Decks are plain MDX files separated into slides with `---`; see the first deck example in [Getting started](https://honeydeck.dev/docs/getting-started).
 
 ## Documentation
 
-- [Getting started](docs/getting-started.md) - first deck, first commands, and the shortest path to presenting
-- [Deeper dive](docs/deeper-dive.md) - CLI options, authoring patterns, imports, themes, architecture, and agent skills
-- [Slides](docs/slides.md) - separators, multiple files, layouts, and assets
-- [Configuration](docs/configuration.md) - deck-level and slide-level frontmatter
-- [Steps and reveals](docs/steps-and-reveals.md) - timeline, reveal groups, code steps, Magic Code, and PDF behavior
-- [Components](docs/components.md) - core Honeydeck components such as `Reveal`, `RevealWith`, `BrowserFrame`, and `Keyboard`
-- [Customization](docs/customization.md) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
-- [Navigation](docs/navigation.md) - keyboard, touch, overview mode, and URL state
-- [Mobile and touch](docs/mobile.md) - mobile controls, touch gestures, and pinch zoom
-- [Presenter mode](docs/presenter-mode.md) - notes, presenter window, sync, and mobile behavior
-- [PDF export](docs/pdf-export.md) - options, color modes, and step handling
-- [Local development](docs/local-development.md) - running Honeydeck from this repository
-- [Skills](docs/skills.md) - optional agent skills for authoring, writing, and migration help
-- [Slidev migration](docs/slidev-migration.md) - moving from Slidev with the bundled agent skill
+- [Getting started](https://honeydeck.dev/docs/getting-started) - first deck, first commands, and the shortest path to presenting
+- [Deeper dive](https://honeydeck.dev/docs/deeper-dive) - CLI options, authoring patterns, imports, themes, architecture, and agent skills
+- [Slides](https://honeydeck.dev/docs/slides) - separators, multiple files, layouts, and assets
+- [Configuration](https://honeydeck.dev/docs/configuration) - deck-level and slide-level frontmatter
+- [Steps and reveals](https://honeydeck.dev/docs/steps-and-reveals) - timeline, reveal groups, code steps, Magic Code, and PDF behavior
+- [Components](https://honeydeck.dev/docs/components) - core Honeydeck components such as `Reveal`, `RevealWith`, `BrowserFrame`, and `Keyboard`
+- [Customization](https://honeydeck.dev/docs/customization) - themes, layout sets, Tailwind tokens, custom layouts, and layout demos
+- [Navigation](https://honeydeck.dev/docs/navigation) - keyboard, touch, overview mode, and URL state
+- [Mobile and touch](https://honeydeck.dev/docs/mobile) - mobile controls, touch gestures, and pinch zoom
+- [Presenter mode](https://honeydeck.dev/docs/presenter-mode) - notes, presenter window, sync, and mobile behavior
+- [PDF export](https://honeydeck.dev/docs/pdf-export) - options, color modes, and step handling
+- [Local development](https://honeydeck.dev/docs/local-development) - running Honeydeck from this repository
+- [Skills](https://honeydeck.dev/docs/skills) - optional agent skills for authoring, writing, and migration help
+- [Slidev migration](https://honeydeck.dev/docs/slidev-migration) - moving from Slidev with the bundled agent skill
 
 ## Common commands
 

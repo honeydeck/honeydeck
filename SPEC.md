@@ -7,17 +7,17 @@ This root spec is the monorepo overview and navigation map. Detailed observable 
 ## Product model
 
 - **Honeydeck runtime/CLI**: public scoped npm package `@honeydeck/honeydeck`, optimized for `npx @honeydeck/honeydeck init` and `@honeydeck/honeydeck/...` imports. It owns runtime components plus token-based UI primitives shared with private monorepo surfaces through public `@honeydeck/honeydeck/components` imports.
-- **Fumadocs docs site**: private package `@honeydeck/docs`, optimized for developer activation, public docs, search, SEO/social basics, AI/LLM discoverability, and Fumadocs/Next documentation over the canonical Honeydeck docs.
+- **Fumadocs docs site**: private package `@honeydeck/docs`, optimized for developer activation, canonical public docs, search, SEO/social basics, AI/LLM discoverability, and Fumadocs/Next documentation.
 - **Showcase deck**: private package `@honeydeck/showcase`, optimized for local demoing and smoke-testing Honeydeck features with a real MDX deck.
 - **Welcome deck**: private package `@honeydeck/welcome-deck`, optimized for a compact first-impression demo deck and layout-reference smoke testing.
-- **Canonical docs**: source-of-truth docs live with `packages/honeydeck` and are synced into the Fumadocs docs site at build/dev time.
+- **Canonical docs**: reader-facing source-of-truth docs live in `packages/docs/content/docs` as authored MDX; implementation behavior remains specified by colocated `SPEC.md` files near the owning code.
 
 ## Workspace packages
 
 | Package | Path | Public? | Owns |
 |---|---|---:|---|
-| `@honeydeck/honeydeck` | `packages/honeydeck` | Yes | CLI, runtime, layouts, themes, Vite plugin, bundled skills, canonical docs, runtime reference pages, shared UI primitives exposed through `@honeydeck/honeydeck/components` |
-| `@honeydeck/docs` | `packages/docs` | No | Public Fumadocs/Next documentation site generated from canonical Honeydeck package docs, start page, search, SEO/social/LLM files |
+| `@honeydeck/honeydeck` | `packages/honeydeck` | Yes | CLI, runtime, layouts, themes, Vite plugin, bundled skills, runtime reference pages, shared UI primitives exposed through `@honeydeck/honeydeck/components` |
+| `@honeydeck/docs` | `packages/docs` | No | Public Fumadocs/Next documentation site, canonical MDX docs content, start page, search, SEO/social/LLM files |
 | `@honeydeck/showcase` | `packages/showcase` | No | Feature showcase deck, package-local demo layouts/components, build/PDF smoke tests |
 | `@honeydeck/welcome-deck` | `packages/welcome-deck` | No | Compact welcome deck, package-local demo layouts, build/PDF smoke tests |
 
@@ -40,7 +40,7 @@ This root spec is the monorepo overview and navigation map. Detailed observable 
 | Honeydeck CLI/runtime implementation | [`packages/honeydeck/src/cli/SPEC.md`](packages/honeydeck/src/cli/SPEC.md), [`packages/honeydeck/src/runtime/SPEC.md`](packages/honeydeck/src/runtime/SPEC.md), [`packages/honeydeck/src/vite-plugin/SPEC.md`](packages/honeydeck/src/vite-plugin/SPEC.md) | Deck building, serving, PDF export, runtime routes, virtual modules |
 | Honeydeck runtime reference behavior | [`packages/honeydeck/src/runtime/views/SPEC.md`](packages/honeydeck/src/runtime/views/SPEC.md) | Theme, layout, and component reference pages |
 | Honeydeck package skills | [`packages/honeydeck/skills/SPEC.md`](packages/honeydeck/skills/SPEC.md) | Bundled installable skills |
-| Fumadocs docs site | [`packages/docs/SPEC.md`](packages/docs/SPEC.md) | Public docs shell, canonical docs sync, start page, search, SEO/social/LLM routes |
+| Fumadocs docs site | [`packages/docs/SPEC.md`](packages/docs/SPEC.md) | Public docs shell, canonical MDX docs content, start page, search, SEO/social/LLM routes |
 | Showcase deck | [`packages/showcase/SPEC.md`](packages/showcase/SPEC.md) | Feature showcase deck behavior and package-local demo layouts/components |
 | Welcome deck | [`packages/welcome-deck/SPEC.md`](packages/welcome-deck/SPEC.md) | Compact welcome deck behavior and package-local demo layouts |
 | Release governance | [`.github/SPEC.md`](.github/SPEC.md) | CI checks, PR title contract, npm publishing for `honeydeck` |

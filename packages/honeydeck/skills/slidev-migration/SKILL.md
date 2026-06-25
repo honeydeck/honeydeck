@@ -11,15 +11,15 @@ Start by reading all Honeydeck related skills available. Alternatively you can c
 
 ## Source of truth
 
-Before changing files, read the available project/package docs:
+Before changing files, read the available project docs and package specs:
 
-- `Readme.md`, `docs/getting-started.md`, root `SPEC.md`, linked colocated `SPEC.md` files, and `docs/slides.md` for Honeydeck deck structure
-- `docs/configuration.md` for Honeydeck frontmatter
-- `docs/steps-and-reveals.md` for Reveal/RevealGroup/code steps
-- `docs/customization.md` for layouts, themes, components, layout maps, and design tokens
+- `Readme.md`, public docs content under `packages/docs/content/docs` when in the monorepo, root `SPEC.md`, linked colocated `SPEC.md` files, and the Slides guide for Honeydeck deck structure
+- The Configuration guide for Honeydeck frontmatter
+- The Steps and reveals guide for Reveal/RevealGroup/code steps
+- The Customization guide for layouts, themes, components, layout maps, and design tokens
 - Existing Slidev files: `slides.md`, `pages/**/*.md`, `components/**/*.vue`, `layouts/**/*.vue`, `styles/**`, `public/**`, `package.json`, `vite.config.*`, and local theme/addon packages
 
-If Honeydeck docs are not nearby, package docs may be in `node_modules/@honeydeck/honeydeck`, or the user can use the public docs site. A migrated deck's runtime reference pages cover active theme tokens, layouts, and built-in components.
+If Honeydeck docs are not nearby, package specs may be in `node_modules/@honeydeck/honeydeck`, or the user can use the public docs site. A migrated deck's runtime reference pages cover active theme tokens, layouts, and built-in components.
 
 ## Migration goal
 

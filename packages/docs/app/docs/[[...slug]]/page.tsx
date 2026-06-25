@@ -34,10 +34,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 			<div className="flex flex-row items-center gap-2 border-b pb-6">
 				<MarkdownCopyButton markdownUrl={markdownUrl} />
 				<ViewOptionsPopover
-					githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/packages/honeydeck/docs/${page.path
-						.split("/")
-						.at(-1)
-						?.replace(/\.mdx$/, ".md")}`}
+					githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/packages/docs/content/docs/${page.path}`}
 					markdownUrl={markdownUrl}
 				/>
 			</div>

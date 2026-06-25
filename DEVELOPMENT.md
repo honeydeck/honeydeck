@@ -45,19 +45,19 @@ npm -w @honeydeck/welcome-deck run dev
 npm -w @honeydeck/welcome-deck run build
 npm -w @honeydeck/welcome-deck run pdf
 npm -w @honeydeck/docs run dev
-npm -w @honeydeck/docs run docs:sync
+npm -w @honeydeck/docs run search:index
 npm -w @honeydeck/docs run build
 ```
 
 ## Docs flow
 
-Canonical Honeydeck docs live in `packages/honeydeck` and are shipped with the public npm package. The Fumadocs docs package syncs selected canonical docs before dev/build:
+Canonical reader-facing Honeydeck docs live in `packages/docs/content/docs` as authored MDX. The docs package generates only derived search data before dev/build:
 
 ```bash
-npm -w @honeydeck/docs run docs:sync
+npm -w @honeydeck/docs run search:index
 ```
 
-Do not manually edit `packages/docs/content/docs/*`.
+Edit `packages/docs/content/docs/*` directly for docs prose and playground usage. When changing documented Honeydeck behavior, update the owning colocated `SPEC.md` near the implementation first.
 
 ## Release flow
 

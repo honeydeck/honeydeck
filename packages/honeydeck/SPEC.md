@@ -31,7 +31,7 @@ The Honeydeck specification is distributed:
 | Runtime | Node.js CLI binary from the scoped `@honeydeck/honeydeck` package | [`src/cli/SPEC.md`](src/cli/SPEC.md) |
 | Build setup | Honeydeck-managed dev/build setup; no user `vite.config.ts` required | [`src/runtime/SPEC.md`](src/runtime/SPEC.md), [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md) |
 | Styling | Explicit CSS imports, Tailwind-compatible utilities, and CSS custom properties | [`src/theme/SPEC.md`](src/theme/SPEC.md) |
-| Markdown | MDX with GitHub-flavored Markdown tables; canonical docs use `docs/*.md` | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md), [`src/remark/SPEC.md`](src/remark/SPEC.md) |
+| Markdown | MDX with GitHub-flavored Markdown tables; reader-facing docs live in `packages/docs/content/docs` | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md), [`src/remark/SPEC.md`](src/remark/SPEC.md) |
 | PDF | Rasterized slide pages matching browser rendering | [`src/cli/SPEC.md`](src/cli/SPEC.md) |
 | Syntax highlighting | Built-in code highlighting, runtime step dimming, and Magic Code transitions | [`src/remark/SPEC.md`](src/remark/SPEC.md) |
 | Icons | `lucide-react` suffixed `...Icon` component imports | [`src/SPEC.md`](src/SPEC.md) |

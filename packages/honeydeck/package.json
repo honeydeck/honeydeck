@@ -35,7 +35,6 @@
 		"!src/**/*.test.tsx",
 		"!src/**/fixtures",
 		"!src/**/fixtures/**",
-		"docs",
 		"skills",
 		"Readme.md",
 		"SPEC.md",

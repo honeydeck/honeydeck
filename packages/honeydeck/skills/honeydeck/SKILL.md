@@ -9,28 +9,28 @@ You help the user work with Honeydeck presentations. Honeydeck decks are MDX fil
 
 ## Source of truth
 
-Before giving Honeydeck-specific syntax or changing a deck, prefer repository/package docs when available.
+Before giving Honeydeck-specific syntax or changing a deck, prefer repository docs and package specs when available.
 
 Docs discovery order:
 
-1. Current project dependency docs: `node_modules/@honeydeck/honeydeck/Readme.md`, `node_modules/@honeydeck/honeydeck/SPEC.md`, and `node_modules/@honeydeck/honeydeck/docs/*.md`.
-2. Monorepo checkout docs: `packages/honeydeck/Readme.md`, `packages/honeydeck/SPEC.md`, and `packages/honeydeck/docs/*.md`.
-3. Fresh app or package-root docs: `Readme.md`, `SPEC.md`, and `docs/*.md`.
+1. Monorepo checkout docs: `packages/docs/content/docs/**/*.mdx`, `packages/docs/SPEC.md`, `packages/honeydeck/Readme.md`, `packages/honeydeck/SPEC.md`, and linked colocated `SPEC.md` files.
+2. Current project dependency docs: `node_modules/@honeydeck/honeydeck/Readme.md`, `node_modules/@honeydeck/honeydeck/SPEC.md`, and linked colocated `SPEC.md` files.
+3. Fresh app or package-root docs: `Readme.md`, `SPEC.md`, and linked colocated `SPEC.md` files.
 4. Public docs URL when local docs are unavailable: `/docs` on the Honeydeck docs site.
 
 Important docs:
 
 - `Readme.md` for the compact package overview and documentation index
-- `docs/getting-started.md` for quick start and first-run orientation
-- `docs/deeper-dive.md` for CLI details, feature overview, architecture, exports, and agent skills
+- `packages/docs/content/docs/(start)/getting-started.mdx` for quick start and first-run orientation
+- `packages/docs/content/docs/(start)/deeper-dive.mdx` for CLI details, feature overview, architecture, exports, and agent skills
 - root/package `SPEC.md` and linked colocated `SPEC.md` files for expected behavior
-- `docs/slides.md` for deck structure, slide separators, and multi-file decks
-- `docs/steps-and-reveals.md` for step-by-step reveals, code steps, and Magic Code
-- `docs/customization.md` for themes, layouts, custom React components, layout maps, demos, and design tokens
-- `docs/configuration.md` for frontmatter options
-- `docs/navigation.md`, `docs/mobile.md`, `docs/presenter-mode.md`, and `docs/pdf-export.md` for presenting/exporting
+- `packages/docs/content/docs/(core)/slides.mdx` for deck structure, slide separators, and multi-file decks
+- `packages/docs/content/docs/(core)/steps-and-reveals.mdx` for step-by-step reveals, code steps, and Magic Code
+- `packages/docs/content/docs/(core)/customization.mdx` for themes, layouts, custom React components, layout maps, demos, and design tokens
+- `packages/docs/content/docs/(core)/configuration.mdx` for frontmatter options
+- `packages/docs/content/docs/(core)/navigation.mdx`, `packages/docs/content/docs/(core)/mobile.mdx`, `packages/docs/content/docs/(core)/presenter-mode.mdx`, and `packages/docs/content/docs/(core)/pdf-export.mdx` for presenting/exporting
 
-If the user is inside a generated Honeydeck project and package docs are not nearby, tell them they can use the public docs site for prose docs and run `npx honeydeck dev` to open runtime reference pages for active theme tokens, layouts, and built-in components.
+If the user is inside a generated Honeydeck project and monorepo docs are not nearby, tell them they can use the public docs site for prose docs and run `npx honeydeck dev` to open runtime reference pages for active theme tokens, layouts, and built-in components.
 
 ## Honeydeck basics to remember
 

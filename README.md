@@ -96,13 +96,13 @@ Restart `npm run dev`.
 ## Learn more
 
 - [Honeydeck.dev](https://honeydeck.dev/docs)
-- [Getting started](packages/honeydeck/docs/getting-started.md)
-- [Slides](packages/honeydeck/docs/slides.md)
-- [Configuration](packages/honeydeck/docs/configuration.md)
-- [Steps and reveals](packages/honeydeck/docs/steps-and-reveals.md)
-- [Components](packages/honeydeck/docs/components.md)
-- [Presenter mode](packages/honeydeck/docs/presenter-mode.md)
-- [PDF export](packages/honeydeck/docs/pdf-export.md)
+- [Getting started](packages/docs/content/docs/(start)/getting-started.mdx)
+- [Slides](packages/docs/content/docs/(core)/slides.mdx)
+- [Configuration](packages/docs/content/docs/(core)/configuration.mdx)
+- [Steps and reveals](packages/docs/content/docs/(core)/steps-and-reveals.mdx)
+- [Components](packages/docs/content/docs/(components)/components.mdx)
+- [Presenter mode](packages/docs/content/docs/(core)/presenter-mode.mdx)
+- [PDF export](packages/docs/content/docs/(core)/pdf-export.mdx)
 - [Package README](packages/honeydeck/Readme.md)
 
 ## For contributors

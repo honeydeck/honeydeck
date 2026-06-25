@@ -3,7 +3,7 @@
 Honeydeck is an npm-workspace monorepo with four packages:
 
 - `packages/honeydeck` — public scoped `@honeydeck/honeydeck` CLI/runtime package for MDX, React, Vite, Tailwind v4 presentations. It also owns shared UI primitives exported through `@honeydeck/honeydeck/components`.
-- `packages/docs` — private `@honeydeck/docs` Fumadocs/Next documentation site generated from canonical Honeydeck docs.
+- `packages/docs` — private `@honeydeck/docs` Fumadocs/Next documentation site with canonical authored MDX docs content.
 - `packages/showcase` — private `@honeydeck/showcase` feature showcase deck for demos and smoke tests.
 - `packages/welcome-deck` — private `@honeydeck/welcome-deck` compact welcome deck for first-impression demos and layout-reference smoke tests.
 
@@ -60,13 +60,13 @@ npm -w @honeydeck/welcome-deck run dev
 npm -w @honeydeck/welcome-deck run build
 npm -w @honeydeck/welcome-deck run pdf
 npm -w @honeydeck/docs run dev
-npm -w @honeydeck/docs run docs:sync
+npm -w @honeydeck/docs run search:index
 npm -w @honeydeck/docs run build
 ```
 
 ## Package boundaries
 
-- `packages/honeydeck/Readme.md` is the compact package README. `packages/honeydeck/docs/getting-started.md` is the canonical first-run guide. Other `packages/honeydeck/docs/*.md` files and specs are canonical Honeydeck docs shipped in the public npm package.
+- `packages/honeydeck/Readme.md` is the compact package README. Reader-facing docs live in `packages/docs/content/docs` as authored MDX; implementation behavior is specified by colocated `SPEC.md` files near owning code.
 - Shared React UI primitives used by runtime and docs live in `packages/honeydeck/src/runtime/components` and are imported via `@honeydeck/honeydeck/components`.
 - The showcase and welcome-deck packages may depend on the public `@honeydeck/honeydeck` package for demos; `honeydeck` must not depend on `@honeydeck/showcase` or `@honeydeck/welcome-deck`.
 - The docs package may depend on the public `@honeydeck/honeydeck` package, but `honeydeck` must not depend on `@honeydeck/docs`.
