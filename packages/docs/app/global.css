@@ -101,6 +101,93 @@ body {
 	outline-offset: 3px;
 }
 
+.docs-home {
+	--docs-home-spotlight-x: 44%;
+	--docs-home-spotlight-y: 27%;
+	--docs-home-spotlight-size: min(34rem, 92vw);
+}
+
+.docs-home-spotlight {
+	position: absolute;
+	left: var(--docs-home-spotlight-x);
+	top: var(--docs-home-spotlight-y);
+	z-index: 0;
+	width: var(--docs-home-spotlight-size);
+	aspect-ratio: 1;
+	pointer-events: none;
+	border-radius: 9999px;
+	background:
+		radial-gradient(
+			circle at 50% 50%,
+			color-mix(in oklab, var(--honeydeck-color-primary) 36%, transparent),
+			transparent 58%
+		),
+		radial-gradient(
+			circle at 70% 28%,
+			color-mix(in oklab, #ff7a1a 24%, transparent),
+			transparent 46%
+		),
+		radial-gradient(
+			circle at 28% 72%,
+			color-mix(in oklab, #9b7cff 22%, transparent),
+			transparent 52%
+		);
+	filter: blur(46px) saturate(1.25);
+	opacity: 0.9;
+	transform: translate(-50%, -50%) translate3d(-3rem, -1rem, 0) scale(0.95);
+	animation: docs-home-spotlight-drift 18s ease-in-out infinite;
+	will-change: left, top, transform;
+}
+
+.dark .docs-home-spotlight {
+	opacity: 0.78;
+	filter: blur(50px) saturate(1.45);
+}
+
+.docs-home-copy {
+	margin: -1.5rem;
+	padding: 1.5rem;
+	border-radius: 1.5rem;
+}
+
+.docs-home:has(.docs-home-copy:is(:hover, :focus-within)) .docs-home-spotlight {
+	animation-play-state: paused;
+}
+
+@keyframes docs-home-spotlight-drift {
+	0%,
+	100% {
+		transform: translate(-50%, -50%) translate3d(-4rem, -1rem, 0) scale(0.9);
+	}
+
+	25% {
+		transform: translate(-50%, -50%) translate3d(6rem, 1.5rem, 0) scale(1.05);
+	}
+
+	50% {
+		transform: translate(-50%, -50%) translate3d(-8rem, 10rem, 0) scale(0.82);
+	}
+
+	75% {
+		transform: translate(-50%, -50%) translate3d(9rem, 12rem, 0) scale(1);
+	}
+}
+
+@media (max-width: 767px) {
+	.docs-home {
+		--docs-home-spotlight-x: 50%;
+		--docs-home-spotlight-y: 22%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.docs-home-spotlight {
+		animation: none;
+		transition: none;
+		transform: translate(-50%, -50%) scale(0.95);
+	}
+}
+
 .docs-hero-card {
 	box-shadow: 0 28px 65px var(--docs-shadow);
 }
