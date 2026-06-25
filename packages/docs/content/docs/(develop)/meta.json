@@ -1,0 +1,6 @@
+{
+	"title": "Develop",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": ["local-development"]
+}

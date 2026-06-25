@@ -1,0 +1,6 @@
+{
+	"title": "Advanced",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": ["skills", "slidev-migration", "mermaid"]
+}

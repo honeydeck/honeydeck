@@ -1,0 +1,419 @@
+---
+title: "Customization"
+description: "Customization documentation for Honeydeck."
+slug: "customization"
+---
+
+# Customization
+
+Honeydeck starts with built-in layouts and a small base theme. Customize only what you need: CSS tokens, React components, or a layout map.
+
+## Mental model
+
+| Concern | What you write | How you use it |
+|---------|----------------|----------------|
+| Theme | CSS files with Honeydeck tokens and Tailwind utilities | import CSS from `deck.mdx` or from another CSS file |
+| Components | React components | import them in MDX |
+| Layouts | React layout components in a layout map | set `layouts:` in deck frontmatter, then choose `layout:` per slide |
+
+All references are explicit. Local files and installed packages work the same way: import the module you want.
+
+## Start with CSS
+
+The starter deck imports `./styles.css` from `deck.mdx`:
+
+```mdx
+import './styles.css'
+
+# Hello world
+```
+
+A typical styles file imports Tailwind and the Honeydeck base theme:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+```
+
+Override tokens after the base theme:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+
+:root {
+  --honeydeck-primary: oklch(55% 0.25 280);
+  --honeydeck-font-heading: "Playfair Display", serif;
+  --honeydeck-border-radius: 1rem;
+}
+```
+
+Target light and dark modes when needed:
+
+```css
+[data-honeydeck-color-mode="light"] {
+  --honeydeck-primary: oklch(50% 0.2 250);
+}
+
+[data-honeydeck-color-mode="dark"] {
+  --honeydeck-primary: oklch(70% 0.2 250);
+}
+```
+
+## Bundled themes and layouts
+
+The default visual style is clean black, white, and grey:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+```
+
+`@honeydeck/honeydeck/themes/clean.css` is available as an optional named clean layer.
+
+The Bee theme adds the original playful palette:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+@import "@honeydeck/honeydeck/themes/bee.css";
+```
+
+Use the matching Bee layout set when you want Bee slide chrome too:
+
+```yaml
+---
+layouts: "@honeydeck/honeydeck/layouts/bee"
+---
+```
+
+The default clean layout set is available through either path:
+
+```yaml
+---
+layouts: "@honeydeck/honeydeck/layouts"
+---
+```
+
+```yaml
+---
+layouts: "@honeydeck/honeydeck/layouts/clean"
+---
+```
+
+## Tailwind token utilities
+
+Honeydeck maps theme tokens to Tailwind utilities:
+
+```mdx
+<div className="rounded-honeydeck border border-border bg-surface p-6 text-surface-foreground">
+  Styled with Honeydeck tokens.
+</div>
+```
+
+Useful color utilities include `primary`, `primary-foreground`, `accent`, `accent-foreground`, `background`, `foreground`, `surface`, `surface-foreground`, and `border`.
+
+## Design tokens
+
+Themes provide CSS custom properties. Colors derive from a primary using `oklch` relative color syntax, with separate values for light and dark modes:
+
+```css
+[data-honeydeck-color-mode="light"] {
+  --honeydeck-primary: oklch(50% 0.2 250);
+  --honeydeck-background: oklch(from var(--honeydeck-primary) 98% 0.01 h);
+  --honeydeck-foreground: oklch(from var(--honeydeck-primary) 15% 0.02 h);
+  --honeydeck-surface: oklch(from var(--honeydeck-primary) 94% 0.02 h);
+}
+```
+
+| Token | Purpose |
+|-------|---------|
+| `--honeydeck-primary` | Brand color for this mode |
+| `--honeydeck-primary-foreground` | Text on primary backgrounds |
+| `--honeydeck-background` | Main slide background |
+| `--honeydeck-foreground` | Main text color |
+| `--honeydeck-surface` | Cards, code blocks, callouts |
+| `--honeydeck-surface-foreground` | Text on surfaces |
+| `--honeydeck-border` | Border/divider color |
+| `--honeydeck-accent` | Accent, computed as complementary by default |
+| `--honeydeck-accent-foreground` | Text on accent backgrounds |
+| `--honeydeck-link-color` | Link color, defaulting to inherit |
+| `--honeydeck-border-radius` | Default border radius |
+| `--honeydeck-font-heading` | Heading font family |
+| `--honeydeck-font-body` | Body font family |
+| `--honeydeck-font-mono` | Monospace font family |
+| `--honeydeck-font-base` | Base font size, defaulting to `16px` |
+| `--honeydeck-font-scale` | Heading scale factor, defaulting to `1.25` |
+| `--honeydeck-code-line-dim-opacity` | Dim opacity for non-highlighted code lines |
+
+## Use built-in layouts
+
+Select a layout in slide frontmatter:
+
+```mdx
+---
+layout: Section
+---
+
+# Big idea
+```
+
+If no `layout:` is specified, `Default` is used. Layout names are PascalCase.
+
+| Layout | Description |
+|--------|-------------|
+| `Blank` | Empty slide with only children |
+| `Default` | Title top-left, body flows below |
+| `Section` | Big centered heading for section breaks |
+| `Cover` | Opening/closing slide with title, body, author, and date |
+| `TwoCol` | Two equal columns |
+| `Image` | Prominent image with optional title and caption/content |
+| `ImageLeft` | Prominent left image with title and body on the right |
+| `ImageRight` | Prominent right image with title and body on the left |
+
+Extra slide frontmatter fields are passed to the selected layout:
+
+```mdx
+---
+layout: Cover
+author: You_Name_Here
+---
+
+# Honeydeck
+
+A modern slide framework.
+```
+
+### Two-column slides
+
+`TwoCol` uses slot components from the active layout set:
+
+```mdx
+---
+layout: TwoCol
+---
+
+import { Left, Right } from '@honeydeck/honeydeck/layouts/TwoCol'
+
+<Left>
+## Benefits
+- Fast iteration
+- Live reload
+</Left>
+
+<Right>
+## Trade-offs
+- Requires Node.js
+</Right>
+```
+
+For Bee layouts, import slots from the Bee path:
+
+```mdx
+import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
+```
+
+### Image slides
+
+`Image`, `ImageLeft`, and `ImageRight` accept `image`, `darkImage`, and `alt` frontmatter:
+
+```mdx
+---
+layout: ImageRight
+image: /photos/launch.jpg
+darkImage: /photos/launch-dark.jpg
+alt: Launch moment
+---
+
+# Launch moment
+
+Supporting context sits beside the image.
+```
+
+## Create custom layouts
+
+Custom layouts are React components. Use a layout map when you want `layout:` frontmatter to select them.
+
+```tsx
+// layouts/Hero.tsx
+import type { LayoutProps } from '@honeydeck/honeydeck/types'
+
+export default function HeroLayout({ title, children }: LayoutProps) {
+  return (
+    <div className="grid h-full place-items-center bg-gradient-to-br from-purple-900 to-indigo-900 p-12 text-center text-white">
+      <div>
+        {title ? <h1>{title}</h1> : null}
+        {children}
+      </div>
+    </div>
+  )
+}
+```
+
+Create a layout map:
+
+```ts
+// layouts/index.ts
+import type { LayoutMap } from '@honeydeck/honeydeck/types'
+import defaultLayouts from '@honeydeck/honeydeck/layouts'
+import HeroLayout from './Hero'
+
+export default {
+  ...defaultLayouts,
+  Hero: HeroLayout,
+} satisfies LayoutMap
+```
+
+Reference it from deck frontmatter:
+
+```yaml
+---
+layouts: "./layouts"
+---
+```
+
+Use it on any slide:
+
+```mdx
+---
+layout: Hero
+---
+
+# Special slide
+
+With a custom gradient background.
+```
+
+You can also import a React component directly and wrap slide content when you do not need a layout map:
+
+```mdx
+---
+
+import { GradientPanel } from './components/GradientPanel'
+
+<GradientPanel>
+# Special slide
+</GradientPanel>
+
+---
+```
+
+## Layout props
+
+`LayoutProps` is generic so layouts can type their accepted frontmatter:
+
+```ts
+type LayoutProps<F extends Record<string, unknown> = Record<string, unknown>> = {
+  title: ReactNode | null
+  children: ReactNode
+  rawChildren: ReactNode
+  frontmatter: F
+}
+```
+
+Example typed layout:
+
+```tsx
+import type { LayoutProps } from '@honeydeck/honeydeck/types'
+
+type CoverFrontmatter = {
+  author?: string
+  date?: string
+}
+
+export function CoverLayout({ title, children, frontmatter }: LayoutProps<CoverFrontmatter>) {
+  const { author, date } = frontmatter
+  return (/* ... */)
+}
+```
+
+## Layout demos
+
+Layouts can export a `demo` constant for `/#/layouts`:
+
+```tsx
+import type { LayoutDemo, LayoutProps } from '@honeydeck/honeydeck/types'
+
+type HeroFrontmatter = {
+  /** Short label shown above the title. */
+  eyebrow?: string
+}
+
+export default function HeroLayout({ title, children, frontmatter }: LayoutProps<HeroFrontmatter>) {
+  return (/* ... */)
+}
+
+export const demo: LayoutDemo<HeroFrontmatter> = {
+  mdx: `---
+layout: Hero
+eyebrow: Launch
+---
+
+# Hero moment
+
+This snippet and preview come from the same demo.`,
+}
+```
+
+`mdx` is the single source for both the live preview and the copyable usage snippet in the layouts reference page. If no demo is exported, the layout still appears with a “No demo MDX provided” hint.
+
+## Slot components
+
+Layouts that need content slots can export slot components alongside the layout:
+
+```tsx
+// layouts/TwoCol.tsx
+import type { ReactNode } from 'react'
+import type { LayoutProps } from '@honeydeck/honeydeck/types'
+
+export function Left({ children }: { children: ReactNode }) {
+  return <div data-honeydeck-slot="left" className="col-start-1 overflow-hidden">{children}</div>
+}
+
+export function Right({ children }: { children: ReactNode }) {
+  return <div data-honeydeck-slot="right" className="col-start-2 overflow-hidden">{children}</div>
+}
+
+export default function TwoColLayout({ title, children }: LayoutProps) {
+  return (
+    <div className="grid h-full grid-cols-2 gap-12">
+      {children}
+    </div>
+  )
+}
+```
+
+Users import slots from the layout module:
+
+```mdx
+import { Left, Right } from './layouts/TwoCol'
+```
+
+## Image helpers
+
+Built-in placeholder images are available as URL exports for custom image layouts:
+
+```ts
+import {
+  imagePlaceholder,
+  imagePlaceholderDark,
+  verticalImagePlaceholder,
+  verticalImagePlaceholderDark,
+} from '@honeydeck/honeydeck/layouts/placeholders'
+```
+
+Use `ColorModeImage` when a custom layout accepts separate light and dark image URLs:
+
+```tsx
+import { ColorModeImage } from '@honeydeck/honeydeck'
+
+<ColorModeImage src={image} darkSrc={darkImage} alt={alt} />
+```
+
+## Runtime reference
+
+During development, open the built-in reference pages:
+
+- `/#/theme` shows all `--honeydeck-*` CSS tokens with computed values and descriptions.
+- `/#/layouts` shows layouts from the active layout map, live visual previews, copyable snippets, and extracted frontmatter prop docs.
+- `/#/components` shows public built-in components exported from `@honeydeck/honeydeck/components`.

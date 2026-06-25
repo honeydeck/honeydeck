@@ -1,0 +1,57 @@
+---
+title: "ListStyle"
+description: "ListStyle documentation for Honeydeck."
+slug: "list-style"
+---
+
+# ListStyle
+
+Use `<ListStyle>` to style Markdown, HTML, or JSX lists inside a wrapper.
+
+<ListStylePlayground />
+
+By default it removes native markers:
+
+```mdx
+import { ListStyle } from '@honeydeck/honeydeck'
+
+<ListStyle>
+  - No marker
+  - Still aligned
+</ListStyle>
+```
+
+Pass `bullets` to render custom markers:
+
+```mdx
+import { ListStyle } from '@honeydeck/honeydeck'
+import { CheckIcon, CircleIcon } from 'lucide-react'
+
+<ListStyle bullets={[<CheckIcon />, <CircleIcon />]}>
+  - Level one uses a check icon
+    - Level two uses a circle icon
+</ListStyle>
+
+<ListStyle bullets={["→", "–", "·"]}>
+  - Level one
+    - Level two
+      - Level three
+</ListStyle>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | — | List content to style. |
+| `bullets` | `ReactNode \| ReactNode[] \| false \| "none" \| null` | `undefined` | Marker config. Omit it, pass `false`, `"none"`, or `null` for markerless lists. |
+| `className` | `string` | — | Custom class for the wrapper. |
+| `style` | `CSSProperties` | — | Inline style for the wrapper. |
+
+## Behavior
+
+- Native list markers are removed for all nested lists in the wrapper.
+- A single `bullets` value is reused for every nesting level.
+- An array uses one marker per nesting level.
+- Deeper levels reuse the last configured marker.
+- Custom markers apply to authored list elements passed as children.

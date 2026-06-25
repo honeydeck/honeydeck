@@ -1,0 +1,6 @@
+{
+	"title": "Start",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": ["getting-started", "deeper-dive"]
+}

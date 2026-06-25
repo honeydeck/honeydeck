@@ -1,0 +1,16 @@
+{
+	"title": "Components",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": [
+		"components",
+		"reveal",
+		"reveal-with",
+		"reveal-group",
+		"timeline-steps",
+		"list-style",
+		"keyboard",
+		"browser-frame",
+		"notes"
+	]
+}
