@@ -4,11 +4,11 @@ import {
 	DocsPage,
 	DocsTitle,
 	MarkdownCopyButton,
-	ViewOptionsPopover,
 } from "fumadocs-ui/layouts/docs/page";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { DocsOpenPopover } from "@/components/DocsOpenPopover";
 import { getMDXComponents } from "@/components/mdx";
 import { gitConfig } from "@/lib/shared";
 import { getPageImage, getPageMarkdownUrl, source } from "@/lib/source";
@@ -33,7 +33,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 			</DocsDescription>
 			<div className="flex flex-row items-center gap-2 border-b pb-6">
 				<MarkdownCopyButton markdownUrl={markdownUrl} />
-				<ViewOptionsPopover
+				<DocsOpenPopover
 					githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/packages/docs/content/docs/${page.path}`}
 					markdownUrl={markdownUrl}
 				/>

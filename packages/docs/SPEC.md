@@ -46,7 +46,8 @@ Documentation pages must use Fumadocs UI as much as practical:
 - The docs start page uses Fumadocs `HomeLayout` so it gets the shared lightweight home navbar instead of the heavier docs shell.
 - Component docs may render package-local interactive playground components for Honeydeck primitives such as `Keyboard`, `ListStyle`, `BrowserFrame`, and `Notes`.
 - Search uses a custom Fumadocs search dialog backed by a static Orama index.
-- Markdown copy/view actions use Fumadocs page controls.
+- Markdown copy uses the Fumadocs copy page control.
+- The docs page Open popover is a package-local page control that only links to the page source on GitHub and the generated Markdown view; it must not include third-party AI provider shortcuts.
 
 Wide docs pages must show the Fumadocs sidebar on the left and the in-page table of contents on the right. Narrow layouts may collapse navigation according to Fumadocs defaults.
 
