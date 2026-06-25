@@ -3,6 +3,10 @@ title: demo-deck
 description: A clean Honeydeck starter deck
 # Define the color mode for your slides: light, dark, system.
 colorMode: system
+# Configure slide transitions. Use "none" to disable.
+transition: fade
+transitionDuration: 200
+transitionEasing: ease
 # Swap layouts for a custom layout map or the included bee theme (also update css).
 # - Custom layouts: layouts: "./layouts"
 # - Bee layouts: layouts: "@honeydeck/honeydeck/layouts/bee"
@@ -43,6 +47,24 @@ All you need is `---` for new slides.
 <Reveal>
 You can press <Keyboard>↓</Keyboard> to skip revealed content and jump to the next slide.
 </Reveal>
+
+---
+transition: slide-left
+transitionDuration: 500
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Choose slide transitions 🎬
+
+Deck-level frontmatter sets the default transition. Slide frontmatter overrides the transition into that slide.
+
+```yaml
+transition: fade
+transitionDuration: 200
+transitionEasing: ease
+```
+
+Use `transition: none` when you want no slide animation.
 
 ---
 

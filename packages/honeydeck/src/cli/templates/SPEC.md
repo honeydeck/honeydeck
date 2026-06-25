@@ -43,8 +43,9 @@ Generated starter tree includes `package.json`, `deck.mdx`, `styles.css`, `.giti
 
 Tutorial-style `deck.mdx` imports `./styles.css` so styling stays explicit and user-controlled. It demonstrates:
 
-- Deck frontmatter, including `colorMode: system`
+- Deck frontmatter, including `colorMode: system`, named transition defaults (`transition`, `transitionDuration`, `transitionEasing`), and layout map hints
 - Slide separators
+- Built-in slide transitions via deck-level defaults and at least one slide-level `transition:` override
 - Built-in layouts via per-slide `layout:` (`Default`, `Section`, `TwoCol`, `Cover`, `Blank`)
 - Code highlighting with step-through
 - Custom interactive component (`SparkleButton`)
