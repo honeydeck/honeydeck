@@ -44,6 +44,7 @@ Documentation pages must use Fumadocs UI as much as practical:
 - The Fumadocs theme-switch slot is replaced with Honeydeck's single color-mode cycle button, cycling `system` → `light` → `dark` → `system` instead of rendering separate light/dark controls.
 - Fumadocs MDX components render prose, callouts, cards, code, and tables.
 - The docs start page uses Fumadocs `HomeLayout` so it gets the shared lightweight home navbar instead of the heavier docs shell.
+- Package-local CTA controls use the shared docs `Button` component/variants for consistent button styling, including the home page CTAs and theme toggle.
 - Component docs may render package-local interactive playground components for Honeydeck primitives such as `Keyboard`, `ListStyle`, `BrowserFrame`, and `Notes`.
 - Search uses a custom Fumadocs search dialog backed by a static Orama index.
 - Markdown copy uses the Fumadocs copy page control.

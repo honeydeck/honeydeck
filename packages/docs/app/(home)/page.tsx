@@ -1,20 +1,8 @@
-import {
-	BookOpenIcon,
-	ExternalLinkIcon,
-	SparklesIcon,
-	StarIcon,
-} from "lucide-react";
+import { BookOpenIcon, ExternalLinkIcon, SparklesIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/Button";
 import { CopyInstallCommand } from "@/components/CopyInstallCommand";
-
-const transitionClass =
-	"transition-[background-color,border-color,color,box-shadow] duration-150";
-const hoverBorderClass =
-	"hover:border-[color:color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]";
-const buttonBaseClass = `inline-flex items-center justify-center gap-2.5 rounded-lg px-4 py-3 font-black no-underline ${transitionClass}`;
-const buttonPrimaryClass = `${buttonBaseClass} border border-[color:color-mix(in_oklab,#000_10%,var(--honeydeck-color-primary))] bg-[color:var(--honeydeck-color-primary)] text-[color:var(--honeydeck-color-primary-foreground)] shadow-[0_14px_30px_color-mix(in_oklab,var(--honeydeck-color-primary)_26%,transparent)] ${hoverBorderClass}`;
-const buttonSecondaryClass = `${buttonBaseClass}`;
 
 export default function HomePage() {
 	return (
@@ -36,17 +24,16 @@ export default function HomePage() {
 						Honeydeck keeps presentations as plain text code, so teams and AI
 						agents can draft, review, present, and export decks with confidence.
 					</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <div className="w-full"><CopyInstallCommand /></div>
-						<Link className={buttonPrimaryClass} href="/docs/getting-started">
+					<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+						<div className="w-full">
+							<CopyInstallCommand />
+						</div>
+						<Button as={Link} href="/docs/getting-started" variant="primary">
 							<BookOpenIcon size={18} aria-hidden="true" /> Start reading docs
-						</Link>
-						<a
-							className={buttonSecondaryClass}
-							href="https://showcase.honeydeck.dev/"
-						>
+						</Button>
+						<Button as="a" href="https://showcase.honeydeck.dev/">
 							View showcase <ExternalLinkIcon size={16} aria-hidden="true" />
-						</a>
+						</Button>
 					</div>
 				</div>
 				<figure className="relative mx-auto w-full max-w-lg overflow-visible">

@@ -7,6 +7,7 @@ import {
 import type { ThemeSwitchProps } from "fumadocs-ui/layouts/shared/slots/theme-switch";
 import { useTheme } from "fumadocs-ui/provider/base";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/Button";
 
 function asColorMode(theme: string | undefined): ColorMode {
 	if (theme === "light" || theme === "dark" || theme === "system") return theme;
@@ -23,12 +24,14 @@ export function ModeToggle({ className, mode: _mode }: ThemeSwitchProps) {
 	}, []);
 
 	return (
-		<ColorModeCycleButton
+		<Button
+			as={ColorModeCycleButton}
 			colorMode={colorMode}
 			onSetColorMode={(mode) => setTheme(mode)}
 			iconSize={16}
 			className={className}
 			data-theme-toggle=""
+			size="icon"
 		/>
 	);
 }
