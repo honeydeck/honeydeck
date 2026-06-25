@@ -166,12 +166,12 @@ Important implications:
 - CLI bin points at `./src/cli/index.ts`.
 - Vite resolves Honeydeck runtime/layout/theme/component exports from source.
 - Local development and tests use `tsx` to execute TypeScript directly.
-- `package.json#files` must include all runtime, docs, spec, development, and skill files needed by installed users and AI agents.
+- `package.json#files` must include all runtime, spec, development, and skill files needed by installed users and AI agents.
 
 Published package contents must include:
 
 - `src/` for CLI, runtime, layouts, themes, Vite plugin, and assets
-- `Readme.md` as the compact package README, `docs/getting-started.md` as the first-run guide, and `docs/*.md` for package docs and marketing-site sync
+- `Readme.md` as the compact package README with links to the public docs site
 - Root `SPEC.md` plus colocated `SPEC.md` files so AI agents and maintainers can inspect expected behavior from an installed package
 - `DEVELOPMENT.md` so maintainers can inspect development workflow, internal architecture, testing, and release expectations from an installed package
 - `skills/` so `honeydeck skill`, `npx skills add <honeydeck-repo-url> --copy`, and explicit `npx skills add <honeydeck-repo-url> --copy --skill <skill-name>` can install Honeydeck agent skills
@@ -498,7 +498,6 @@ honeydeck/
     theme/                  Base, clean, and bee CSS theme layers and colocated theme tests
     defaults.ts             Shared defaults such as default deck entry
     assets.d.ts             Static asset type declarations
-  docs/                     Canonical Markdown docs synced into the marketing docs site
   skills/                   Bundled installable agent skills
   Readme.md                 Compact package README and documentation index
   SPEC.md                   Overview and navigation map for behavior specs

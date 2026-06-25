@@ -21,7 +21,7 @@ try {
 		],
 		repoRoot,
 	);
-	const packed = JSON.parse(packOutput.stdout)[0];
+	const [packed] = parseNpmPackOutput(packOutput.stdout);
 	const tarballPath = join(tempRoot, basename(packed.filename));
 	const projectRoot = join(tempRoot, "smoke");
 
@@ -42,6 +42,21 @@ try {
 		rmSync(tempRoot, { recursive: true, force: true });
 	} else {
 		console.log(`Kept smoke temp directory: ${tempRoot}`);
+	}
+}
+
+function parseNpmPackOutput(stdout) {
+	try {
+		return JSON.parse(stdout);
+	} catch {
+		const jsonStart = stdout.indexOf("[");
+		const jsonEnd = stdout.lastIndexOf("]");
+
+		if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+			throw new Error("npm pack did not return JSON output");
+		}
+
+		return JSON.parse(stdout.slice(jsonStart, jsonEnd + 1));
 	}
 }
 

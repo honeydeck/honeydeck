@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@source "../../honeydeck/src/runtime/components";
+
+@theme {
+	--color-primary: var(--honeydeck-color-primary);
+	--color-primary-foreground: var(--honeydeck-color-primary-foreground);
+	--color-background: var(--honeydeck-color-background);
+	--color-foreground: var(--honeydeck-color-foreground);
+	--color-surface: var(--honeydeck-color-surface);
+	--color-surface-foreground: var(--honeydeck-color-surface-foreground);
+	--color-border: var(--honeydeck-color-border);
+	--color-accent: var(--honeydeck-color-primary);
+	--color-accent-foreground: var(--honeydeck-color-primary-foreground);
+	--radius-honeydeck: var(--honeydeck-border-radius);
+	--font-body: var(--honeydeck-font-body);
+	--font-mono: var(--honeydeck-font-mono);
+}
+
+:root {
+	--honeydeck-font-heading: Inter, ui-sans-serif, system-ui, sans-serif;
+	--honeydeck-font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+	--honeydeck-color-background: #fffdf8;
+	--honeydeck-color-foreground: #191528;
+	--honeydeck-color-surface: #fbf5e8;
+	--honeydeck-color-surface-foreground: #2c2447;
+	--honeydeck-color-border: #ded7c5;
+	--honeydeck-color-primary: #f0b423;
+	--honeydeck-color-primary-foreground: #19120a;
+	--honeydeck-color-muted-foreground: #696475;
+	--honeydeck-border-radius: 0.5rem;
+	--honeydeck-font-mono:
+		"SFMono-Regular", Consolas, "Liberation Mono", monospace;
+	--docs-panel: #fffaf0;
+	--docs-panel-strong: #f3efff;
+	--docs-shadow: rgb(71 54 21 / 14%);
+	--color-fd-background: var(--honeydeck-color-background);
+	--color-fd-foreground: var(--honeydeck-color-foreground);
+	--color-fd-card: var(--honeydeck-color-surface);
+	--color-fd-card-foreground: var(--honeydeck-color-foreground);
+	--color-fd-border: var(--honeydeck-color-border);
+	--color-fd-primary: var(--honeydeck-color-primary);
+	--color-fd-primary-foreground: var(--honeydeck-color-primary-foreground);
+	--color-fd-muted-foreground: var(--honeydeck-color-muted-foreground);
+}
+
+.dark {
+	--honeydeck-color-background: #101017;
+	--honeydeck-color-foreground: #fbf7ea;
+	--honeydeck-color-surface: #201d28;
+	--honeydeck-color-surface-foreground: #eee7ff;
+	--honeydeck-color-border: #393343;
+	--honeydeck-color-primary: #ffd449;
+	--honeydeck-color-primary-foreground: #14100a;
+	--honeydeck-color-muted-foreground: #b9b2c6;
+	--docs-panel: #181721;
+	--docs-panel-strong: #231f33;
+	--docs-shadow: rgb(0 0 0 / 32%);
+}
+
+html {
+	scroll-behavior: smooth;
+	scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+	}
+}
+
+body {
+	min-width: 320px;
+	background:
+		linear-gradient(
+			180deg,
+			color-mix(in oklab, var(--honeydeck-color-primary) 10%, transparent),
+			transparent 22rem
+		),
+		var(--honeydeck-color-background);
+	color: var(--honeydeck-color-foreground);
+	font-family: var(--honeydeck-font-body);
+}
+
+::selection {
+	background: color-mix(
+		in oklab,
+		var(--honeydeck-color-primary) 28%,
+		transparent
+	);
+}
+
+:focus-visible {
+	outline: 2px solid var(--honeydeck-color-primary);
+	outline-offset: 3px;
+}
+
+.docs-hero-card {
+	box-shadow: 0 28px 65px var(--docs-shadow);
+}
+
+.fd-prose a {
+	font-weight: 800;
+	text-decoration-line: underline;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.18em;
+}
+
+.fd-prose table {
+	display: block;
+	overflow-x: auto;
+	white-space: nowrap;
+}

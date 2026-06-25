@@ -7,7 +7,7 @@ This repository is an npm workspace monorepo.
 ```txt
 packages/
   honeydeck/    public scoped Honeydeck CLI/runtime package and shared UI primitives
-  marketing/    private marketing/docs site package
+  docs/         private Fumadocs/Next documentation site package
   showcase/     private feature showcase deck package
   welcome-deck/ private compact welcome deck package
 ```
@@ -24,7 +24,7 @@ npm install
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Run package dev servers together: showcase deck and marketing/docs site |
+| `npm run dev` | Run package dev servers together: showcase deck and Fumadocs docs site |
 | `npm run lint` | Biome validation for the monorepo |
 | `npm run typecheck` | Typecheck all workspaces |
 | `npm test` | Run workspace test suites |
@@ -44,20 +44,20 @@ npm -w @honeydeck/showcase run pdf:steps
 npm -w @honeydeck/welcome-deck run dev
 npm -w @honeydeck/welcome-deck run build
 npm -w @honeydeck/welcome-deck run pdf
-npm -w @honeydeck/marketing run dev
-npm -w @honeydeck/marketing run docs:sync
-npm -w @honeydeck/marketing run build
+npm -w @honeydeck/docs run dev
+npm -w @honeydeck/docs run search:index
+npm -w @honeydeck/docs run build
 ```
 
 ## Docs flow
 
-Canonical Honeydeck docs live in `packages/honeydeck` and are shipped with the public npm package. The marketing package syncs selected canonical docs before dev/build:
+Canonical reader-facing Honeydeck docs live in `packages/docs/content/docs` as authored MDX. The docs package generates only derived search data before dev/build:
 
 ```bash
-npm -w @honeydeck/marketing run docs:sync
+npm -w @honeydeck/docs run search:index
 ```
 
-Do not manually edit `packages/marketing/src/content/docs/generated/*`.
+Edit `packages/docs/content/docs/*` directly for docs prose and playground usage. When changing documented Honeydeck behavior, update the owning colocated `SPEC.md` near the implementation first.
 
 ## Release flow
 

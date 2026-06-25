@@ -14,7 +14,7 @@ Injected fenced code blocks render through `HoneydeckCodeBlock` from the direct 
 
 ### Color Mode Controls
 
-`@honeydeck/honeydeck/components` exports the configured color mode type and color mode cycle button for public imports used by Honeydeck chrome surfaces and the marketing site.
+`@honeydeck/honeydeck/components` exports the configured color mode type and color mode cycle button for public imports used by Honeydeck chrome surfaces and the docs site.
 
 ```tsx
 import { ColorModeCycleButton, type ColorMode } from '@honeydeck/honeydeck/components'
@@ -30,7 +30,7 @@ Behavior:
 
 ### Button Controls
 
-`@honeydeck/honeydeck/components` exports generic Honeydeck-token-based button primitives and class recipes for runtime chrome, runtime reference pages, and marketing controls.
+`@honeydeck/honeydeck/components` exports generic Honeydeck-token-based button primitives and class recipes for runtime chrome, runtime reference pages, and docs controls.
 
 ```tsx
 import { Button, buttonPrimaryClass, iconButtonClass } from '@honeydeck/honeydeck/components'
@@ -41,7 +41,7 @@ Behavior:
 - `<Button>` renders a native `button` with `type="button"` by default.
 - `variant` selects one of `primary`, `secondary`, `icon`, `small`, or `quiet`.
 - `buttonClass(variant, className)` returns the matching token-based Tailwind class string and appends `className` when provided.
-- Exported class recipes use only shipped Honeydeck base-theme tokens for foreground, surface, border, primary, and transition behavior (`--honeydeck-primary`, `--honeydeck-primary-foreground`, `--honeydeck-surface`, `--honeydeck-surface-foreground`, `--honeydeck-border`, `--honeydeck-foreground`, `--honeydeck-background`) so public imports do not depend on marketing-only aliases at publish time.
+- Exported class recipes use only shipped Honeydeck base-theme tokens for foreground, surface, border, primary, and transition behavior (`--honeydeck-primary`, `--honeydeck-primary-foreground`, `--honeydeck-surface`, `--honeydeck-surface-foreground`, `--honeydeck-border`, `--honeydeck-foreground`, `--honeydeck-background`) so public imports do not depend on docs-site-only aliases at publish time.
 
 ### Runtime chrome buttons
 

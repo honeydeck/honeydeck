@@ -9,28 +9,28 @@ You help the user work with Honeydeck presentations. Honeydeck decks are MDX fil
 
 ## Source of truth
 
-Before giving Honeydeck-specific syntax or changing a deck, prefer repository/package docs when available.
+Before giving Honeydeck-specific syntax or changing a deck, prefer the installed package docs and package specs when available. This skill is for consumers of the `@honeydeck/honeydeck` package, so do not depend on monorepo-only paths.
 
 Docs discovery order:
 
-1. Current project dependency docs: `node_modules/@honeydeck/honeydeck/Readme.md`, `node_modules/@honeydeck/honeydeck/SPEC.md`, and `node_modules/@honeydeck/honeydeck/docs/*.md`.
-2. Monorepo checkout docs: `packages/honeydeck/Readme.md`, `packages/honeydeck/SPEC.md`, and `packages/honeydeck/docs/*.md`.
-3. Fresh app or package-root docs: `Readme.md`, `SPEC.md`, and `docs/*.md`.
-4. Public docs URL when local docs are unavailable: `/docs` on the Honeydeck marketing site.
+1. Current project dependency docs: `node_modules/@honeydeck/honeydeck/docs/index.json`, `node_modules/@honeydeck/honeydeck/docs/*.md`, `node_modules/@honeydeck/honeydeck/Readme.md`, `node_modules/@honeydeck/honeydeck/SPEC.md`, and linked colocated `SPEC.md` files.
+2. Package-root checkout docs: `docs/index.json`, `docs/*.md`, `Readme.md`, `SPEC.md`, and linked colocated `SPEC.md` files.
+3. Public docs URL when local docs are unavailable: `https://honeydeck.dev/docs`.
 
 Important docs:
 
 - `Readme.md` for the compact package overview and documentation index
+- `docs/index.json` for the installed docs page list and order
 - `docs/getting-started.md` for quick start and first-run orientation
 - `docs/deeper-dive.md` for CLI details, feature overview, architecture, exports, and agent skills
-- root/package `SPEC.md` and linked colocated `SPEC.md` files for expected behavior
+- package `SPEC.md` and linked colocated `SPEC.md` files for expected behavior
 - `docs/slides.md` for deck structure, slide separators, and multi-file decks
 - `docs/steps-and-reveals.md` for step-by-step reveals, code steps, and Magic Code
 - `docs/customization.md` for themes, layouts, custom React components, layout maps, demos, and design tokens
 - `docs/configuration.md` for frontmatter options
 - `docs/navigation.md`, `docs/mobile.md`, `docs/presenter-mode.md`, and `docs/pdf-export.md` for presenting/exporting
 
-If the user is inside a generated Honeydeck project and package docs are not nearby, tell them they can use the public docs site for prose docs and run `npx honeydeck dev` to open runtime reference pages for active theme tokens, layouts, and built-in components.
+If local package docs are unavailable, tell the user they can use the public docs site for prose docs and run `npx honeydeck dev` to open runtime reference pages for active theme tokens, layouts, and built-in components.
 
 ## Honeydeck basics to remember
 

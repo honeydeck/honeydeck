@@ -1,0 +1,15 @@
+{
+	"title": "Core",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": [
+		"slides",
+		"configuration",
+		"steps-and-reveals",
+		"customization",
+		"navigation",
+		"mobile",
+		"presenter-mode",
+		"pdf-export"
+	]
+}

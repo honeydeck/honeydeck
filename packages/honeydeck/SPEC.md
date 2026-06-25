@@ -31,7 +31,7 @@ The Honeydeck specification is distributed:
 | Runtime | Node.js CLI binary from the scoped `@honeydeck/honeydeck` package | [`src/cli/SPEC.md`](src/cli/SPEC.md) |
 | Build setup | Honeydeck-managed dev/build setup; no user `vite.config.ts` required | [`src/runtime/SPEC.md`](src/runtime/SPEC.md), [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md) |
 | Styling | Explicit CSS imports, Tailwind-compatible utilities, and CSS custom properties | [`src/theme/SPEC.md`](src/theme/SPEC.md) |
-| Markdown | MDX with GitHub-flavored Markdown tables; canonical docs use `docs/*.md` | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md), [`src/remark/SPEC.md`](src/remark/SPEC.md) |
+| Markdown | MDX with GitHub-flavored Markdown tables; reader-facing docs are authored in `packages/docs/content/docs` and exported into package-local `docs/*.md` files during npm packaging | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md), [`src/remark/SPEC.md`](src/remark/SPEC.md) |
 | PDF | Rasterized slide pages matching browser rendering | [`src/cli/SPEC.md`](src/cli/SPEC.md) |
 | Syntax highlighting | Built-in code highlighting, runtime step dimming, and Magic Code transitions | [`src/remark/SPEC.md`](src/remark/SPEC.md) |
 | Icons | `lucide-react` suffixed `...Icon` component imports | [`src/SPEC.md`](src/SPEC.md) |
@@ -43,6 +43,7 @@ The Honeydeck specification is distributed:
 - Honeydeck wires the Tailwind Vite plugin internally, but Tailwind/theme CSS is only loaded when user-authored CSS imports it; generated projects install `tailwindcss` and import `./styles.css` from `deck.mdx`.
 - Generated projects use compatible semver ranges for React, Tailwind, TypeScript, and types.
 - Custom themes, layouts, and components are plain CSS/TypeScript modules; installed-package usage is handled by standard package metadata rather than by a Honeydeck-specific mechanism.
+- Published packages include generated package-local docs under `docs/*.md` plus `docs/index.json` so bundled agent skills can read version-aligned documentation from `node_modules/@honeydeck/honeydeck/docs`.
 - Icons come from `lucide-react` and must use suffixed `...Icon` component exports (for example `ChevronLeftIcon`), not inline SVG path helpers, emoji glyphs, or unsuffixed aliases.
 
 ---
