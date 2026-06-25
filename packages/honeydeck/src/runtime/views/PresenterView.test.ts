@@ -35,7 +35,7 @@ describe("<PresenterCastButton>", () => {
 		assert.match(html, /aria-label="Stop casting"/);
 	});
 
-	it("renders the unsupported feedback state", () => {
+	it("renders the unsupported disabled-looking state without inline feedback", () => {
 		const html = renderToStaticMarkup(
 			createElement(PresenterCastButton, {
 				supported: false,
@@ -48,7 +48,9 @@ describe("<PresenterCastButton>", () => {
 		assert.match(html, /Cast audience view/);
 		assert.match(html, /Presentation casting is not supported in this browser/);
 		assert.match(html, /aria-disabled="true"/);
+		assert.match(html, /cursor-not-allowed/);
 		assert.doesNotMatch(html, /disabled=""/);
+		assert.doesNotMatch(html, /aria-live/);
 	});
 });
 
