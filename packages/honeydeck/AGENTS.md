@@ -5,7 +5,7 @@ This package publishes the scoped public `@honeydeck/honeydeck` npm package. It 
 ## Rules
 
 - Keep public import paths as `@honeydeck/honeydeck/...`.
-- `Readme.md` is the compact package README and links to the public docs site. Reader-facing docs live in `packages/docs/content/docs`.
+- `Readme.md` is the compact package README and links to the public docs site. Reader-facing docs live in `packages/docs/content/docs`; update those canonical docs for user-facing behavior changes.
 - Built-in runtime reference pages cover project-specific theme tokens, active layouts, and built-in component docs. They do not render public docs in-deck.
 - Specs, `DEVELOPMENT.md`, and skills must remain included in npm package contents.
 - Use suffixed `lucide-react` icon exports.

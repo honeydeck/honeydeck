@@ -20,7 +20,9 @@ Defined in the first frontmatter block of the deck entry file (before any slide 
 | `colorMode` | `"system" \| "light" \| "dark"` | `"system"` | Browser color mode |
 | `pdfColorMode` | `"light" \| "dark"` | unset | Optional PDF color mode; when unset, falls back to pinned `colorMode`, then `light` |
 | `pdfSteps` | `"final" \| "all"` | `"final"` | PDF includes all steps or final state |
-| `transition` | `boolean` | `true` | Enable crossfade between slides |
+| `transition` | `string \| boolean` | `fade` | Default named slide transition (`fade`, `none`, `slide-left`, or custom CSS name) |
+| `transitionDuration` | `number` | `200` | Default slide transition duration in milliseconds |
+| `transitionEasing` | `string` | `ease` | Default slide transition timing function |
 | `magicCodeDuration` | `number` | `800` | Default Magic Code animation duration in milliseconds |
 | `layouts` | `string` | `""` (built-in) | Layout map module path |
 | `defaultLayout` | `string` | `"Default"` | Layout used when slide has no `layout:` |
@@ -50,12 +52,16 @@ When pinned, the viewer cannot switch mode from navigation controls.
 
 ### Transitions
 
-A subtle crossfade (~200ms) is applied between slides by default:
+A subtle named `fade` transition is applied between slides by default:
 
 ```yaml
-transition: true    # default
-transition: false   # disable
+transition: fade    # default
+transition: none    # disable
 ```
+
+Legacy booleans still work: `transition: true` maps to `fade`, and `transition: false` maps to `none`.
+
+For built-ins, custom CSS transitions, duration, and easing, see [Transitions](/docs/transitions).
 
 ### Magic Code Duration
 
@@ -74,6 +80,9 @@ Per-slide frontmatter (after `---`):
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `layout` | `string` | (uses `defaultLayout`) | Layout to use (PascalCase) |
+| `transition` | `string \| boolean` | deck default | Named transition into this slide |
+| `transitionDuration` | `number` | deck default | Transition duration into this slide in milliseconds |
+| `transitionEasing` | `string` | deck default | Transition easing into this slide |
 | ...layout props | varies | — | Additional props the layout accepts |
 
 Example:

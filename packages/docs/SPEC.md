@@ -16,7 +16,7 @@
 
 ## Canonical docs content
 
-Canonical documentation content lives in `packages/docs/content/docs` as authored MDX. The docs package is the source of truth for public prose docs and interactive docs-only examples.
+Canonical documentation content lives in `packages/docs/content/docs` as authored MDX. The docs package is the source of truth for public prose docs and interactive docs-only examples. Publicly visible Honeydeck behavior must be documented here in addition to the owning implementation spec.
 
 Authored docs content must include:
 
@@ -26,7 +26,7 @@ Authored docs content must include:
 
 Docs content is tracked source and may use docs-package MDX components such as interactive playgrounds. Do not hand-author public docs pages in the published `@honeydeck/honeydeck` package.
 
-When a docs page explains behavior owned by `packages/honeydeck`, update the owning Honeydeck colocated `SPEC.md` first, then update the docs page. Specs remain the closest source for observable implementation behavior; `packages/docs/content/docs` owns reader-facing guides, examples, and playgrounds.
+When a docs page explains behavior owned by `packages/honeydeck`, update the owning Honeydeck colocated `SPEC.md` first, then update the docs page. Specs remain the closest source for observable implementation behavior; `packages/docs/content/docs` owns reader-facing guides, examples, and playgrounds. Core slide-transition behavior is documented by `/docs/transitions`, including deck defaults, slide overrides, built-in transition names, custom CSS hooks, timing variables, and reverse-aware custom CSS.
 
 The docs package must provide `npm run export:package-docs` to export the authored docs into package-local Markdown files under `packages/honeydeck/docs` for the published Honeydeck package. The export must be generated from `packages/docs/content/docs`, preserve the curated `meta.json` order, write one Markdown file per docs page plus `index.json`, and be safe against path traversal. Generated package docs are build artifacts and must not be manually edited.
 

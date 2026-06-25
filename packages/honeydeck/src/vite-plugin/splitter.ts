@@ -65,6 +65,8 @@ const DECK_FRONTMATTER_KEYS = new Set([
 	"pdfColorMode",
 	"pdfSteps",
 	"transition",
+	"transitionDuration",
+	"transitionEasing",
 	"magicCodeDuration",
 	"layouts",
 	"defaultLayout",

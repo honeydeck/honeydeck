@@ -115,19 +115,22 @@ Deck-level settings live in the first frontmatter block of the deck entry file.
 | `colorMode` | `"system" \| "light" \| "dark"` | `"system"` | Color mode |
 | `pdfColorMode` | `"light" \| "dark"` | unset | Optional PDF color mode; falls back to pinned `colorMode`, then `light` |
 | `pdfSteps` | `"final" \| "all"` | `"final"` | PDF step handling |
-| `transition` | `boolean` | `true` | Crossfade between slides |
+| `transition` | `string \| boolean` | `fade` | Named slide transition |
 | `layouts` | `string` | `""` (built-in) | Custom layout map path |
 | `defaultLayout` | `string` | `"Default"` | Fallback layout |
 | `showSlideNumbers` | `boolean` | `false` | Show slide numbers |
 
-Slide-level frontmatter chooses the slide layout and passes layout-specific props.
+Slide-level frontmatter chooses the slide layout, passes layout-specific props, and can override the transition into that slide.
 
 | Property | Type | Description |
 |----------|------|-------------|
 | `layout` | `string` | Layout name in PascalCase |
+| `transition` | `string \| boolean` | Named transition into this slide |
+| `transitionDuration` | `number` | Transition duration in milliseconds |
+| `transitionEasing` | `string` | Transition timing function |
 | layout props | varies | Layout-specific fields |
 
-For the full reference, see [Configuration](/docs/configuration).
+For the full reference, see [Configuration](/docs/configuration) and [Transitions](/docs/transitions).
 
 ## Core components
 

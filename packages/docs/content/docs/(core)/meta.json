@@ -5,6 +5,7 @@
 	"pages": [
 		"slides",
 		"configuration",
+		"transitions",
 		"steps-and-reveals",
 		"customization",
 		"navigation",
