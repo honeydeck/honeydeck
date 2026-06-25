@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PresenterCastButton } from "../../runtime/views/PresenterCastButton.tsx";
+import { formatPresenterElapsedTime } from "../../runtime/views/presenterTime.ts";
 
 describe("<PresenterCastButton>", () => {
 	it("renders the supported idle state", () => {
@@ -34,7 +35,7 @@ describe("<PresenterCastButton>", () => {
 		assert.match(html, /aria-label="Stop casting"/);
 	});
 
-	it("renders the unsupported disabled state", () => {
+	it("renders the unsupported feedback state", () => {
 		const html = renderToStaticMarkup(
 			createElement(PresenterCastButton, {
 				supported: false,
@@ -46,6 +47,19 @@ describe("<PresenterCastButton>", () => {
 
 		assert.match(html, /Cast audience view/);
 		assert.match(html, /Presentation casting is not supported in this browser/);
-		assert.match(html, /disabled=""/);
+		assert.match(html, /aria-disabled="true"/);
+		assert.doesNotMatch(html, /disabled=""/);
+	});
+});
+
+describe("formatPresenterElapsedTime", () => {
+	it("formats elapsed presenter time", () => {
+		assert.equal(formatPresenterElapsedTime(0), "0:00");
+		assert.equal(formatPresenterElapsedTime(65_000), "1:05");
+		assert.equal(formatPresenterElapsedTime(3_661_000), "1:01:01");
+	});
+
+	it("clamps negative elapsed time", () => {
+		assert.equal(formatPresenterElapsedTime(-1_000), "0:00");
 	});
 });

@@ -9,6 +9,8 @@
  *
  * ### Message types
  * - `navigate`              — presenter changed slide/step
+ * - `color-mode`            — presenter changed configured color mode
+ * - `blank-screen`          — presenter toggled audience blank screen
  * - `sync-request`          — audience asks for the current presenter route
  * - `sync-response`         — presenter replies with the current route
  * - `presenter-connected`   — a presenter window opened
@@ -28,7 +30,8 @@
  * ```
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
 import { navigate, parseHash, type Route } from "./router.ts";
 
 // ---------------------------------------------------------------------------
@@ -49,6 +52,17 @@ export type SyncResponseMessage = {
 	type: "sync-response";
 	slide: number;
 	step: number;
+	colorMode?: ColorMode;
+};
+
+export type SyncColorModeMessage = {
+	type: "color-mode";
+	colorMode: ColorMode;
+};
+
+export type SyncBlankScreenMessage = {
+	type: "blank-screen";
+	mode: "black" | "off";
 };
 
 export type SyncPresenceMessage =
@@ -59,6 +73,8 @@ export type SyncMessage =
 	| SyncNavigateMessage
 	| SyncRequestMessage
 	| SyncResponseMessage
+	| SyncColorModeMessage
+	| SyncBlankScreenMessage
 	| SyncPresenceMessage;
 
 export type UseSyncOptions = {
@@ -70,6 +86,12 @@ export type UseSyncOptions = {
 	currentSlide?: number;
 	/** Current 0-based step index (required when `isPresenter: true`). */
 	currentStep?: number;
+	/** Current configured color mode, broadcast by presenter when supplied. */
+	currentColorMode?: ColorMode;
+	/** Called by audience windows when presenter color mode changes. */
+	onSetColorMode?: (mode: ColorMode) => void;
+	/** Called by audience windows when presenter toggles blank screen. */
+	onBlankScreen?: (mode: "black" | "off") => void;
 };
 
 type PresenterRoute = {
@@ -89,12 +111,26 @@ export function createSyncRequestMessage(): SyncRequestMessage {
 
 export function createSyncResponseMessage(
 	route: PresenterRoute,
+	colorMode?: ColorMode,
 ): SyncResponseMessage {
 	return {
 		type: "sync-response",
 		slide: route.slide,
 		step: route.step,
+		...(colorMode ? { colorMode } : {}),
 	};
+}
+
+export function createSyncColorModeMessage(
+	colorMode: ColorMode,
+): SyncColorModeMessage {
+	return { type: "color-mode", colorMode };
+}
+
+export function createSyncBlankScreenMessage(
+	mode: "black" | "off",
+): SyncBlankScreenMessage {
+	return { type: "blank-screen", mode };
 }
 
 export function resolveAudienceRouteFromSyncMessage(
@@ -110,6 +146,14 @@ export function resolveAudienceRouteFromSyncMessage(
 	};
 }
 
+function isColorModeValue(value: unknown): value is { colorMode: ColorMode } {
+	if (typeof value !== "object" || value === null) return false;
+	const colorMode = (value as { colorMode?: unknown }).colorMode;
+	return (
+		colorMode === "system" || colorMode === "light" || colorMode === "dark"
+	);
+}
+
 function isSyncMessage(value: unknown): value is SyncMessage {
 	if (typeof value !== "object" || value === null) return false;
 	if (!("type" in value)) return false;
@@ -118,23 +162,50 @@ function isSyncMessage(value: unknown): value is SyncMessage {
 	if (type === "sync-request") return true;
 	if (type === "presenter-connected") return true;
 	if (type === "presenter-disconnected") return true;
+	if (type === "color-mode") return isColorModeValue(value);
+	if (type === "blank-screen") return isBlankScreenValue(value);
 
 	if (type !== "navigate" && type !== "sync-response") return false;
 
 	const slide = (value as { slide?: unknown }).slide;
 	const step = (value as { step?: unknown }).step;
-	return (
-		typeof slide === "number" &&
-		Number.isFinite(slide) &&
-		typeof step === "number" &&
-		Number.isFinite(step)
-	);
+	if (
+		typeof slide !== "number" ||
+		!Number.isFinite(slide) ||
+		typeof step !== "number" ||
+		!Number.isFinite(step)
+	) {
+		return false;
+	}
+
+	const colorMode = (value as { colorMode?: unknown }).colorMode;
+	return colorMode === undefined || isColorModeValue({ colorMode });
+}
+
+function isBlankScreenValue(
+	value: unknown,
+): value is { mode: "black" | "off" } {
+	if (typeof value !== "object" || value === null) return false;
+	const mode = (value as { mode?: unknown }).mode;
+	return mode === "black" || mode === "off";
 }
 
 function isRouteSyncMessage(
 	message: SyncMessage,
 ): message is SyncNavigateMessage | SyncResponseMessage {
 	return message.type === "navigate" || message.type === "sync-response";
+}
+
+function isColorModeSyncMessage(
+	message: SyncMessage,
+): message is SyncColorModeMessage {
+	return message.type === "color-mode";
+}
+
+function isBlankScreenSyncMessage(
+	message: SyncMessage,
+): message is SyncBlankScreenMessage {
+	return message.type === "blank-screen";
 }
 
 // ---------------------------------------------------------------------------
@@ -144,21 +215,31 @@ function isRouteSyncMessage(
 /**
  * Bidirectional sync hook.
  *
- * @returns `{ presenterConnected }` — true when an audience window has
- * detected that a presenter window is open on the same channel.
+ * @returns `{ presenterConnected, broadcastBlankScreen }` — presenterConnected is
+ * true when an audience window has detected that a presenter window is open on
+ * the same channel. broadcastBlankScreen sends a blank-screen command.
  */
 export function useSync({
 	enabled = true,
 	isPresenter,
 	currentSlide,
 	currentStep,
-}: UseSyncOptions): { presenterConnected: boolean } {
+	currentColorMode,
+	onSetColorMode,
+	onBlankScreen,
+}: UseSyncOptions): {
+	presenterConnected: boolean;
+	broadcastBlankScreen: (mode: "black" | "off") => void;
+} {
 	const [presenterConnected, setPresenterConnected] = useState(false);
 	const channelRef = useRef<BroadcastChannel | null>(null);
 	const presenterRouteRef = useRef<PresenterRoute>({
 		slide: currentSlide ?? 1,
 		step: currentStep ?? 0,
 	});
+	const presenterColorModeRef = useRef<ColorMode | undefined>(currentColorMode);
+	const onBlankScreenRef = useRef(onBlankScreen);
+	onBlankScreenRef.current = onBlankScreen;
 
 	useEffect(() => {
 		if (!isPresenter) return;
@@ -169,6 +250,11 @@ export function useSync({
 			step: currentStep,
 		};
 	}, [currentSlide, currentStep, isPresenter]);
+
+	useEffect(() => {
+		if (!isPresenter) return;
+		presenterColorModeRef.current = currentColorMode;
+	}, [currentColorMode, isPresenter]);
 
 	// ── Channel lifecycle ───────────────────────────────────────────────────
 
@@ -199,6 +285,7 @@ export function useSync({
 					channel.postMessage(
 						createSyncResponseMessage(
 							presenterRouteRef.current,
+							presenterColorModeRef.current,
 						) satisfies SyncMessage,
 					);
 				}
@@ -207,6 +294,7 @@ export function useSync({
 
 			if (msg.type === "presenter-disconnected") {
 				setPresenterConnected(false);
+				onBlankScreenRef.current?.("off");
 				return;
 			}
 
@@ -215,8 +303,23 @@ export function useSync({
 				return;
 			}
 
+			if (isColorModeSyncMessage(msg)) {
+				setPresenterConnected(true);
+				onSetColorMode?.(msg.colorMode);
+				return;
+			}
+
+			if (isBlankScreenSyncMessage(msg)) {
+				setPresenterConnected(true);
+				onBlankScreenRef.current?.(msg.mode);
+				return;
+			}
+
 			if (isRouteSyncMessage(msg)) {
 				setPresenterConnected(true);
+				if (msg.type === "sync-response" && msg.colorMode) {
+					onSetColorMode?.(msg.colorMode);
+				}
 				const currentRoute = parseHash(location.hash);
 				const nextRoute = resolveAudienceRouteFromSyncMessage(
 					currentRoute,
@@ -241,7 +344,7 @@ export function useSync({
 			channel.close();
 			channelRef.current = null;
 		};
-	}, [enabled, isPresenter]);
+	}, [enabled, isPresenter, onSetColorMode]);
 
 	// ── Presenter: broadcast navigation changes ─────────────────────────────
 
@@ -263,5 +366,20 @@ export function useSync({
 		} satisfies SyncMessage);
 	}, [enabled, isPresenter, currentSlide, currentStep]);
 
-	return { presenterConnected };
+	useEffect(() => {
+		if (!enabled || !isPresenter || !currentColorMode) return;
+
+		presenterColorModeRef.current = currentColorMode;
+		channelRef.current?.postMessage(
+			createSyncColorModeMessage(currentColorMode) satisfies SyncMessage,
+		);
+	}, [enabled, isPresenter, currentColorMode]);
+
+	const broadcastBlankScreen = useCallback((mode: "black" | "off") => {
+		channelRef.current?.postMessage(
+			createSyncBlankScreenMessage(mode) satisfies SyncMessage,
+		);
+	}, []);
+
+	return { presenterConnected, broadcastBlankScreen };
 }

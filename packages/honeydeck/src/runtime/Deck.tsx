@@ -156,12 +156,22 @@ export function Deck() {
 	}, [route]);
 
 	// ── Audience sync: BroadcastChannel + Presentation API receiver ──────
+	const [blankScreen, setBlankScreen] = useState<"black" | null>(null);
+	const handleBlankScreen = useCallback(
+		(mode: "black" | "off") =>
+			setBlankScreen(mode === "black" ? "black" : null),
+		[],
+	);
 	useSync({
 		enabled: route.view === "slide" || route.view === "overview",
 		isPresenter: false,
+		onSetColorMode: setColorMode,
+		onBlankScreen: handleBlankScreen,
 	});
 	usePresentationReceiverSync({
 		enabled: route.view === "slide" || route.view === "overview",
+		onSetColorMode: setColorMode,
+		onBlankScreen: handleBlankScreen,
 	});
 
 	const resetZoom = useCallback(() => {
@@ -250,7 +260,9 @@ export function Deck() {
 
 	// ── Presenter mode: delegate to PresenterView ──────────────────────────
 	if (route.view === "presenter") {
-		return <PresenterView />;
+		return (
+			<PresenterView colorMode={colorMode} onSetColorMode={setColorMode} />
+		);
 	}
 
 	// Whether slide transitions are enabled (can be disabled via deck frontmatter)
@@ -392,6 +404,11 @@ export function Deck() {
 							})
 						}
 					/>
+				)}
+
+				{/* ── Black screen overlay (controlled by presenter) ────────── */}
+				{blankScreen === "black" && (
+					<div className="fixed inset-0 bg-black z-[100]" aria-hidden="true" />
 				)}
 
 				{/* ── Navigation bar ────────────────────────────────────────────── */}

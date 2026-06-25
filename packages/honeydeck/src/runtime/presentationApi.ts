@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
 import { getRouteUrl } from "./navigation.ts";
 import { navigate, parseHash, type Route } from "./router.ts";
 import {
+	createSyncColorModeMessage,
 	createSyncResponseMessage,
 	resolveAudienceRouteFromSyncMessage,
+	type SyncBlankScreenMessage,
+	type SyncColorModeMessage,
 	type SyncMessage,
 	type SyncNavigateMessage,
 	type SyncRequestMessage,
@@ -58,6 +62,10 @@ type PresentationNavigatorLike = {
 type PresenterRoute = {
 	slide: number;
 	step: number;
+};
+
+type PresentationColorModeRef = {
+	current: ColorMode;
 };
 
 type PresentationWindowLike = Window & {
@@ -142,11 +150,19 @@ function sendPresentationSyncResponse(
 	connection: PresentationConnectionLike | null,
 	slide: number,
 	step: number,
+	colorMode?: ColorMode,
 ): void {
 	sendPresentationMessage(
 		connection,
-		createSyncResponseMessage({ slide, step }),
+		createSyncResponseMessage({ slide, step }, colorMode),
 	);
+}
+
+function sendPresentationColorModeToConnection(
+	connection: PresentationConnectionLike | null,
+	colorMode: ColorMode,
+): void {
+	sendPresentationMessage(connection, createSyncColorModeMessage(colorMode));
 }
 
 type PresentationRouteRef = {
@@ -163,7 +179,9 @@ export async function startPresentationCast({
 	audienceUrl,
 	currentSlide,
 	currentStep,
+	currentColorMode,
 	routeRef,
+	colorModeRef,
 	requestConstructor,
 	connectionRef,
 	startInFlightRef,
@@ -175,7 +193,9 @@ export async function startPresentationCast({
 	audienceUrl: string | null;
 	currentSlide: number;
 	currentStep: number;
+	currentColorMode: ColorMode;
 	routeRef: PresentationRouteRef;
+	colorModeRef: PresentationColorModeRef;
 	requestConstructor: PresentationRequestLike | null;
 	connectionRef: { current: PresentationConnectionLike | null };
 	startInFlightRef: { current: boolean };
@@ -212,6 +232,7 @@ export async function startPresentationCast({
 				connection,
 				routeRef.current.slide,
 				routeRef.current.step,
+				colorModeRef.current,
 			);
 		};
 
@@ -235,6 +256,7 @@ export async function startPresentationCast({
 		connection.addEventListener?.("statechange", onStateChange);
 
 		sendPresentationRouteToConnection(connection, currentSlide, currentStep);
+		sendPresentationColorModeToConnection(connection, currentColorMode);
 	} catch {
 		if (castGeneration !== castGenerationRef.current) {
 			return;
@@ -265,8 +287,12 @@ function getConnectionFromEvent(event: {
 
 export function usePresentationReceiverSync({
 	enabled = true,
+	onSetColorMode,
+	onBlankScreen,
 }: {
 	enabled?: boolean;
+	onSetColorMode?: (mode: ColorMode) => void;
+	onBlankScreen?: (mode: "black" | "off") => void;
 }): void {
 	useEffect(() => {
 		if (!enabled) return;
@@ -283,6 +309,20 @@ export function usePresentationReceiverSync({
 		function handleMessage(event: MessageEvent<unknown>) {
 			const message = parsePresentationMessage(event.data);
 			if (cancelled || !isSyncMessage(message)) return;
+
+			if (isColorModeMessage(message)) {
+				onSetColorMode?.(message.colorMode);
+				return;
+			}
+
+			if (isBlankScreenMessage(message)) {
+				onBlankScreen?.(message.mode);
+				return;
+			}
+
+			if (message.type === "sync-response" && message.colorMode) {
+				onSetColorMode?.(message.colorMode);
+			}
 			const currentRoute = parseHash(location.hash);
 			const nextRoute = resolveAudienceRouteFromSyncMessage(
 				currentRoute,
@@ -342,7 +382,7 @@ export function usePresentationReceiverSync({
 			});
 			connections.clear();
 		};
-	}, [enabled]);
+	}, [enabled, onSetColorMode, onBlankScreen]);
 }
 
 export function usePresentationCast({
@@ -350,16 +390,19 @@ export function usePresentationCast({
 	audienceUrl,
 	currentSlide,
 	currentStep,
+	currentColorMode,
 }: {
 	enabled?: boolean;
 	audienceUrl: string | null;
 	currentSlide: number;
 	currentStep: number;
+	currentColorMode: ColorMode;
 }): {
 	supported: boolean;
 	isCasting: boolean;
 	startCasting: () => Promise<void>;
 	stopCasting: () => void;
+	sendMessage: (message: SyncMessage) => void;
 } {
 	const [isCasting, setIsCasting] = useState(false);
 	const isMountedRef = useRef(true);
@@ -370,6 +413,7 @@ export function usePresentationCast({
 		slide: currentSlide,
 		step: currentStep,
 	});
+	const colorModeRef = useRef<ColorMode>(currentColorMode);
 	const supported = isPresentationApiSupported();
 
 	useEffect(() => {
@@ -378,6 +422,10 @@ export function usePresentationCast({
 			step: currentStep,
 		};
 	}, [currentSlide, currentStep]);
+
+	useEffect(() => {
+		colorModeRef.current = currentColorMode;
+	}, [currentColorMode]);
 
 	const setCastingState = useCallback((next: boolean) => {
 		if (isMountedRef.current) setIsCasting(next);
@@ -394,7 +442,9 @@ export function usePresentationCast({
 			audienceUrl,
 			currentSlide,
 			currentStep,
+			currentColorMode,
 			routeRef,
+			colorModeRef,
 			requestConstructor: getPresentationRequestConstructor(),
 			connectionRef,
 			startInFlightRef,
@@ -405,6 +455,7 @@ export function usePresentationCast({
 		audienceUrl,
 		currentSlide,
 		currentStep,
+		currentColorMode,
 		enabled,
 		supported,
 		setCastingState,
@@ -420,6 +471,14 @@ export function usePresentationCast({
 	}, [currentSlide, currentStep, isCasting]);
 
 	useEffect(() => {
+		if (!isCasting) return;
+		sendPresentationColorModeToConnection(
+			connectionRef.current,
+			currentColorMode,
+		);
+	}, [currentColorMode, isCasting]);
+
+	useEffect(() => {
 		isMountedRef.current = true;
 		return () => {
 			isMountedRef.current = false;
@@ -427,9 +486,13 @@ export function usePresentationCast({
 		};
 	}, [stopCasting]);
 
+	const sendMessage = useCallback((message: SyncMessage) => {
+		sendPresentationMessage(connectionRef.current, message);
+	}, []);
+
 	return useMemo(
-		() => ({ supported, isCasting, startCasting, stopCasting }),
-		[supported, isCasting, startCasting, stopCasting],
+		() => ({ supported, isCasting, startCasting, stopCasting, sendMessage }),
+		[supported, isCasting, startCasting, stopCasting, sendMessage],
 	);
 }
 
@@ -441,9 +504,52 @@ function isSyncRequestMessage(value: unknown): value is SyncRequestMessage {
 
 function isSyncMessage(
 	value: unknown,
-): value is SyncNavigateMessage | SyncResponseMessage {
+): value is
+	| SyncNavigateMessage
+	| SyncResponseMessage
+	| SyncColorModeMessage
+	| SyncBlankScreenMessage {
 	if (typeof value !== "object" || value === null) return false;
 	if (!("type" in value)) return false;
 	const type = (value as SyncMessage).type;
-	return type === "navigate" || type === "sync-response";
+	if (type === "color-mode") return isColorModeMessage(value);
+	if (type === "blank-screen") return isBlankScreenMessage(value);
+	if (type !== "navigate" && type !== "sync-response") return false;
+
+	const slide = (value as { slide?: unknown }).slide;
+	const step = (value as { step?: unknown }).step;
+	if (
+		typeof slide !== "number" ||
+		!Number.isFinite(slide) ||
+		typeof step !== "number" ||
+		!Number.isFinite(step)
+	) {
+		return false;
+	}
+
+	const colorMode = (value as { colorMode?: unknown }).colorMode;
+	return colorMode === undefined || isColorMode(colorMode);
+}
+
+function isColorModeMessage(value: unknown): value is SyncColorModeMessage {
+	if (typeof value !== "object" || value === null) return false;
+	if (!("type" in value)) return false;
+	return (
+		(value as SyncMessage).type === "color-mode" &&
+		isColorMode((value as { colorMode?: unknown }).colorMode)
+	);
+}
+
+function isBlankScreenMessage(value: unknown): value is SyncBlankScreenMessage {
+	if (typeof value !== "object" || value === null) return false;
+	if (!("type" in value)) return false;
+	const mode = (value as { mode?: unknown }).mode;
+	return (
+		(value as SyncMessage).type === "blank-screen" &&
+		(mode === "black" || mode === "off")
+	);
+}
+
+function isColorMode(value: unknown): value is ColorMode {
+	return value === "system" || value === "light" || value === "dark";
 }

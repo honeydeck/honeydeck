@@ -11,7 +11,7 @@
  *   │  │    (large)           │  ├──────────┤  │
  *   │  │                      │  │  Notes   │  │
  *   │  └──────────────────────┘  └──────────┘  │
- *   │  Slide 3/12 · Step 2/4    12:34   [Open] │
+ *   │  Slide 3/12 · Step 2/4  12:34  Timer 1:23 [Open] │
  *   └──────────────────────────────────────────┘
  *
  * ### Notes collection
@@ -35,6 +35,11 @@ import {
 	ChevronRightIcon,
 	ChevronUpIcon,
 	ExternalLinkIcon,
+	MonitorOffIcon,
+	PauseIcon,
+	PlayIcon,
+	RotateCcwIcon,
+	XIcon,
 } from "lucide-react";
 import {
 	type ReactNode,
@@ -44,8 +49,14 @@ import {
 	useRef,
 	useState,
 } from "react";
+import {
+	type ColorMode,
+	ColorModeCycleButton,
+} from "../components/ColorModeCycleButton.tsx";
 import { NotesContext } from "../components/Notes.tsx";
 import {
+	getSlideRouteFromRoute,
+	navigateTo,
 	nextSlide,
 	nextStep,
 	openUrlInNewTab,
@@ -65,6 +76,7 @@ import { useSwipeNav } from "../useSwipeNav.ts";
 import { PresenterCastButton } from "./PresenterCastButton.tsx";
 import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
 import { getPresenterNextPreview } from "./presenterPreview.ts";
+import { formatPresenterElapsedTime } from "./presenterTime.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -163,14 +175,27 @@ function usePresenterMobile(): boolean {
 // Component
 // ---------------------------------------------------------------------------
 
-export function PresenterView() {
+type PresenterViewProps = {
+	colorMode: ColorMode;
+	onSetColorMode: (mode: ColorMode) => void;
+};
+
+export function PresenterView({
+	colorMode,
+	onSetColorMode,
+}: PresenterViewProps) {
 	const route = useRoute();
 	const totalSlides = slideData.length;
 	const slide = Math.max(1, Math.min(route.slide, totalSlides || 1));
 	const step = Math.max(0, route.step);
 
 	const [clock, setClock] = useState(() => new Date().toLocaleTimeString());
+	const [timerState, setTimerState] = useState<"idle" | "running" | "paused">(
+		"idle",
+	);
+	const [elapsedSeconds, setElapsedSeconds] = useState(0);
 	const [notes, setNotes] = useState<ReactNode>(null);
+	const [isBlankScreen, setIsBlankScreen] = useState(false);
 	const notesContextValue = useMemo(() => ({ setNotes }), []);
 	const isMobile = usePresenterMobile();
 
@@ -186,18 +211,27 @@ export function PresenterView() {
 		audienceUrl: getPresentationAudienceUrl({ view: "slide", slide, step }),
 		currentSlide: slide,
 		currentStep: step,
+		currentColorMode: colorMode,
 	});
+	const sendCastMessage = presentationCast.sendMessage;
+	const elapsedTime = formatPresenterElapsedTime(elapsedSeconds * 1000);
 
-	// ── Wall clock ─────────────────────────────────────────────────────────
+	// ── Wall clock + elapsed timer ─────────────────────────────────────────
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setClock(new Date().toLocaleTimeString());
+			if (timerState === "running") setElapsedSeconds((value) => value + 1);
 		}, 1000);
 		return () => clearInterval(timer);
-	}, []);
+	}, [timerState]);
 
 	// ── BroadcastChannel: this window IS the presenter (controller) ─────────
-	useSync({ isPresenter: true, currentSlide: slide, currentStep: step });
+	const { broadcastBlankScreen } = useSync({
+		isPresenter: true,
+		currentSlide: slide,
+		currentStep: step,
+		currentColorMode: colorMode,
+	});
 
 	// ── Keyboard navigation ─────────────────────────────────────────────────
 	const getStepCount = useCallback(
@@ -210,6 +244,60 @@ export function PresenterView() {
 		onToggleOverview: () => {},
 	});
 	useSwipeNav({ enabled: isMobile });
+
+	// ── Presenter exit + blank screen shortcuts ─────────────────────────────
+	const closePresenter = useCallback(() => {
+		navigateTo(getSlideRouteFromRoute({ view: "presenter", slide, step }));
+	}, [slide, step]);
+
+	const toggleBlankScreen = useCallback(() => {
+		const next = !isBlankScreen;
+		setIsBlankScreen(next);
+		const mode = next ? "black" : "off";
+		broadcastBlankScreen(mode);
+		sendCastMessage({ type: "blank-screen", mode });
+	}, [isBlankScreen, broadcastBlankScreen, sendCastMessage]);
+
+	useEffect(() => {
+		function handlePresenterKeys(event: KeyboardEvent) {
+			if (event.key === "p" || event.key === "Escape") {
+				event.preventDefault();
+				closePresenter();
+				return;
+			}
+
+			if (event.key === "b" || event.key === "B") {
+				event.preventDefault();
+				toggleBlankScreen();
+			}
+		}
+
+		window.addEventListener("keydown", handlePresenterKeys);
+		return () => window.removeEventListener("keydown", handlePresenterKeys);
+	}, [closePresenter, toggleBlankScreen]);
+
+	// ── Timer controls ──────────────────────────────────────────────────────
+	function startTimer() {
+		setTimerState("running");
+	}
+
+	function pauseTimer() {
+		setTimerState("paused");
+	}
+
+	function continueTimer() {
+		setTimerState("running");
+	}
+
+	function restartTimer() {
+		setElapsedSeconds(0);
+		setTimerState("running");
+	}
+
+	function closeTimer() {
+		setElapsedSeconds(0);
+		setTimerState("idle");
+	}
 
 	// ── Open audience window ────────────────────────────────────────────────
 	function openAudienceView() {
@@ -246,6 +334,13 @@ export function PresenterView() {
 
 	return (
 		<div className="fixed inset-0 bg-black text-white font-sans grid grid-rows-[1fr_auto_auto] grid-cols-1 overflow-hidden select-none">
+			{/* ── Blank screen indicator overlay ────────────────────────────── */}
+			{isBlankScreen && (
+				<div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-md bg-red-600/90 text-white text-sm font-semibold tracking-wide uppercase">
+					Screen blanked (b)
+				</div>
+			)}
+
 			{/* ── Top section: current slide plus desktop next/notes column ─── */}
 			<div
 				className={
@@ -284,33 +379,152 @@ export function PresenterView() {
 				/>
 			)}
 
-			{/* ── Bottom bar: counter · fixed nav buttons · clock/actions ───── */}
-			<div className="grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-3 sm:px-5 py-2.5 border-t border-white/8 bg-black/30 gap-x-3 sm:gap-x-4 gap-y-2">
-				{/* Counter */}
-				<div className="min-w-0 text-md text-white/60 tabular-nums truncate">
-					Slide {slide}/{totalSlides}
-					{currentStepCount > 0 && ` · Step ${step}/${currentStepCount}`}
+			{/* ── Bottom bar: counter · mobile nav buttons · timer/actions ──── */}
+			<div
+				className={
+					isMobile
+						? "grid grid-cols-[minmax(0,1fr)_auto] items-center px-3 py-2.5 border-t border-white/8 bg-black/30 gap-x-3 gap-y-2"
+						: "grid grid-cols-[minmax(0,1fr)_auto] items-center px-5 py-2.5 border-t border-white/8 bg-black/30 gap-x-4 gap-y-2"
+				}
+			>
+				{/* Counter + timer */}
+				<div className="min-w-0 flex flex-wrap items-center gap-3 text-md text-white/60 tabular-nums">
+					<span className="truncate">
+						Slide {slide}/{totalSlides}
+						{currentStepCount > 0 && ` · Step ${step}/${currentStepCount}`}
+					</span>
+					{timerState === "idle" && (
+						<button
+							type="button"
+							onClick={startTimer}
+							title="Start timer"
+							className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/6 text-white/50 hover:text-white/80 text-sm"
+						>
+							<PlayIcon aria-hidden="true" size={14} />
+							Start timer
+						</button>
+					)}
+					{timerState === "running" && (
+						<>
+							<button
+								type="button"
+								onClick={pauseTimer}
+								title="Pause timer"
+								className="text-lg font-semibold text-white tabular-nums bg-white/10 px-2.5 py-0.5 rounded"
+							>
+								⏱ {elapsedTime}
+							</button>
+							<button
+								type="button"
+								onClick={pauseTimer}
+								title="Pause timer"
+								aria-label="Pause timer"
+								className="text-white/50 hover:text-white/80 inline-flex"
+							>
+								<PauseIcon aria-hidden="true" size={16} />
+							</button>
+						</>
+					)}
+					{timerState === "paused" && (
+						<>
+							<span className="text-lg font-semibold text-white/60 tabular-nums bg-white/6 px-2.5 py-0.5 rounded">
+								⏱ {elapsedTime}
+							</span>
+							<button
+								type="button"
+								onClick={continueTimer}
+								title="Continue timer"
+								aria-label="Continue timer"
+								className="text-white/50 hover:text-white/80 inline-flex"
+							>
+								<PlayIcon aria-hidden="true" size={16} />
+							</button>
+							<button
+								type="button"
+								onClick={restartTimer}
+								title="Restart timer from zero"
+								aria-label="Restart timer from zero"
+								className="text-white/30 hover:text-white/60 inline-flex"
+							>
+								<RotateCcwIcon aria-hidden="true" size={15} />
+							</button>
+							<button
+								type="button"
+								onClick={closeTimer}
+								title="Close timer"
+								aria-label="Close timer"
+								className="text-white/30 hover:text-white/60 inline-flex"
+							>
+								<XIcon aria-hidden="true" size={16} />
+							</button>
+						</>
+					)}
 				</div>
 
-				{/* Nav buttons */}
-				<div className="flex gap-2 items-center justify-self-end sm:justify-self-center">
-					<NavButton onClick={goPrevSlide} title="Previous slide (↑)">
-						<ChevronUpIcon aria-hidden="true" size={18} />
-					</NavButton>
-					<NavButton onClick={goPrev} title="Previous step (←)">
-						<ChevronLeftIcon aria-hidden="true" size={18} />
-					</NavButton>
-					<NavButton onClick={goNext} title="Next step (→)">
-						<ChevronRightIcon aria-hidden="true" size={18} />
-					</NavButton>
-					<NavButton onClick={goNextSlide} title="Next slide (↓)">
-						<ChevronDownIcon aria-hidden="true" size={18} />
-					</NavButton>
-				</div>
+				{/* Nav buttons are mobile-only; desktop uses keyboard shortcuts. */}
+				{isMobile && (
+					<div className="order-last col-span-2 flex w-full gap-2 items-center justify-center">
+						<NavButton
+							onClick={goPrev}
+							title="Previous step (←)"
+							className="h-12 w-16"
+						>
+							<ChevronLeftIcon aria-hidden="true" className="h-6 w-6" />
+						</NavButton>
+						<NavButton
+							onClick={goPrevSlide}
+							title="Previous slide (↑)"
+							className="h-12 w-16"
+						>
+							<ChevronUpIcon aria-hidden="true" className="h-6 w-6" />
+						</NavButton>
+						<NavButton
+							onClick={goNextSlide}
+							title="Next slide (↓)"
+							className="h-12 w-16"
+						>
+							<ChevronDownIcon aria-hidden="true" className="h-6 w-6" />
+						</NavButton>
+						<NavButton
+							onClick={goNext}
+							title="Next step (→)"
+							className="h-12 w-16"
+						>
+							<ChevronRightIcon aria-hidden="true" className="h-6 w-6" />
+						</NavButton>
+					</div>
+				)}
 
-				{/* Clock + open button */}
-				<div className="col-span-2 sm:col-span-1 sm:col-start-3 flex flex-wrap gap-3 items-center justify-self-start sm:justify-self-end">
-					<span className="text-md tabular-nums text-white/60">{clock}</span>
+				{/* Clock + mode/open/cast buttons */}
+				<div
+					className={
+						isMobile
+							? "col-span-2 flex flex-wrap gap-3 items-center justify-self-start"
+							: "flex flex-wrap gap-3 items-center justify-self-end"
+					}
+				>
+					<span
+						className="text-md tabular-nums text-white/60"
+						title="Wall clock"
+					>
+						{clock}
+					</span>
+					<ColorModeCycleButton
+						colorMode={colorMode}
+						onSetColorMode={onSetColorMode}
+						iconSize={14}
+						className="w-8 h-8 rounded border border-white/20 bg-white/6 text-white/80 inline-flex items-center justify-center"
+					/>
+					<NavButton
+						onClick={toggleBlankScreen}
+						title={isBlankScreen ? "Unblank screen (b)" : "Blank screen (b)"}
+					>
+						<MonitorOffIcon
+							aria-hidden="true"
+							size={16}
+							className={isBlankScreen ? "text-red-400" : ""}
+						/>
+					</NavButton>
 					<button
 						type="button"
 						onClick={openAudienceView}
@@ -338,10 +552,12 @@ export function PresenterView() {
 function NavButton({
 	onClick,
 	title,
+	className,
 	children,
 }: {
 	onClick: () => void;
 	title?: string;
+	className?: string;
 	children: ReactNode;
 }) {
 	return (
@@ -349,7 +565,8 @@ function NavButton({
 			type="button"
 			onClick={onClick}
 			title={title}
-			className="w-9 h-9 rounded border border-white/15 bg-white/6 text-white/75 text-md flex items-center justify-center font-[inherit]"
+			aria-label={title}
+			className={`w-9 h-9 rounded border border-white/15 bg-white/6 text-white/75 text-md flex items-center justify-center font-[inherit] ${className ?? ""}`}
 		>
 			{children}
 		</button>

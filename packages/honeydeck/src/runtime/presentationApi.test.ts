@@ -151,6 +151,9 @@ describe("presentation API helpers", () => {
 		const castGenerationRef = { current: 0 };
 		let isCasting = false;
 		const routeRef = { current: { slide: 4, step: 2 } };
+		const colorModeRef = {
+			current: "dark" as "system" | "light" | "dark",
+		};
 
 		await startPresentationCast({
 			enabled: true,
@@ -158,7 +161,9 @@ describe("presentation API helpers", () => {
 			audienceUrl: "https://example.com/deck/index.html#/4/2",
 			currentSlide: 4,
 			currentStep: 2,
+			currentColorMode: "dark",
 			routeRef,
+			colorModeRef,
 			requestConstructor: FakeRequest as never,
 			connectionRef,
 			startInFlightRef,
@@ -178,15 +183,21 @@ describe("presentation API helpers", () => {
 			slide: 4,
 			step: 2,
 		});
+		assert.deepEqual(parseSentMessage(connection.sent[1]), {
+			type: "color-mode",
+			colorMode: "dark",
+		});
 
 		routeRef.current = { slide: 7, step: 1 };
+		colorModeRef.current = "light";
 		connection.emit("message", {
 			data: JSON.stringify({ type: "sync-request" }),
 		});
-		assert.deepEqual(parseSentMessage(connection.sent[1]), {
+		assert.deepEqual(parseSentMessage(connection.sent[2]), {
 			type: "sync-response",
 			slide: 7,
 			step: 1,
+			colorMode: "light",
 		});
 
 		stopPresentationCast(
@@ -227,7 +238,9 @@ describe("presentation API helpers", () => {
 			audienceUrl: "https://example.com/deck/index.html#/4/2",
 			currentSlide: 4,
 			currentStep: 2,
+			currentColorMode: "system",
 			routeRef: { current: { slide: 4, step: 2 } },
+			colorModeRef: { current: "system" },
 			requestConstructor: FakeRequest as never,
 			connectionRef,
 			startInFlightRef,
@@ -265,7 +278,9 @@ describe("presentation API helpers", () => {
 			audienceUrl: "https://example.com/deck/index.html#/4/2",
 			currentSlide: 4,
 			currentStep: 2,
+			currentColorMode: "light",
 			routeRef: { current: { slide: 4, step: 2 } },
+			colorModeRef: { current: "light" },
 			requestConstructor: FakeRequest as never,
 			connectionRef,
 			startInFlightRef,
