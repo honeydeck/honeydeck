@@ -12,11 +12,9 @@ const transitionClass =
 	"transition-[background-color,border-color,color,box-shadow] duration-150";
 const hoverBorderClass =
 	"hover:border-[color:color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]";
-const surfaceControlClass = `border border-[color:var(--honeydeck-color-border)] bg-[color-mix(in_oklab,var(--honeydeck-color-surface)_86%,transparent)] text-[color:var(--honeydeck-color-foreground)] ${hoverBorderClass}`;
 const buttonBaseClass = `inline-flex items-center justify-center gap-2.5 rounded-lg px-4 py-3 font-black no-underline ${transitionClass}`;
 const buttonPrimaryClass = `${buttonBaseClass} border border-[color:color-mix(in_oklab,#000_10%,var(--honeydeck-color-primary))] bg-[color:var(--honeydeck-color-primary)] text-[color:var(--honeydeck-color-primary-foreground)] shadow-[0_14px_30px_color-mix(in_oklab,var(--honeydeck-color-primary)_26%,transparent)] ${hoverBorderClass}`;
-const buttonSecondaryClass = `${buttonBaseClass} ${surfaceControlClass}`;
-const quietLinkClass = `inline-flex items-center justify-center gap-1.5 rounded-lg border border-[color:var(--honeydeck-color-border)] px-4 py-3 font-black text-[color:color-mix(in_oklab,var(--honeydeck-color-foreground)_70%,var(--honeydeck-color-background))] no-underline hover:text-[color:var(--honeydeck-color-foreground)] ${hoverBorderClass} ${transitionClass}`;
+const buttonSecondaryClass = `${buttonBaseClass}`;
 
 export default function HomePage() {
 	return (
@@ -38,22 +36,16 @@ export default function HomePage() {
 						Honeydeck keeps presentations as plain text code, so teams and AI
 						agents can draft, review, present, and export decks with confidence.
 					</p>
-					<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="w-full"><CopyInstallCommand /></div>
 						<Link className={buttonPrimaryClass} href="/docs/getting-started">
 							<BookOpenIcon size={18} aria-hidden="true" /> Start reading docs
 						</Link>
-						<CopyInstallCommand />
 						<a
 							className={buttonSecondaryClass}
 							href="https://showcase.honeydeck.dev/"
 						>
 							View showcase <ExternalLinkIcon size={16} aria-hidden="true" />
-						</a>
-						<a
-							className={quietLinkClass}
-							href="https://github.com/honeydeck/honeydeck"
-						>
-							<StarIcon size={16} aria-hidden="true" /> Star on GitHub
 						</a>
 					</div>
 				</div>
