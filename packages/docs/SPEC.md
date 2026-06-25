@@ -6,7 +6,7 @@
 
 | Route | Behavior |
 |---|---|
-| `/` | Documentation-first start page with Honeydeck/Dex visual styling, install CTA, and docs CTA |
+| `/` | Documentation-first start page with Fumadocs `HomeLayout`, Honeydeck/Dex visual styling, install CTA, and docs CTA |
 | `/docs` | Redirects to `/docs/getting-started` |
 | `/docs/:slug` | Fumadocs-rendered documentation page generated from canonical Honeydeck docs |
 | `/docs/:slug.md` | Markdown negotiation/sibling route served through Fumadocs LLM markdown routes |
@@ -39,6 +39,7 @@ Documentation pages must use Fumadocs UI as much as practical:
 - `DocsLayout` owns the overall docs shell and left sidebar.
 - `DocsPage` owns the article frame and right-side table of contents.
 - Fumadocs MDX components render prose, callouts, cards, code, and tables.
+- The docs start page uses Fumadocs `HomeLayout` so it gets the shared lightweight home navbar instead of the heavier docs shell.
 - Component docs may render package-local interactive playground components for Honeydeck primitives such as `Keyboard`, `ListStyle`, `BrowserFrame`, and `Notes`.
 - Search uses a custom Fumadocs search dialog backed by a static Orama index.
 - Markdown copy/view actions use Fumadocs page controls.

@@ -1,0 +1,26 @@
+---
+title: "Components"
+description: "Core Honeydeck components for timelines, presenter notes, browser frames, keyboard shortcuts, and styled lists."
+slug: "components"
+---
+
+# Components
+
+Honeydeck components are explicit MDX imports from `@honeydeck/honeydeck`. Use them when plain Markdown is not enough for timeline control, speaker notes, rich previews, or inline UI.
+
+```mdx
+import { Reveal, RevealWith, RevealGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+```
+
+| Component | Use it for |
+| --- | --- |
+| [`Reveal`](/docs/reveal) | Show content at a specific slide timeline step. |
+| [`RevealWith`](/docs/reveal-with) | Show content with an existing reveal or numeric slide step without adding another step. |
+| [`RevealGroup`](/docs/reveal-group) | Reveal each direct child or list item one after another, with optional nested-list reveals. |
+| [`TimelineSteps`](/docs/timeline-steps) | Reserve timeline steps for an imported custom React component. |
+| [`ListStyle`](/docs/list-style) | Style Markdown, HTML, or JSX lists with no markers or custom markers. |
+| [`Keyboard`](/docs/keyboard) | Render semantic inline keyboard keys and shortcuts. |
+| [`BrowserFrame`](/docs/browser-frame) | Show a live iframe or fallback screenshot inside browser chrome. |
+| [`Notes`](/docs/notes) | Add formatted speaker notes for presenter mode. |
+
+For timeline behavior in context, also see [Steps and reveals](/docs/steps-and-reveals).
