@@ -40,6 +40,8 @@ Documentation pages must use Fumadocs UI as much as practical:
 
 - `DocsLayout` owns the overall docs shell and left sidebar.
 - `DocsPage` owns the article frame and right-side table of contents.
+- Fumadocs `RootProvider` owns theme state through `next-themes`, defaults to `system`, and reacts to system color-scheme changes while system mode is selected.
+- The Fumadocs theme-switch slot is replaced with Honeydeck's single color-mode cycle button, cycling `system` → `light` → `dark` → `system` instead of rendering separate light/dark controls.
 - Fumadocs MDX components render prose, callouts, cards, code, and tables.
 - The docs start page uses Fumadocs `HomeLayout` so it gets the shared lightweight home navbar instead of the heavier docs shell.
 - Component docs may render package-local interactive playground components for Honeydeck primitives such as `Keyboard`, `ListStyle`, `BrowserFrame`, and `Notes`.

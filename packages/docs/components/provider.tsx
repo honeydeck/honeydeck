@@ -6,7 +6,10 @@ import { ClientSearchDialog } from "./search";
 
 export function Provider({ children }: { children: ReactNode }) {
 	return (
-		<RootProvider search={{ SearchDialog: ClientSearchDialog }}>
+		<RootProvider
+			search={{ SearchDialog: ClientSearchDialog }}
+			theme={{ defaultTheme: "system", enableSystem: true }}
+		>
 			{children}
 		</RootProvider>
 	);
