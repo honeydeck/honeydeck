@@ -1,18 +1,34 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+	createSyncBlankScreenMessage,
+	createSyncColorModeMessage,
 	createSyncRequestMessage,
 	createSyncResponseMessage,
 	resolveAudienceRouteFromSyncMessage,
 } from "./sync.ts";
 
 describe("sync message helpers", () => {
-	it("builds request and response messages", () => {
+	it("builds request, response, and color mode messages", () => {
 		assert.deepEqual(createSyncRequestMessage(), { type: "sync-request" });
 		assert.deepEqual(createSyncResponseMessage({ slide: 4, step: 2 }), {
 			type: "sync-response",
 			slide: 4,
 			step: 2,
+		});
+		assert.deepEqual(createSyncResponseMessage({ slide: 4, step: 2 }, "dark"), {
+			type: "sync-response",
+			slide: 4,
+			step: 2,
+			colorMode: "dark",
+		});
+		assert.deepEqual(createSyncColorModeMessage("light"), {
+			type: "color-mode",
+			colorMode: "light",
+		});
+		assert.deepEqual(createSyncBlankScreenMessage("black"), {
+			type: "blank-screen",
+			mode: "black",
 		});
 	});
 
