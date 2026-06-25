@@ -61,6 +61,7 @@ The start page should use the warm Honeydeck docs mood:
 - docs CTA to `/docs/getting-started`
 - package/GitHub links
 - Honeydeck base and bee tokens where useful, layered with Fumadocs CSS variables
+- animated spotlight gradient that slowly drifts behind the hero copy and CTAs, pauses via CSS while the pointer is inside the left hero copy/CTA area (including gaps between text and controls) or the area contains focus, and respects reduced-motion preferences
 
 ## Out of scope
 

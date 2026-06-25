@@ -6,13 +6,13 @@ import { CopyInstallCommand } from "@/components/CopyInstallCommand";
 
 export default function HomePage() {
 	return (
-		<section className="relative flex flex-1 overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
-			<div
-				aria-hidden="true"
-				className="absolute left-1/2 top-16 h-80 w-80 -translate-x-1/2 rounded-full bg-[color-mix(in_oklab,var(--honeydeck-color-primary)_22%,transparent)] blur-3xl"
-			/>
-			<div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,0.7fr)]">
-				<div className="max-w-3xl">
+		<section className="docs-home relative isolate flex flex-1 overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+			<div aria-hidden="true" className="docs-home-spotlight" />
+			<div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,0.7fr)]">
+				<div
+					className="docs-home-copy max-w-3xl"
+					data-home-spotlight-pause-area
+				>
 					<p className="inline-flex items-center gap-2 rounded-full border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] px-3 py-1 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
 						<SparklesIcon size={16} aria-hidden="true" /> Deck experience for
 						MDX people
