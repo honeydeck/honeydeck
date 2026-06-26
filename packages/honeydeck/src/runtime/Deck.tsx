@@ -47,6 +47,7 @@ import {
 	EffectiveColorModeProvider,
 } from "./EffectiveColorModeContext.tsx";
 import { rememberSlideRoute } from "./lastSlideRoute.ts";
+import { startMagicTransition } from "./magicTransition.ts";
 import {
 	closeOverview,
 	toggleOverview as toggleOverviewRoute,
@@ -85,7 +86,9 @@ function calcScaleFromElement(el: HTMLElement | null): number | null {
 
 type SlideTransitionState = {
 	from: number;
+	fromStep: number;
 	to: number;
+	toStep: number;
 	name: string;
 	className: string;
 	duration: number;
@@ -134,7 +137,13 @@ function getTransitionOptions(
 	slideIndex: number,
 ): Omit<
 	SlideTransitionState,
-	"from" | "to" | "direction" | "enterFromOpacity" | "exitFromOpacity"
+	| "from"
+	| "fromStep"
+	| "to"
+	| "toStep"
+	| "direction"
+	| "enterFromOpacity"
+	| "exitFromOpacity"
 > {
 	const frontmatter = slideData[slideIndex]?.frontmatter ?? {};
 	const name = normalizeTransitionName(
@@ -338,36 +347,51 @@ export function Deck() {
 		1,
 		Math.min(route.slide, slideData.length || 1),
 	);
-	const previousSlideRef = useRef<number | null>(null);
+	const currentStep = Math.max(0, route.step);
+	const previousRouteRef = useRef<{ slide: number; step: number } | null>(null);
 	const slideLayerRefs = useRef<Record<number, HTMLDivElement | null>>({});
 	const [slideTransition, setSlideTransition] =
 		useState<SlideTransitionState | null>(null);
 	const slideTransitionRef = useRef<SlideTransitionState | null>(null);
 	slideTransitionRef.current = slideTransition;
+	const magicTransitionScale = scale * slideZoom;
 
 	useLayoutEffect(() => {
 		if (route.view !== "slide") {
-			previousSlideRef.current = currentSlide;
+			previousRouteRef.current = { slide: currentSlide, step: currentStep };
 			setSlideTransition(null);
 			return;
 		}
 
 		if (reducedMotion) {
-			previousSlideRef.current = currentSlide;
+			previousRouteRef.current = { slide: currentSlide, step: currentStep };
 			setSlideTransition(null);
 			return;
 		}
 
-		const previousSlide = previousSlideRef.current;
-		if (previousSlide === null) {
-			previousSlideRef.current = currentSlide;
+		const previousRoute = previousRouteRef.current;
+		if (previousRoute === null) {
+			previousRouteRef.current = { slide: currentSlide, step: currentStep };
 			return;
 		}
-		if (previousSlide === currentSlide) return;
+		if (previousRoute.slide === currentSlide) {
+			previousRouteRef.current = { slide: currentSlide, step: currentStep };
+			setSlideTransition((active) =>
+				active?.to === currentSlide && active.toStep !== currentStep
+					? null
+					: active,
+			);
+			return;
+		}
 
+		const previousSlide = previousRoute.slide;
 		const direction: 1 | -1 = currentSlide > previousSlide ? 1 : -1;
-		const options = getTransitionOptions(currentSlide - 1);
-		previousSlideRef.current = currentSlide;
+		const rawOptions = getTransitionOptions(currentSlide - 1);
+		const options =
+			rawOptions.name === "magic" && direction === -1
+				? { ...rawOptions, name: "fade", className: "fade" }
+				: rawOptions;
+		previousRouteRef.current = { slide: currentSlide, step: currentStep };
 
 		if (options.name === "none" || options.duration === 0) {
 			setSlideTransition(null);
@@ -379,7 +403,9 @@ export function Deck() {
 		const nextTransition = {
 			...options,
 			from: previousSlide,
+			fromStep: previousRoute.step,
 			to: currentSlide,
+			toStep: currentStep,
 			direction,
 			enterFromOpacity: isInterruptingFade
 				? (readLayerOpacity(slideLayerRefs.current[currentSlide]) ?? 0)
@@ -399,7 +425,19 @@ export function Deck() {
 		}, options.duration);
 
 		return () => window.clearTimeout(timeout);
-	}, [currentSlide, reducedMotion, route.view]);
+	}, [currentSlide, currentStep, reducedMotion, route.view]);
+
+	useLayoutEffect(() => {
+		if (!slideTransition || slideTransition.name !== "magic") return;
+		return startMagicTransition({
+			fromLayer: slideLayerRefs.current[slideTransition.from],
+			toLayer: slideLayerRefs.current[slideTransition.to],
+			duration: slideTransition.duration,
+			easing: slideTransition.easing,
+			scale: magicTransitionScale,
+			direction: slideTransition.direction,
+		});
+	}, [magicTransitionScale, slideTransition]);
 
 	// ── Reference mode: delegate to DocsView ─────────────────────────────
 	if (route.view === "kit") {
@@ -431,7 +469,6 @@ export function Deck() {
 		);
 	}
 
-	const currentStep = Math.max(0, route.step);
 	const controlRoute =
 		route.view === "slide" || route.view === "overview"
 			? { ...route, slide: currentSlide, step: currentStep }
@@ -486,6 +523,14 @@ export function Deck() {
 									? "exit"
 									: null;
 						const isVisible = isCurrent || transitionRole !== null;
+						const slideStepIndex =
+							transitionRole === "exit" && activeTransition
+								? activeTransition.fromStep
+								: transitionRole === "enter" && activeTransition
+									? activeTransition.toStep
+									: isCurrent
+										? currentStep
+										: 0;
 						const transitionLayerClass =
 							transitionRole && activeTransition
 								? `honeydeck-transition-${activeTransition.className} honeydeck-transition-${transitionRole}`
@@ -546,7 +591,7 @@ export function Deck() {
 										}}
 									>
 										<TimelineProvider
-											stepIndex={isCurrent ? currentStep : 0}
+											stepIndex={slideStepIndex}
 											stepCount={stepCount}
 										>
 											<SlideScaleProvider scale={activeSlideScale}>

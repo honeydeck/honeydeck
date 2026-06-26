@@ -38,6 +38,19 @@ describe("base theme CSS", () => {
 		assert.doesNotMatch(baseCss, /--honeydeck-magic-code-enter-delay/);
 	});
 
+	it("ships magic transition layer crossfade hooks", () => {
+		assert.match(
+			baseCss,
+			/\.honeydeck-slide-layer\.honeydeck-transition-magic\.honeydeck-transition-enter/,
+		);
+		assert.match(
+			baseCss,
+			/\.honeydeck-slide-layer\.honeydeck-transition-magic\.honeydeck-transition-exit/,
+		);
+		assert.match(baseCss, /animation-name:\s*honeydeck-transition-fade-enter/);
+		assert.match(baseCss, /animation-name:\s*honeydeck-transition-fade-exit/);
+	});
+
 	it("fades normal code line highlights from dimmed to full opacity", () => {
 		assert.match(baseCss, /honeydeck-code-line-highlight-enter/);
 		assert.match(
