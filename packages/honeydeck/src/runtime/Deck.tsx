@@ -91,6 +91,8 @@ type SlideTransitionState = {
 	duration: number;
 	easing: string;
 	direction: 1 | -1;
+	enterFromOpacity: number;
+	exitFromOpacity: number;
 };
 
 function normalizeTransitionName(value: unknown): string {
@@ -120,9 +122,20 @@ function transitionClassName(name: string): string {
 	return name.toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
 }
 
+function readLayerOpacity(
+	element: HTMLElement | null | undefined,
+): number | null {
+	if (!element) return null;
+	const opacity = Number.parseFloat(window.getComputedStyle(element).opacity);
+	return Number.isFinite(opacity) ? opacity : null;
+}
+
 function getTransitionOptions(
 	slideIndex: number,
-): Omit<SlideTransitionState, "from" | "to" | "direction"> {
+): Omit<
+	SlideTransitionState,
+	"from" | "to" | "direction" | "enterFromOpacity" | "exitFromOpacity"
+> {
 	const frontmatter = slideData[slideIndex]?.frontmatter ?? {};
 	const name = normalizeTransitionName(
 		frontmatter.transition ?? config.transition,
@@ -326,10 +339,13 @@ export function Deck() {
 		Math.min(route.slide, slideData.length || 1),
 	);
 	const previousSlideRef = useRef<number | null>(null);
+	const slideLayerRefs = useRef<Record<number, HTMLDivElement | null>>({});
 	const [slideTransition, setSlideTransition] =
 		useState<SlideTransitionState | null>(null);
+	const slideTransitionRef = useRef<SlideTransitionState | null>(null);
+	slideTransitionRef.current = slideTransition;
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (route.view !== "slide") {
 			previousSlideRef.current = currentSlide;
 			setSlideTransition(null);
@@ -358,11 +374,19 @@ export function Deck() {
 			return;
 		}
 
+		const activeTransition = slideTransitionRef.current;
+		const isInterruptingFade = activeTransition?.name === "fade";
 		const nextTransition = {
 			...options,
 			from: previousSlide,
 			to: currentSlide,
 			direction,
+			enterFromOpacity: isInterruptingFade
+				? (readLayerOpacity(slideLayerRefs.current[currentSlide]) ?? 0)
+				: 0,
+			exitFromOpacity: isInterruptingFade
+				? (readLayerOpacity(slideLayerRefs.current[previousSlide]) ?? 1)
+				: 1,
 		};
 		setSlideTransition(nextTransition);
 
@@ -413,7 +437,9 @@ export function Deck() {
 			? { ...route, slide: currentSlide, step: currentStep }
 			: route;
 	const activeSlideScale = scale * slideZoom;
+	const viewportScale = scale || 1;
 	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${activeSlideScale})`;
+	const zoomedSlideTransform = `translate(${slidePan.x / viewportScale}px, ${slidePan.y / viewportScale}px) scale(${slideZoom})`;
 	const showSlideNumbers = config.showSlideNumbers === true;
 	const disableSlideTextSelection =
 		route.view === "slide" &&
@@ -471,6 +497,10 @@ export function Deck() {
 										"--honeydeck-transition-easing": activeTransition.easing,
 										"--honeydeck-transition-direction":
 											activeTransition.direction,
+										"--honeydeck-transition-enter-from-opacity":
+											activeTransition.enterFromOpacity,
+										"--honeydeck-transition-exit-from-opacity":
+											activeTransition.exitFromOpacity,
 									} as CSSProperties)
 								: undefined;
 						const { Component, stepCount, title, frontmatter, layoutName } =
@@ -481,11 +511,9 @@ export function Deck() {
 							<div
 								key={data.id}
 								aria-hidden={!isCurrent}
-								className={`honeydeck-slide-layer absolute inset-0 flex items-center justify-center ${
-									isCurrent ? "opacity-100" : "opacity-0"
-								} ${isVisible ? "visible" : "invisible"} ${
-									isCurrent ? "pointer-events-auto" : "pointer-events-none"
-								} ${
+								className={`absolute inset-0 flex items-center justify-center ${
+									isVisible ? "visible" : "invisible"
+								} ${isCurrent ? "pointer-events-auto" : "pointer-events-none"} ${
 									transitionRole === "enter"
 										? "z-2"
 										: transitionRole === "exit"
@@ -493,35 +521,58 @@ export function Deck() {
 											: isCurrent
 												? "z-1"
 												: "z-0"
-								} ${transitionLayerClass}`}
-								style={layerStyle}
+								}`}
 							>
-								<TimelineProvider
-									stepIndex={isCurrent ? currentStep : 0}
-									stepCount={stepCount}
+								<div
+									className="shrink-0 overflow-hidden"
+									style={{
+										width: BASE_WIDTH,
+										height: BASE_HEIGHT,
+										transform: `scale(${scale})`,
+										transformOrigin: "center center",
+									}}
 								>
-									<SlideScaleProvider scale={activeSlideScale}>
-										<div
-											className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
-											style={{
-												width: BASE_WIDTH,
-												height: BASE_HEIGHT,
-												transform: slideTransform,
-												transformOrigin: "center center",
-											}}
+									<div
+										ref={(element) => {
+											slideLayerRefs.current[slideNumber] = element;
+										}}
+										className={`honeydeck-slide-layer relative ${
+											isCurrent ? "opacity-100" : "opacity-0"
+										} ${transitionLayerClass}`}
+										style={{
+											width: BASE_WIDTH,
+											height: BASE_HEIGHT,
+											...layerStyle,
+										}}
+									>
+										<TimelineProvider
+											stepIndex={isCurrent ? currentStep : 0}
+											stepCount={stepCount}
 										>
-											<ErrorBoundary slideNumber={slideNumber}>
-												<LayoutComponent
-													title={title || null}
-													frontmatter={frontmatter}
-													rawChildren={<Component />}
+											<SlideScaleProvider scale={activeSlideScale}>
+												<div
+													className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
+													style={{
+														width: BASE_WIDTH,
+														height: BASE_HEIGHT,
+														transform: zoomedSlideTransform,
+														transformOrigin: "center center",
+													}}
 												>
-													<Component />
-												</LayoutComponent>
-											</ErrorBoundary>
-										</div>
-									</SlideScaleProvider>
-								</TimelineProvider>
+													<ErrorBoundary slideNumber={slideNumber}>
+														<LayoutComponent
+															title={title || null}
+															frontmatter={frontmatter}
+															rawChildren={<Component />}
+														>
+															<Component />
+														</LayoutComponent>
+													</ErrorBoundary>
+												</div>
+											</SlideScaleProvider>
+										</TimelineProvider>
+									</div>
+								</div>
 							</div>
 						);
 					})}
