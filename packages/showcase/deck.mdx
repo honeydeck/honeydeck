@@ -824,6 +824,126 @@ Custom transitions are normal CSS hooks on the incoming and outgoing slide layer
 
 ---
 
+# Magic Transition Source ✨
+
+This slide sets up explicit `data-magic-id` elements for the next slide.
+
+<div className="mt-8 grid grid-cols-3 gap-6">
+  <div data-magic-id="magic-card" className="rounded-2xl border border-primary/40 bg-primary/10 p-6 shadow-lg">
+    <SparklesIcon className="mb-4 h-10 w-10 text-primary" />
+    <h2 className="m-0 text-3xl font-black">Move me</h2>
+    <p className="mb-0 text-surface-foreground/70">Same id on both slides.</p>
+  </div>
+
+  <div className="rounded-2xl border border-border bg-surface p-6">
+    Untagged content changes with the slide crossfade.
+  </div>
+
+  <div data-magic-id="magic-leaving" className="rounded-2xl border border-accent/40 bg-accent/10 p-6 text-accent">
+    Previous-only id fades out.
+  </div>
+</div>
+
+<p className="mt-10 text-5xl font-black">
+  Hello <span data-magic-id="magic-word" className="text-primary">World</span>
+</p>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: ease-in-out
+---
+
+# Magic: move, leave, enter
+
+<div className="grid grid-cols-[1fr_1.25fr] gap-8">
+  <div>
+    <p className="text-4xl font-black">
+      Same word arrives here: <span data-magic-id="magic-word" className="text-primary">World</span>
+    </p>
+
+    <div data-magic-id="magic-entering" className="mt-8 rounded-2xl border border-primary/40 bg-primary/10 p-6">
+      Incoming-only id fades in.
+    </div>
+  </div>
+
+  <div data-magic-id="magic-card" className="rounded-3xl border border-primary/40 bg-primary/10 p-10 shadow-2xl">
+    <SparklesIcon className="mb-6 h-16 w-16 text-primary" />
+    <h2 className="m-0 text-5xl font-black">Moved + resized</h2>
+    <p className="mb-0 text-surface-foreground/70">Overlay clone keeps styles while traveling.</p>
+  </div>
+</div>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: ease-in-out
+---
+
+# Magic: explicit IDs only
+
+<div className="grid grid-cols-2 gap-8">
+  <div data-magic-id="same-text-before" className="rounded-2xl border border-accent/40 bg-accent/10 p-8 text-4xl font-black text-accent">
+    Same visible text
+  </div>
+
+  <div className="rounded-2xl border border-border bg-surface p-8">
+    The text on the next slide looks identical, but the id changes, so Honeydeck does not move it.
+  </div>
+</div>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: ease-in-out
+---
+
+# Magic: no text heuristics
+
+<div className="grid grid-cols-2 gap-8">
+  <div className="rounded-2xl border border-border bg-surface p-8">
+    Previous-only `same-text-before` fades out.
+  </div>
+
+  <div data-magic-id="same-text-after" className="rounded-2xl border border-primary/40 bg-primary/10 p-8 text-4xl font-black text-primary">
+    Same visible text
+  </div>
+</div>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Magic: inline to block
+
+<p className="text-5xl font-black leading-tight">
+  Inline <span data-magic-id="inline-spark" className="rounded-xl bg-primary px-3 py-1 text-primary-foreground">spark</span> can become a larger card.
+</p>
+
+<div className="mt-12 rounded-2xl border border-border bg-surface p-6">
+  Inline tags use predictable clone sizing during the transition.
+</div>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Magic: block destination
+
+<div data-magic-id="inline-spark" className="mx-auto mt-16 w-96 rounded-3xl bg-primary p-10 text-center text-6xl font-black text-primary-foreground shadow-2xl">
+  spark
+</div>
+
+<p className="mt-10 text-center text-surface-foreground/70">
+  Backward navigation falls back to `fade`; magic is intentionally forward-only.
+</p>
+
+---
+
 # Overview Mode
 
 Press <Keyboard>o</Keyboard>.

@@ -567,6 +567,28 @@
 	}
 }
 
+.honeydeck-slide-layer.honeydeck-transition-magic.honeydeck-transition-enter {
+	animation-name: honeydeck-transition-fade-enter;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+.honeydeck-slide-layer.honeydeck-transition-magic.honeydeck-transition-exit {
+	animation-name: honeydeck-transition-fade-exit;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+.honeydeck-magic-transition-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 120;
+	pointer-events: none;
+	contain: layout style paint;
+}
+
 .honeydeck-slide-layer.honeydeck-transition-slide-left.honeydeck-transition-enter {
 	animation-name: honeydeck-transition-slide-left-enter;
 	animation-duration: var(--honeydeck-transition-duration, 200ms);

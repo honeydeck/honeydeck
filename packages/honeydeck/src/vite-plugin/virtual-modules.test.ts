@@ -126,6 +126,42 @@ export const demo = {
 		}
 	});
 
+	it("exports literal data-magic-id metadata from slide modules", async () => {
+		const root = mkdtempSync(join(tmpdir(), "honeydeck-magic-ids-"));
+
+		try {
+			writeFileSync(
+				join(root, "deck.mdx"),
+				'# One\n\n<span data-magic-id="world">World</span>\n\n<span data-magic-id="world">Again</span>\n\n<span data-magic-id={dynamicId}>Dynamic</span>',
+			);
+
+			const plugin = virtualModulesPlugin({
+				entryPath: join(root, "deck.mdx"),
+			});
+			const context = {
+				addWatchFile() {},
+				error(message: string): never {
+					throw new Error(message);
+				},
+			};
+			const load = plugin.load as unknown as (
+				this: typeof context,
+				id: string,
+			) => Promise<string> | string | null;
+
+			const slideModule = await load.call(
+				context,
+				"\0virtual:honeydeck/slide/0.mdx",
+			);
+			assert.match(
+				String(slideModule),
+				/export const slideMagicIds = \["world"\]/,
+			);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
 	it("invalidates compiled slide and layout demo modules when deck frontmatter changes", async () => {
 		const root = mkdtempSync(join(tmpdir(), "honeydeck-layout-demo-hmr-"));
 		const deckPath = join(root, "deck.mdx");

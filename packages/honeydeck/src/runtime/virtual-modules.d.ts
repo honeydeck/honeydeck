@@ -12,7 +12,7 @@ declare module "virtual:honeydeck/slides" {
 	export const slideCount: number;
 
 	// Individual slide components are exported as Slide0, Slide1, Slide2, …
-	// Per-slide metadata is exported as stepCount0, slideTitle0, slideFrontmatter0, slideLayout0, …
+	// Per-slide metadata is exported as stepCount0, slideTitle0, slideFrontmatter0, slideLayout0, slideMagicIds0, …
 	// They cannot be statically typed here because the count is dynamic.
 	// Access them via a cast:
 	//   import * as slideModules from 'virtual:honeydeck/slides';
@@ -95,4 +95,7 @@ declare module "virtual:honeydeck/slide/*.mdx" {
 
 	/** Layout name from frontmatter.layout, or '' for default */
 	export const slideLayout: string;
+
+	/** Explicit data-magic-id values authored in this slide's MDX source */
+	export const slideMagicIds: string[];
 }

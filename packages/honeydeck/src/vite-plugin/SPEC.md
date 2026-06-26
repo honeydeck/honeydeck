@@ -108,7 +108,7 @@ All settings use **camelCase**. No separate config file exists. Frontmatter pars
 | `colorMode` | `"system" \| "light" \| "dark"` | `"system"` | Browser color mode |
 | `pdfColorMode` | `"light" \| "dark"` | unset | Optional explicit PDF color mode; when unset, PDF falls back to pinned deck `colorMode`, then `light` |
 | `pdfSteps` | `"final" \| "all"` | `"final"` | Whether PDF includes all steps or final state |
-| `transition` | `string \| boolean` | `fade` | Default named slide transition (`fade`, `none`, `slide-left`, or a custom CSS name); legacy `true` maps to `fade` and `false` maps to `none` |
+| `transition` | `string \| boolean` | `fade` | Default named slide transition (`fade`, `none`, `slide-left`, `magic`, or a custom CSS name); legacy `true` maps to `fade` and `false` maps to `none` |
 | `transitionDuration` | `number` | `200` | Default slide transition duration in milliseconds |
 | `transitionEasing` | `string` | `ease` | Default slide transition timing function |
 | `magicCodeDuration` | `number` | `800` | Default Magic Code animation duration in milliseconds |
@@ -131,6 +131,8 @@ All settings use **camelCase**. No separate config file exists. Frontmatter pars
 The first frontmatter block in the deck entry file is parsed as deck config. Deck-level keys are not copied into slide frontmatter. If that block also contains `layout:` plus layout-specific keys, those non-deck keys are emitted as first-slide frontmatter.
 
 Slide-level frontmatter is a frontmatter-only block after a slide separator and applies to the following slide. Imported MDX files are normal MDX modules and cannot set deck-level properties. `magicCodeDuration` is deck-level only; the same key in slide-level frontmatter is treated as a normal layout prop and does not configure Magic Code.
+
+Compiled slide modules export `slideMagicIds`, a de-duplicated source-order list of explicit `data-magic-id` values authored on that slide. Only literal quoted MDX attribute values are collected; the runtime still performs final Magic transition matching from measured DOM elements.
 
 Invalid `aspectRatio`, `colorMode`, and `pdfSteps` values fall back to defaults. Invalid `pdfColorMode` is ignored as unset, allowing the pinned `colorMode` fallback. `showSlideNumbers` is enabled only by literal `true`; slide transition values normalize at runtime, with non-empty strings treated as named built-ins or custom CSS hooks. Invalid explicit Magic Code block `duration` values are compile errors; invalid deck-level `magicCodeDuration` falls back to the default Magic Code duration.
 

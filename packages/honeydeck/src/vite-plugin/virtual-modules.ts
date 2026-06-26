@@ -84,6 +84,17 @@ const EXTENSIONLESS_IMPORT_EXTENSIONS = [
 	".css",
 ];
 
+const MAGIC_ID_ATTRIBUTE_RE = /\bdata-magic-id\s*=\s*(?:"([^"]+)"|'([^']+)')/g;
+
+function extractMagicIds(source: string): string[] {
+	const ids = new Set<string>();
+	for (const match of source.matchAll(MAGIC_ID_ATTRIBUTE_RE)) {
+		const id = (match[1] ?? match[2] ?? "").trim();
+		if (id) ids.add(id);
+	}
+	return [...ids];
+}
+
 export function resolveRelativeImport(baseDir: string, id: string): string {
 	const absolute = resolve(baseDir, id);
 
@@ -338,7 +349,7 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 
 				const lines: string[] = slides.map(
 					(s) =>
-						`export { default as Slide${s.index}, stepCount as stepCount${s.index}, slideTitle as slideTitle${s.index}, slideFrontmatter as slideFrontmatter${s.index}, slideLayout as slideLayout${s.index} } from '${VIRTUAL_SLIDE_PREFIX}${s.index}.mdx';`,
+						`export { default as Slide${s.index}, stepCount as stepCount${s.index}, slideTitle as slideTitle${s.index}, slideFrontmatter as slideFrontmatter${s.index}, slideLayout as slideLayout${s.index}, slideMagicIds as slideMagicIds${s.index} } from '${VIRTUAL_SLIDE_PREFIX}${s.index}.mdx';`,
 				);
 				lines.push(`export const slideCount = ${slides.length};`);
 				return lines.join("\n");
@@ -386,13 +397,15 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				const frontmatter: Record<string, unknown> =
 					(vfile.data.frontmatter as Record<string, unknown> | undefined) ?? {};
 				const layout: string = (frontmatter.layout as string | undefined) ?? "";
+				const magicIds = extractMagicIds(slide.rawMdx);
 
 				const js =
 					String(vfile) +
 					`\nexport const stepCount = ${stepCount};` +
 					`\nexport const slideTitle = ${JSON.stringify(title)};` +
 					`\nexport const slideFrontmatter = ${JSON.stringify(frontmatter)};` +
-					`\nexport const slideLayout = ${JSON.stringify(layout)};\n`;
+					`\nexport const slideLayout = ${JSON.stringify(layout)};` +
+					`\nexport const slideMagicIds = ${JSON.stringify(magicIds)};\n`;
 
 				return js;
 			}

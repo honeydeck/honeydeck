@@ -157,6 +157,182 @@ function getTransitionOptions(
 	};
 }
 
+type MagicElementRecord = {
+	element: HTMLElement;
+	rect: DOMRect;
+};
+
+function collectMagicElements(layer: HTMLElement): Map<string, MagicElementRecord> {
+	const records = new Map<string, MagicElementRecord>();
+	for (const element of layer.querySelectorAll<HTMLElement>("[data-magic-id]")) {
+		const id = element.dataset.magicId?.trim();
+		if (!id || records.has(id)) continue;
+		const rect = element.getBoundingClientRect();
+		if (rect.width <= 0 && rect.height <= 0) continue;
+		records.set(id, { element, rect });
+	}
+	return records;
+}
+
+function copyComputedStyles(source: Element, target: Element) {
+	const computed = window.getComputedStyle(source);
+	const targetElement = target as HTMLElement;
+	for (let index = 0; index < computed.length; index += 1) {
+		const property = computed.item(index);
+		targetElement.style.setProperty(
+			property,
+			computed.getPropertyValue(property),
+			computed.getPropertyPriority(property),
+		);
+	}
+
+	const sourceChildren = Array.from(source.children);
+	const targetChildren = Array.from(target.children);
+	for (let index = 0; index < sourceChildren.length; index += 1) {
+		const sourceChild = sourceChildren[index];
+		const targetChild = targetChildren[index];
+		if (sourceChild && targetChild) copyComputedStyles(sourceChild, targetChild);
+	}
+}
+
+function createMagicClone(
+	record: MagicElementRecord,
+	overlay: HTMLElement,
+	activeSlideScale: number,
+) {
+	const scale = activeSlideScale || 1;
+	const clone = record.element.cloneNode(true) as HTMLElement;
+	copyComputedStyles(record.element, clone);
+	clone.removeAttribute("id");
+	clone.setAttribute("aria-hidden", "true");
+	clone.style.position = "fixed";
+	clone.style.left = `${record.rect.left}px`;
+	clone.style.top = `${record.rect.top}px`;
+	clone.style.width = `${record.rect.width / scale}px`;
+	clone.style.height = `${record.rect.height / scale}px`;
+	clone.style.margin = "0";
+	clone.style.pointerEvents = "none";
+	clone.style.transformOrigin = "top left";
+	clone.style.transform = `scale(${scale})`;
+	clone.style.willChange = "transform, opacity";
+	if (window.getComputedStyle(record.element).display === "inline") {
+		clone.style.display = "inline-block";
+	}
+	overlay.appendChild(clone);
+
+	const cloneRect = clone.getBoundingClientRect();
+	const left = record.rect.left + (record.rect.left - cloneRect.left);
+	const top = record.rect.top + (record.rect.top - cloneRect.top);
+	clone.style.left = `${left}px`;
+	clone.style.top = `${top}px`;
+	return { clone, left, top };
+}
+
+function runMagicTransition({
+	fromLayer,
+	toLayer,
+	duration,
+	easing,
+	activeSlideScale,
+}: {
+	fromLayer: HTMLElement;
+	toLayer: HTMLElement;
+	duration: number;
+	easing: string;
+	activeSlideScale: number;
+}) {
+	const fromRecords = collectMagicElements(fromLayer);
+	const toRecords = collectMagicElements(toLayer);
+	const hiddenOriginals: Array<{ element: HTMLElement; opacity: string }> = [];
+	const animations: Animation[] = [];
+	const overlay = document.createElement("div");
+	overlay.className = "honeydeck-magic-transition-overlay";
+	overlay.setAttribute("aria-hidden", "true");
+	document.body.appendChild(overlay);
+
+	function hideOriginal(element: HTMLElement) {
+		hiddenOriginals.push({ element, opacity: element.style.opacity });
+		element.style.opacity = "0";
+	}
+
+	for (const record of fromRecords.values()) hideOriginal(record.element);
+	for (const record of toRecords.values()) hideOriginal(record.element);
+
+	const scale = activeSlideScale || 1;
+	const allIds = new Set([...fromRecords.keys(), ...toRecords.keys()]);
+	for (const id of allIds) {
+		const from = fromRecords.get(id);
+		const to = toRecords.get(id);
+		if (from && to) {
+			const { clone, left, top } = createMagicClone(to, overlay, scale);
+			const x = from.rect.left - left;
+			const y = from.rect.top - top;
+			const scaleX = to.rect.width > 0 ? from.rect.width / to.rect.width : 1;
+			const scaleY = to.rect.height > 0 ? from.rect.height / to.rect.height : 1;
+			animations.push(
+				clone.animate(
+					[
+						{
+							transform: `translate(${x}px, ${y}px) scale(${scale * scaleX}, ${scale * scaleY})`,
+							opacity: 1,
+						},
+						{ transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
+					],
+					{ duration, easing, fill: "both" },
+				),
+			);
+			continue;
+		}
+
+		if (from) {
+			const { clone } = createMagicClone(from, overlay, scale);
+			animations.push(
+				clone.animate(
+					[
+						{ transform: `scale(${scale})`, opacity: 1 },
+						{ transform: `scale(${scale})`, opacity: 0 },
+					],
+					{ duration, easing, fill: "both" },
+				),
+			);
+			continue;
+		}
+
+		if (to) {
+			const { clone } = createMagicClone(to, overlay, scale);
+			animations.push(
+				clone.animate(
+					[
+						{ transform: `scale(${scale})`, opacity: 0 },
+						{ transform: `scale(${scale})`, opacity: 1 },
+					],
+					{ duration, easing, fill: "both" },
+				),
+			);
+		}
+	}
+
+	let cleaned = false;
+	function cleanup() {
+		if (cleaned) return;
+		cleaned = true;
+		for (const animation of animations) animation.cancel();
+		for (const { element, opacity } of hiddenOriginals) {
+			element.style.opacity = opacity;
+		}
+		overlay.remove();
+	}
+
+	const timeout = window.setTimeout(cleanup, duration);
+	void Promise.allSettled(animations.map((animation) => animation.finished)).then(
+		cleanup,
+	);
+	return () => {
+		window.clearTimeout(timeout);
+		cleanup();
+	};
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -366,7 +542,11 @@ export function Deck() {
 		if (previousSlide === currentSlide) return;
 
 		const direction: 1 | -1 = currentSlide > previousSlide ? 1 : -1;
-		const options = getTransitionOptions(currentSlide - 1);
+		const rawOptions = getTransitionOptions(currentSlide - 1);
+		const options =
+			rawOptions.name === "magic" && direction === -1
+				? { ...rawOptions, name: "fade", className: "fade" }
+				: rawOptions;
 		previousSlideRef.current = currentSlide;
 
 		if (options.name === "none" || options.duration === 0) {
@@ -400,6 +580,26 @@ export function Deck() {
 
 		return () => window.clearTimeout(timeout);
 	}, [currentSlide, reducedMotion, route.view]);
+
+	const activeSlideScale = scale * slideZoom;
+
+	useLayoutEffect(() => {
+		if (route.view !== "slide") return;
+		if (slideTransition?.name !== "magic" || slideTransition.direction !== 1) {
+			return;
+		}
+		const fromLayer = slideLayerRefs.current[slideTransition.from];
+		const toLayer = slideLayerRefs.current[slideTransition.to];
+		if (!fromLayer || !toLayer) return;
+
+		return runMagicTransition({
+			fromLayer,
+			toLayer,
+			duration: slideTransition.duration,
+			easing: slideTransition.easing,
+			activeSlideScale,
+		});
+	}, [activeSlideScale, route.view, slideTransition]);
 
 	// ── Reference mode: delegate to DocsView ─────────────────────────────
 	if (route.view === "kit") {
@@ -436,7 +636,6 @@ export function Deck() {
 		route.view === "slide" || route.view === "overview"
 			? { ...route, slide: currentSlide, step: currentStep }
 			: route;
-	const activeSlideScale = scale * slideZoom;
 	const viewportScale = scale || 1;
 	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${activeSlideScale})`;
 	const zoomedSlideTransform = `translate(${slidePan.x / viewportScale}px, ${slidePan.y / viewportScale}px) scale(${slideZoom})`;
@@ -486,6 +685,9 @@ export function Deck() {
 									? "exit"
 									: null;
 						const isVisible = isCurrent || transitionRole !== null;
+						const isMagicTransition = activeTransition?.name === "magic";
+						const layerIsOpaque =
+							isCurrent || (isMagicTransition && transitionRole === "exit");
 						const transitionLayerClass =
 							transitionRole && activeTransition
 								? `honeydeck-transition-${activeTransition.className} honeydeck-transition-${transitionRole}`
@@ -537,7 +739,7 @@ export function Deck() {
 											slideLayerRefs.current[slideNumber] = element;
 										}}
 										className={`honeydeck-slide-layer relative ${
-											isCurrent ? "opacity-100" : "opacity-0"
+											layerIsOpaque ? "opacity-100" : "opacity-0"
 										} ${transitionLayerClass}`}
 										style={{
 											width: BASE_WIDTH,

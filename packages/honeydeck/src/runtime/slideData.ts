@@ -41,6 +41,8 @@ export type SlideData = {
 	frontmatter: Record<string, unknown>;
 	/** Layout name from frontmatter.layout, or 'Default' when absent. */
 	layoutName: string;
+	/** Explicit `data-magic-id` values authored in this slide's MDX source. */
+	magicIds: string[];
 };
 
 // ---------------------------------------------------------------------------
@@ -73,6 +75,7 @@ function buildSlideData(): SlideData[] {
 				(_allExports[`slideLayout${i}`] as string | undefined) ||
 				(config.defaultLayout as string | undefined) ||
 				"Default",
+			magicIds: (_allExports[`slideMagicIds${i}`] as string[] | undefined) ?? [],
 		};
 	});
 }

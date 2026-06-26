@@ -29,6 +29,7 @@ Built-in transition names:
 - `fade` — default crossfade
 - `none` — no slide transition
 - `slide-left` — horizontal slide, reverse-aware when navigating backward
+- `magic` — forward-only FLIP transition for explicitly tagged elements
 
 ## Slide overrides
 
@@ -45,6 +46,35 @@ transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
 ```
 
 Slides without transition frontmatter use the deck defaults.
+
+## Magic transition
+
+Use `transition: magic` to move explicitly tagged elements between slides:
+
+```mdx
+# Before
+
+<span data-magic-id="world">World</span>
+
+---
+transition: magic
+transitionDuration: 600
+transitionEasing: ease-in-out
+---
+
+# After
+
+Hello <span data-magic-id="world">World</span>
+```
+
+Matching uses only `data-magic-id`:
+
+- same id on both slides → element moves
+- id only on previous slide → element fades out
+- id only on incoming slide → element fades in
+- untagged content crossfades with slide layers
+
+Honeydeck does not do automatic DOM diffing or text matching. Backward navigation with `magic` falls back to `fade`.
 
 ## Custom transitions
 
