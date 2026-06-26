@@ -30,10 +30,6 @@
  */
 
 import {
-	ChevronDownIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	ChevronUpIcon,
 	ExternalLinkIcon,
 	MonitorOffIcon,
 	PauseIcon,
@@ -57,11 +53,7 @@ import { NotesContext } from "../components/Notes.tsx";
 import {
 	getSlideRouteFromRoute,
 	navigateTo,
-	nextSlide,
-	nextStep,
 	openUrlInNewTab,
-	previousSlide,
-	previousStep,
 } from "../navigation.ts";
 import {
 	getPresentationAudienceUrl,
@@ -72,7 +64,6 @@ import { SlideCanvas } from "../SlideCanvas.tsx";
 import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
 import { useSync } from "../sync.ts";
 import { useKeyboardNav } from "../useKeyboardNav.ts";
-import { useSwipeNav } from "../useSwipeNav.ts";
 import { PresenterCastButton } from "./PresenterCastButton.tsx";
 import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
 import { getPresenterNextPreview } from "./presenterPreview.ts";
@@ -154,23 +145,6 @@ function SlidePreview({
 	);
 }
 
-function usePresenterMobile(): boolean {
-	const [isMobile, setIsMobile] = useState(() => {
-		if (typeof window === "undefined") return false;
-		return window.matchMedia("(max-width: 767px)").matches;
-	});
-
-	useEffect(() => {
-		const query = window.matchMedia("(max-width: 767px)");
-		const update = () => setIsMobile(query.matches);
-		update();
-		query.addEventListener("change", update);
-		return () => query.removeEventListener("change", update);
-	}, []);
-
-	return isMobile;
-}
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -197,7 +171,6 @@ export function PresenterView({
 	const [notes, setNotes] = useState<ReactNode>(null);
 	const [isBlankScreen, setIsBlankScreen] = useState(false);
 	const notesContextValue = useMemo(() => ({ setNotes }), []);
-	const isMobile = usePresenterMobile();
 
 	const currentIndex = slide - 1; // 0-based
 	const currentStepCount = slideData[currentIndex]?.stepCount ?? 0;
@@ -243,7 +216,6 @@ export function PresenterView({
 		getStepCount,
 		onToggleOverview: () => {},
 	});
-	useSwipeNav({ enabled: isMobile });
 
 	// ── Presenter exit + blank screen shortcuts ─────────────────────────────
 	const closePresenter = useCallback(() => {
@@ -305,60 +277,50 @@ export function PresenterView({
 		if (url) openUrlInNewTab(url);
 	}
 
-	// ── Navigate (presenter stays on presenter route) ───────────────────────
-	function goNext() {
-		nextStep(
-			{ view: "presenter", slide, step },
-			{ slideCount: totalSlides, getStepCount },
-		);
-	}
-
-	function goPrev() {
-		previousStep(
-			{ view: "presenter", slide, step },
-			{ slideCount: totalSlides, getStepCount },
-		);
-	}
-
-	function goNextSlide() {
-		nextSlide({ view: "presenter", slide, step }, { slideCount: totalSlides });
-	}
-
-	function goPrevSlide() {
-		previousSlide({ view: "presenter", slide, step });
-	}
-
 	// ---------------------------------------------------------------------------
 	// Render
 	// ---------------------------------------------------------------------------
 
 	return (
-		<div className="fixed inset-0 bg-black text-white font-sans grid grid-rows-[1fr_auto_auto] grid-cols-1 overflow-hidden select-none">
-			{/* ── Blank screen indicator overlay ────────────────────────────── */}
-			{isBlankScreen && (
-				<div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-md bg-red-600/90 text-white text-sm font-semibold tracking-wide uppercase">
-					Screen blanked (b)
+		<div className="fixed inset-0 bg-black text-white font-sans overflow-hidden select-none">
+			<div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center md:hidden">
+				<div className="max-w-sm space-y-2">
+					<h1 className="text-2xl font-semibold">
+						Presenter mode is not supported on mobile.
+					</h1>
+					<p className="text-sm text-white/60">
+						Open presenter mode on a larger screen, or return to this slide in
+						the audience view.
+					</p>
 				</div>
-			)}
+				<button
+					type="button"
+					onClick={closePresenter}
+					className="rounded border border-white/20 bg-white/10 px-4 py-2 text-sm font-[inherit] text-white/85"
+				>
+					Go to slide
+				</button>
+			</div>
 
-			{/* ── Top section: current slide plus desktop next/notes column ─── */}
-			<div
-				className={
-					isMobile
-						? "grid grid-cols-1 gap-3 px-3 pt-3 pb-2 min-h-0 overflow-hidden"
-						: "grid grid-cols-[minmax(0,3fr)_minmax(280px,2fr)] gap-4 px-4 pt-4 pb-2 min-h-0 overflow-hidden"
-				}
-			>
-				{/* Current slide owns NotesContext. Next preview must not overwrite notes. */}
-				<NotesContext.Provider value={notesContextValue}>
-					<SlidePreview
-						slideIndex={currentIndex}
-						stepIndex={step}
-						label="Current"
-					/>
-				</NotesContext.Provider>
+			<div className="hidden h-full grid-rows-[1fr_auto] grid-cols-1 md:grid">
+				{/* ── Blank screen indicator overlay ────────────────────────────── */}
+				{isBlankScreen && (
+					<div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-md bg-red-600/90 text-white text-sm font-semibold tracking-wide uppercase">
+						Screen blanked (b)
+					</div>
+				)}
 
-				{!isMobile && (
+				{/* ── Top section: current slide plus next/notes column ─────────── */}
+				<div className="grid grid-cols-[minmax(0,3fr)_minmax(280px,2fr)] gap-4 px-4 pt-4 pb-2 min-h-0 overflow-hidden">
+					{/* Current slide owns NotesContext. Next preview must not overwrite notes. */}
+					<NotesContext.Provider value={notesContextValue}>
+						<SlidePreview
+							slideIndex={currentIndex}
+							stepIndex={step}
+							label="Current"
+						/>
+					</NotesContext.Provider>
+
 					<div className="grid grid-rows-[minmax(0,1fr)_minmax(8rem,0.8fr)] gap-4 min-h-0 overflow-hidden">
 						<SlidePreview
 							slideIndex={nextPreview?.slideIndex ?? -1}
@@ -368,177 +330,123 @@ export function PresenterView({
 						/>
 						<PresenterNotesPanel notes={notes} />
 					</div>
-				)}
-			</div>
-
-			{/* ── Mobile notes live below the current slide ─────────────────── */}
-			{isMobile && (
-				<PresenterNotesPanel
-					notes={notes}
-					className="mx-3 mb-2 min-h-20 max-h-40"
-				/>
-			)}
-
-			{/* ── Bottom bar: counter · mobile nav buttons · timer/actions ──── */}
-			<div
-				className={
-					isMobile
-						? "grid grid-cols-[minmax(0,1fr)_auto] items-center px-3 py-2.5 border-t border-white/8 bg-black/30 gap-x-3 gap-y-2"
-						: "grid grid-cols-[minmax(0,1fr)_auto] items-center px-5 py-2.5 border-t border-white/8 bg-black/30 gap-x-4 gap-y-2"
-				}
-			>
-				{/* Counter + timer */}
-				<div className="min-w-0 flex flex-wrap items-center gap-3 text-md text-white/60 tabular-nums">
-					<span className="truncate">
-						Slide {slide}/{totalSlides}
-						{currentStepCount > 0 && ` · Step ${step}/${currentStepCount}`}
-					</span>
-					{timerState === "idle" && (
-						<button
-							type="button"
-							onClick={startTimer}
-							title="Start timer"
-							className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/6 text-white/50 hover:text-white/80 text-sm"
-						>
-							<PlayIcon aria-hidden="true" size={14} />
-							Start timer
-						</button>
-					)}
-					{timerState === "running" && (
-						<>
-							<button
-								type="button"
-								onClick={pauseTimer}
-								title="Pause timer"
-								className="text-lg font-semibold text-white tabular-nums bg-white/10 px-2.5 py-0.5 rounded"
-							>
-								⏱ {elapsedTime}
-							</button>
-							<button
-								type="button"
-								onClick={pauseTimer}
-								title="Pause timer"
-								aria-label="Pause timer"
-								className="text-white/50 hover:text-white/80 inline-flex"
-							>
-								<PauseIcon aria-hidden="true" size={16} />
-							</button>
-						</>
-					)}
-					{timerState === "paused" && (
-						<>
-							<span className="text-lg font-semibold text-white/60 tabular-nums bg-white/6 px-2.5 py-0.5 rounded">
-								⏱ {elapsedTime}
-							</span>
-							<button
-								type="button"
-								onClick={continueTimer}
-								title="Continue timer"
-								aria-label="Continue timer"
-								className="text-white/50 hover:text-white/80 inline-flex"
-							>
-								<PlayIcon aria-hidden="true" size={16} />
-							</button>
-							<button
-								type="button"
-								onClick={restartTimer}
-								title="Restart timer from zero"
-								aria-label="Restart timer from zero"
-								className="text-white/30 hover:text-white/60 inline-flex"
-							>
-								<RotateCcwIcon aria-hidden="true" size={15} />
-							</button>
-							<button
-								type="button"
-								onClick={closeTimer}
-								title="Close timer"
-								aria-label="Close timer"
-								className="text-white/30 hover:text-white/60 inline-flex"
-							>
-								<XIcon aria-hidden="true" size={16} />
-							</button>
-						</>
-					)}
 				</div>
 
-				{/* Nav buttons are mobile-only; desktop uses keyboard shortcuts. */}
-				{isMobile && (
-					<div className="order-last col-span-2 flex w-full gap-2 items-center justify-center">
-						<NavButton
-							onClick={goPrev}
-							title="Previous step (←)"
-							className="h-12 w-16"
-						>
-							<ChevronLeftIcon aria-hidden="true" className="h-6 w-6" />
-						</NavButton>
-						<NavButton
-							onClick={goPrevSlide}
-							title="Previous slide (↑)"
-							className="h-12 w-16"
-						>
-							<ChevronUpIcon aria-hidden="true" className="h-6 w-6" />
-						</NavButton>
-						<NavButton
-							onClick={goNextSlide}
-							title="Next slide (↓)"
-							className="h-12 w-16"
-						>
-							<ChevronDownIcon aria-hidden="true" className="h-6 w-6" />
-						</NavButton>
-						<NavButton
-							onClick={goNext}
-							title="Next step (→)"
-							className="h-12 w-16"
-						>
-							<ChevronRightIcon aria-hidden="true" className="h-6 w-6" />
-						</NavButton>
+				{/* ── Bottom bar: counter · timer/actions ──────────────────────── */}
+				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center px-5 py-2.5 border-t border-white/8 bg-black/30 gap-x-4 gap-y-2">
+					{/* Counter + timer */}
+					<div className="min-w-0 flex flex-wrap items-center gap-3 text-md text-white/60 tabular-nums">
+						<span className="truncate">
+							Slide {slide}/{totalSlides}
+							{currentStepCount > 0 && ` · Step ${step}/${currentStepCount}`}
+						</span>
+						{timerState === "idle" && (
+							<button
+								type="button"
+								onClick={startTimer}
+								title="Start timer"
+								className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/6 text-white/50 hover:text-white/80 text-sm"
+							>
+								<PlayIcon aria-hidden="true" size={14} />
+								Start timer
+							</button>
+						)}
+						{timerState === "running" && (
+							<>
+								<button
+									type="button"
+									onClick={pauseTimer}
+									title="Pause timer"
+									className="text-lg font-semibold text-white tabular-nums bg-white/10 px-2.5 py-0.5 rounded"
+								>
+									⏱ {elapsedTime}
+								</button>
+								<button
+									type="button"
+									onClick={pauseTimer}
+									title="Pause timer"
+									aria-label="Pause timer"
+									className="text-white/50 hover:text-white/80 inline-flex"
+								>
+									<PauseIcon aria-hidden="true" size={16} />
+								</button>
+							</>
+						)}
+						{timerState === "paused" && (
+							<>
+								<span className="text-lg font-semibold text-white/60 tabular-nums bg-white/6 px-2.5 py-0.5 rounded">
+									⏱ {elapsedTime}
+								</span>
+								<button
+									type="button"
+									onClick={continueTimer}
+									title="Continue timer"
+									aria-label="Continue timer"
+									className="text-white/50 hover:text-white/80 inline-flex"
+								>
+									<PlayIcon aria-hidden="true" size={16} />
+								</button>
+								<button
+									type="button"
+									onClick={restartTimer}
+									title="Restart timer from zero"
+									aria-label="Restart timer from zero"
+									className="text-white/30 hover:text-white/60 inline-flex"
+								>
+									<RotateCcwIcon aria-hidden="true" size={15} />
+								</button>
+								<button
+									type="button"
+									onClick={closeTimer}
+									title="Close timer"
+									aria-label="Close timer"
+									className="text-white/30 hover:text-white/60 inline-flex"
+								>
+									<XIcon aria-hidden="true" size={16} />
+								</button>
+							</>
+						)}
 					</div>
-				)}
 
-				{/* Clock + mode/open/cast buttons */}
-				<div
-					className={
-						isMobile
-							? "col-span-2 flex flex-wrap gap-3 items-center justify-self-start"
-							: "flex flex-wrap gap-3 items-center justify-self-end"
-					}
-				>
-					<span
-						className="text-md tabular-nums text-white/60"
-						title="Wall clock"
-					>
-						{clock}
-					</span>
-					<ColorModeCycleButton
-						colorMode={colorMode}
-						onSetColorMode={onSetColorMode}
-						iconSize={14}
-						className="w-8 h-8 rounded border border-white/20 bg-white/6 text-white/80 inline-flex items-center justify-center"
-					/>
-					<NavButton
-						onClick={toggleBlankScreen}
-						title={isBlankScreen ? "Unblank screen (b)" : "Blank screen (b)"}
-					>
-						<MonitorOffIcon
-							aria-hidden="true"
-							size={16}
-							className={isBlankScreen ? "text-red-400" : ""}
+					{/* Clock + mode/open/cast buttons */}
+					<div className="flex flex-wrap gap-3 items-center justify-self-end">
+						<span
+							className="text-md tabular-nums text-white/60"
+							title="Wall clock"
+						>
+							{clock}
+						</span>
+						<ColorModeCycleButton
+							colorMode={colorMode}
+							onSetColorMode={onSetColorMode}
+							iconSize={14}
+							className="w-8 h-8 rounded border border-white/20 bg-white/6 text-white/80 inline-flex items-center justify-center"
 						/>
-					</NavButton>
-					<button
-						type="button"
-						onClick={openAudienceView}
-						className="px-3 py-1 rounded border border-white/20 bg-white/6 text-white/80 text-sm font-[inherit] inline-flex items-center gap-1.5"
-					>
-						Open audience view
-						<ExternalLinkIcon aria-hidden="true" size={14} />
-					</button>
-					<PresenterCastButton
-						supported={presentationCast.supported}
-						isCasting={presentationCast.isCasting}
-						onStartCasting={presentationCast.startCasting}
-						onStopCasting={presentationCast.stopCasting}
-					/>
+						<NavButton
+							onClick={toggleBlankScreen}
+							title={isBlankScreen ? "Unblank screen (b)" : "Blank screen (b)"}
+						>
+							<MonitorOffIcon
+								aria-hidden="true"
+								size={16}
+								className={isBlankScreen ? "text-red-400" : ""}
+							/>
+						</NavButton>
+						<button
+							type="button"
+							onClick={openAudienceView}
+							className="px-3 py-1 rounded border border-white/20 bg-white/6 text-white/80 text-sm font-[inherit] inline-flex items-center gap-1.5"
+						>
+							Open audience view
+							<ExternalLinkIcon aria-hidden="true" size={14} />
+						</button>
+						<PresenterCastButton
+							supported={presentationCast.supported}
+							isCasting={presentationCast.isCasting}
+							onStartCasting={presentationCast.startCasting}
+							onStopCasting={presentationCast.stopCasting}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

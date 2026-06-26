@@ -7,7 +7,7 @@
 ### Activation
 
 - Keyboard shortcut `p` (opens presenter mode in the current tab)
-- Navigation controls button
+- Navigation controls button on `md` and wider screens
 - Direct URL: `/#/presenter/1/0`
 
 ### Deactivation
@@ -45,17 +45,15 @@ Includes:
 - Color mode cycle button (system → light → dark → system). Presenter color mode changes also sync to BroadcastChannel audience views and Presentation API cast receivers.
 - Blank screen toggle button and `b` keyboard shortcut. While blanked, the presenter sees a `Screen blanked (b)` indicator and audience/cast views see a black screen.
 - Button to cast the audience view to a secondary display when the Presentation API is supported. Unsupported browsers keep a visibly disabled-looking control in the action row; it does not render extra inline feedback, and its hover title/accessible label explains that Presentation API casting is unavailable. Active casting can be stopped from the same control.
-- Presenter navigation buttons provide previous/next timeline-step navigation and previous/next slide navigation on mobile presenter layouts. Desktop presenter layouts do not show navigation buttons. On mobile, the timeline-step buttons sit on the outside edges of the button group (previous step, previous slide, next slide, next step), because step navigation is the primary/default action. Timeline keyboard shortcuts (`→`/`←`/`↓`/`↑`, `d`/`a`/`s`/`w`) update the presenter route and keep the window in presenter mode.
-- Presenter navigation uses the shared Honeydeck navigation command abstraction so button, keyboard, and touch inputs share the same semantics as audience view.
+- Timeline keyboard shortcuts (`→`/`←`/`↓`/`↑`, `d`/`a`/`s`/`w`) update the presenter route and keep the window in presenter mode on supported desktop layouts.
 - Presenter notes are scroll-owned regions: wheel, trackpad, touch scroll, and swipe gestures that start in notes scroll notes and never navigate slides, even at scroll boundaries.
-- On mobile presenter layouts, the Current preview may use tap zones and swipe navigation; speaker notes remain scroll-only. Pinch-to-zoom and pinch-to-overview are not required in presenter mode.
 - Code step-through previews use the same timeline state as audience view, so the Next preview shows the upcoming highlighted code step.
 - In the Next preview, reveal content from later timeline steps is visible at reduced opacity so the speaker can see what is still coming on that slide. Audience view and the Current preview keep future steps hidden.
 - When no next timeline state exists (final step of the final slide), the Next preview shows a placeholder (`No next step`) instead of trying to render a missing slide.
 
 ### Presenter Responsiveness
 
-Presenter mode uses a two-column preview area (`Current` larger, `Next` smaller), a notes panel, and a bottom status/action bar on desktop. On narrow/mobile screens it switches to a single-column layout and hides the Next preview. The navigation button group is the bottom-most element on mobile and uses larger touch targets than desktop.
+Presenter mode uses a two-column preview area (`Current` larger, `Next` smaller), a notes panel, and a bottom status/action bar on `md` and wider screens. Below Tailwind's `md` breakpoint, presenter mode is not supported: direct presenter URLs show a full-page hint that presenter mode is not supported on mobile and provide a button back to the same slide/step in audience view.
 
 ### Presentation Timer
 

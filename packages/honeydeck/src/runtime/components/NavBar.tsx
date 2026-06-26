@@ -183,12 +183,14 @@ export function NavBar({
 
 					{/* Presenter mode */}
 					{route.view !== "presenter" && (
-						<NavBarButton
-							onClick={() => openPresenter(route)}
-							label="Presenter mode (p)"
-						>
-							<PresentationIcon aria-hidden="true" size={16} />
-						</NavBarButton>
+						<div className="hidden md:block">
+							<NavBarButton
+								onClick={() => openPresenter(route)}
+								label="Presenter mode (p)"
+							>
+								<PresentationIcon aria-hidden="true" size={16} />
+							</NavBarButton>
+						</div>
 					)}
 				</div>
 

@@ -17,7 +17,7 @@ Honeydeck works on phones and tablets, but mobile presentation mode behaves diff
 | Text selection | Slide text can be selected normally | Slide text selection is off by default; use the nav bar toggle when you need it |
 | Zoom | Browser/page zoom or normal browser controls | Honeydeck-controlled slide zoom with pinch, up to `5x` |
 | Overview | Keyboard selection and mouse clicks | Responsive fixed two-column grid |
-| Presenter mode | Current slide, next preview, notes, clock, timer, actions; no navigation buttons | Current slide, notes, navigation buttons; no next preview |
+| Presenter mode | Current slide, next preview, notes, clock, timer, actions | Not supported; direct presenter URLs show a full-page hint with a button back to the slide |
 
 ## Tap zones
 
@@ -97,13 +97,7 @@ Touch scroll belongs to the overview grid and never navigates slides. Tap a slid
 
 ## Presenter mode on mobile
 
-Presenter mode keeps the mobile layout compact:
-
-- Current slide preview
-- Speaker notes
-- Navigation buttons
-
-The desktop next-slide preview is hidden on mobile because there is not enough space.
+Presenter mode is not supported below Tailwind's `md` breakpoint. The mobile navigation bar does not offer the presenter-mode button. If someone opens a `/#/presenter/...` URL directly on mobile, Honeydeck shows a full-page hint and a **Go to slide** button that returns to the same slide and step in audience view.
 
 ## Tips for mobile-friendly decks
 

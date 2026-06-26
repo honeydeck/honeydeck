@@ -126,7 +126,7 @@ Reference page routes intentionally do not encode slide or step. During one brow
 | `↓` / `s` | Next slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `↑` / `w` | Previous slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode (same tab) |
+| `p` | Open presenter mode (same tab); presenter mode is unsupported below Tailwind's `md` breakpoint and shows a mobile hint with a button back to the same audience slide/step |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview; in reference pages, return to slides; browser-native Escape handles fullscreen exit |
 
@@ -145,7 +145,7 @@ Shown in normal slide view only (not presenter/reference views).
   - Overview mode button
   - Layouts reference button (opens `/#/layouts` while preserving the current slide/step as the return target)
   - Docs website button (opens `https://honeydeck.dev` in a new tab)
-  - Presenter mode button
+  - Presenter mode button on `md` and wider screens
   - Fullscreen button
   - Mobile text selection toggle (off by default, enables selecting slide content when needed)
   - Color mode switch (system → light → dark → system)
