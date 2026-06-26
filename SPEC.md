@@ -1,6 +1,6 @@
 # Honeydeck Monorepo Specification
 
-Honeydeck is an npm workspace for an MDX + React presentation framework and its public Fumadocs documentation site.
+Honeydeck is a pnpm workspace for an MDX + React presentation framework and its public Fumadocs documentation site.
 
 This root spec is the monorepo overview and navigation map. Detailed observable behavior lives in colocated `SPEC.md` files near the package/folder that owns it.
 

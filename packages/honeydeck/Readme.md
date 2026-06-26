@@ -9,7 +9,7 @@ Honeydeck helps you create polished, interactive presentations from plain-text M
 ```bash
 npx @honeydeck/honeydeck init --name awesome-talk
 cd awesome-talk
-npm run dev
+pnpm run dev
 ```
 
 Open the local URL printed by the dev server, edit `deck.mdx`, and your slides update instantly.

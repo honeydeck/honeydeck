@@ -38,31 +38,31 @@ When changing behavior:
 Run from the repository root:
 
 ```bash
-npm install
-npm run dev              # All package dev servers
-npm run lint
-npm run typecheck
-npm test
-npm run build
-npm run pack:dry-run
+pnpm install
+pnpm run dev              # All package dev servers
+pnpm run lint
+pnpm run typecheck
+pnpm test
+pnpm run build
+pnpm run pack:dry-run
 ```
 
 Target a package explicitly when useful:
 
 ```bash
-npm -w @honeydeck/honeydeck run dev          # starter template smoke-test deck
-npm -w @honeydeck/honeydeck run test
-npm -w @honeydeck/honeydeck run typecheck
-npm -w @honeydeck/showcase run dev
-npm -w @honeydeck/showcase run build
-npm -w @honeydeck/showcase run pdf
-npm -w @honeydeck/showcase run pdf:steps
-npm -w @honeydeck/welcome-deck run dev
-npm -w @honeydeck/welcome-deck run build
-npm -w @honeydeck/welcome-deck run pdf
-npm -w @honeydeck/docs run dev
-npm -w @honeydeck/docs run search:index
-npm -w @honeydeck/docs run build
+pnpm --filter @honeydeck/honeydeck run dev          # starter template smoke-test deck
+pnpm --filter @honeydeck/honeydeck run test
+pnpm --filter @honeydeck/honeydeck run typecheck
+pnpm --filter @honeydeck/showcase run dev
+pnpm --filter @honeydeck/showcase run build
+pnpm --filter @honeydeck/showcase run pdf
+pnpm --filter @honeydeck/showcase run pdf:steps
+pnpm --filter @honeydeck/welcome-deck run dev
+pnpm --filter @honeydeck/welcome-deck run build
+pnpm --filter @honeydeck/welcome-deck run pdf
+pnpm --filter @honeydeck/docs run dev
+pnpm --filter @honeydeck/docs run search:index
+pnpm --filter @honeydeck/docs run build
 ```
 
 ## Package boundaries

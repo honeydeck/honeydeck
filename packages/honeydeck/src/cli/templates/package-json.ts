@@ -14,6 +14,7 @@ export function generatePackageJson(projectName: string): string {
 		version: "0.1.0",
 		private: true,
 		type: "module",
+		packageManager: "pnpm@10.34.4",
 		scripts: {
 			dev: "honeydeck dev",
 			build: "honeydeck build",

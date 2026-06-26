@@ -62,17 +62,19 @@ Honeydeck is currently developed and tested with:
 - npm
 - Playwright Chromium for PDF export
 
-Check runtime:
+Check runtime and enable pnpm through Corepack:
 
 ```bash
 node --version
-npm --version
+corepack enable
+corepack prepare pnpm@10.34.4 --activate
+pnpm --version
 ```
 
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Install Playwright Chromium when PDF export is used locally:
@@ -87,14 +89,14 @@ npx playwright install chromium
 
 | Script | Purpose |
 |--------|---------|
-| `npm run dev` | Run source CLI against starter template deck |
-| `npm run dev:init` | Run source CLI against starter template deck |
-| `npm run format` | Format/lint with Biome and write fixes |
-| `npm run lint` | Validate Biome formatting/lint rules without writing fixes |
-| `npm run pack:dry-run` | Validate the npm package contents without publishing |
-| `npm run release:plan` | Inspect the next Conventional Commit release plan |
-| `npm test` | Run Node test suite through `tsx` |
-| `npm run typecheck` | Run strict TypeScript checks without emitting files |
+| `pnpm run dev` | Run source CLI against starter template deck |
+| `pnpm run dev:init` | Run source CLI against starter template deck |
+| `pnpm run format` | Format/lint with Biome and write fixes |
+| `pnpm run lint` | Validate Biome formatting/lint rules without writing fixes |
+| `pnpm run pack:dry-run` | Validate the npm package contents without publishing |
+| `pnpm run release:plan` | Inspect the next Conventional Commit release plan |
+| `pnpm test` | Run Node test suite through `tsx` |
+| `pnpm run typecheck` | Run strict TypeScript checks without emitting files |
 
 The source CLI is run directly with `tsx`, for example:
 
@@ -109,24 +111,24 @@ node --import tsx ./src/cli/index.ts dev --deck src/cli/templates/starter/deck.m
 Before considering a change complete, run:
 
 ```bash
-npm run format
-npm run lint
-npm run typecheck
-npm test
-npm run pack:dry-run
+pnpm run format
+pnpm run lint
+pnpm run typecheck
+pnpm test
+pnpm run pack:dry-run
 ```
 
 For UI/runtime changes, also run at least one manual deck session:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 For PDF-related changes, run the showcase package PDF smoke tests from the repository root:
 
 ```bash
-npm -w @honeydeck/showcase run pdf
-npm -w @honeydeck/showcase run pdf:steps
+pnpm --filter @honeydeck/showcase run pdf
+pnpm --filter @honeydeck/showcase run pdf:steps
 ```
 
 Test coverage should match the changed layer and live next to the implementation by default:
@@ -444,9 +446,9 @@ Before Honeydeck is published, generated projects may need a local file dependen
 ```bash
 cd /path/to/generated-project
 npm pkg set dependencies.honeydeck="file:/absolute/path/to/honeydeck"
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+pnpm run dev
 ```
 
 ---

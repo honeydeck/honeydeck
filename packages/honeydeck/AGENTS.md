@@ -15,10 +15,10 @@ This package publishes the scoped public `@honeydeck/honeydeck` npm package. It 
 From repo root:
 
 ```bash
-npm -w @honeydeck/honeydeck run dev
-npm -w @honeydeck/honeydeck run test
-npm -w @honeydeck/honeydeck run typecheck
-npm -w @honeydeck/honeydeck run pack:dry-run
+pnpm --filter @honeydeck/honeydeck run dev
+pnpm --filter @honeydeck/honeydeck run test
+pnpm --filter @honeydeck/honeydeck run typecheck
+pnpm --filter @honeydeck/honeydeck run pack:dry-run
 ```
 
-For full monorepo gates use root workspace scripts: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run pack:dry-run`. Root `npm run build` runs only workspaces that define a build script.
+For full monorepo gates use root workspace scripts: `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, `pnpm run build`, and `pnpm run pack:dry-run`. Root `pnpm run build` runs only workspaces that define a build script.

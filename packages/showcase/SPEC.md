@@ -24,8 +24,8 @@
 
 ## Scripts
 
-- `npm -w @honeydeck/showcase run dev` serves the showcase deck with the source Honeydeck CLI.
-- `npm -w @honeydeck/showcase run build` builds the showcase into `packages/showcase/dist`.
-- `npm -w @honeydeck/showcase run pdf` exports the final-state showcase PDF.
-- `npm -w @honeydeck/showcase run pdf:steps` exports all timeline steps.
-- Root `npm run dev` runs this showcase package together with the docs site.
+- `pnpm --filter @honeydeck/showcase run dev` serves the showcase deck with the source Honeydeck CLI.
+- `pnpm --filter @honeydeck/showcase run build` builds the showcase into `packages/showcase/dist`.
+- `pnpm --filter @honeydeck/showcase run pdf` exports the final-state showcase PDF.
+- `pnpm --filter @honeydeck/showcase run pdf:steps` exports all timeline steps.
+- Root `pnpm run dev` runs this showcase package together with the docs site.

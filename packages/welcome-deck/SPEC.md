@@ -19,7 +19,7 @@
 
 ## Scripts
 
-- `npm -w @honeydeck/welcome-deck run dev` serves the welcome deck with the source Honeydeck CLI.
-- `npm -w @honeydeck/welcome-deck run build` builds the welcome deck into `packages/welcome-deck/dist`.
-- `npm -w @honeydeck/welcome-deck run pdf` exports the final-state welcome PDF.
-- `npm -w @honeydeck/welcome-deck run typecheck` typechecks the welcome deck and local layouts.
+- `pnpm --filter @honeydeck/welcome-deck run dev` serves the welcome deck with the source Honeydeck CLI.
+- `pnpm --filter @honeydeck/welcome-deck run build` builds the welcome deck into `packages/welcome-deck/dist`.
+- `pnpm --filter @honeydeck/welcome-deck run pdf` exports the final-state welcome PDF.
+- `pnpm --filter @honeydeck/welcome-deck run typecheck` typechecks the welcome deck and local layouts.

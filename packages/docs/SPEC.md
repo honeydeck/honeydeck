@@ -28,11 +28,11 @@ Docs content is tracked source and may use docs-package MDX components such as i
 
 When a docs page explains behavior owned by `packages/honeydeck`, update the owning Honeydeck colocated `SPEC.md` first, then update the docs page. Specs remain the closest source for observable implementation behavior; `packages/docs/content/docs` owns reader-facing guides, examples, and playgrounds. Core slide-transition behavior is documented by `/docs/transitions`, including deck defaults, slide overrides, built-in transition names, custom CSS hooks, timing variables, and reverse-aware custom CSS.
 
-The docs package must provide `npm run export:package-docs` to export the authored docs into package-local Markdown files under `packages/honeydeck/docs` for the published Honeydeck package. The export must be generated from `packages/docs/content/docs`, preserve the curated `meta.json` order, write one Markdown file per docs page plus `index.json`, and be safe against path traversal. Generated package docs are build artifacts and must not be manually edited.
+The docs package must provide `pnpm run export:package-docs` to export the authored docs into package-local Markdown files under `packages/honeydeck/docs` for the published Honeydeck package. The export must be generated from `packages/docs/content/docs`, preserve the curated `meta.json` order, write one Markdown file per docs page plus `index.json`, and be safe against path traversal. Generated package docs are build artifacts and must not be manually edited.
 
 ## Search
 
-Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from authored Fumadocs content using `npm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. The docs site must not use a server-side search API route.
+Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from authored Fumadocs content using `pnpm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. The docs site must not use a server-side search API route.
 
 ## Fumadocs layout
 
