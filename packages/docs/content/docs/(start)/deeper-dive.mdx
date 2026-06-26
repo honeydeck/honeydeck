@@ -245,7 +245,7 @@ Keyboard shortcuts:
 | `down` / `s` | Next slide |
 | `up` / `w` | Previous slide |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode in the current tab |
+| `p` | Open presenter mode in the current tab; on mobile, direct presenter URLs show an unsupported hint |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview or fullscreen |
 
@@ -260,9 +260,9 @@ URL state preserves slide and step position:
 /#/components    components tab
 ```
 
-On touch devices, swipe left/right for next/previous step and swipe up/down for next/previous slide. The navigation bar is always visible on touch devices.
+On touch devices, swipe left/right for next/previous step and swipe up/down for next/previous slide. The navigation bar is always visible on touch devices and hides the presenter-mode button on mobile.
 
-Presenter mode opens with `p` and includes:
+On `md` and wider screens, presenter mode opens with `p` and includes:
 
 - current slide and next slide preview
 - speaker notes from `<Notes>`

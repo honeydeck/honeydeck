@@ -96,6 +96,15 @@ importers:
       lucide-react:
         specifier: ^1.16.0
         version: 1.17.0(react@19.2.7)
+      mdast-util-mdx-jsx:
+        specifier: ^3.2.0
+        version: 3.2.0
+      mdast-util-mdxjs-esm:
+        specifier: ^2.0.1
+        version: 2.0.1
+      mdast-util-to-string:
+        specifier: ^4.0.0
+        version: 4.0.0
       pdf-lib:
         specifier: ^1.17.1
         version: 1.17.1
@@ -130,6 +139,12 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.15
         version: 2.4.15
+      '@types/estree':
+        specifier: ^1.0.9
+        version: 1.0.9
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^25.6.2
         version: 25.9.2

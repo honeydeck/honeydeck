@@ -126,7 +126,7 @@ Reference page routes intentionally do not encode slide or step. During one brow
 | `↓` / `s` | Next slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `↑` / `w` | Previous slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `o` | Toggle overview mode |
-| `p` | Open presenter mode (same tab) |
+| `p` | Open presenter mode (same tab); presenter mode is unsupported below Tailwind's `md` breakpoint and shows a mobile hint with a button back to the same audience slide/step |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview; in reference pages, return to slides; browser-native Escape handles fullscreen exit |
 
@@ -145,7 +145,7 @@ Shown in normal slide view only (not presenter/reference views).
   - Overview mode button
   - Layouts reference button (opens `/#/layouts` while preserving the current slide/step as the return target)
   - Docs website button (opens `https://honeydeck.dev` in a new tab)
-  - Presenter mode button
+  - Presenter mode button on `md` and wider screens
   - Fullscreen button
   - Mobile text selection toggle (off by default, enables selecting slide content when needed)
   - Color mode switch (system → light → dark → system)
@@ -231,9 +231,11 @@ transitionDuration: 200
 transitionEasing: ease
 ```
 
-Built-in transition names are `fade`, `none`, and `slide-left`. Any other string is exposed as a custom CSS hook on the participating slide layers. Legacy `transition: true` maps to `fade`, and `transition: false` maps to `none`.
+Built-in transition names are `fade`, `none`, `slide-left`, and `magic`. Any other string is exposed as a custom CSS hook on the participating slide layers. Legacy `transition: true` maps to `fade`, and `transition: false` maps to `none`.
 
 During slide navigation, Honeydeck keeps the outgoing and incoming slide layers mounted inside a scaled slide-sized clipping viewport, applies `honeydeck-slide-layer`, `honeydeck-transition-{name}`, and either `honeydeck-transition-enter` or `honeydeck-transition-exit` only to those two layers, then clears transition state after the configured duration. Transition visuals are clipped to the slide canvas area and must not animate into letterbox or pillarbox bars around the slide. If the next transition is `none` or navigation is interrupted, stale transition state is cleared/replaced so old slides do not remain visible. Outgoing layers are visible during the transition but have pointer events disabled. The built-in `fade` transition uses keyframes and, when a fade is interrupted, starts the next fade from the participating layers' current computed opacity so quick back-and-forth navigation stays close to the old opacity-transition behavior.
+
+The built-in `magic` transition is forward-only FLIP behavior for explicitly tagged elements. On forward navigation into a slide with `transition: magic`, Honeydeck measures only elements with `data-magic-id` in the outgoing and incoming slide DOM. Equal IDs move through fixed overlay clones; IDs present only on the outgoing slide fade out through clones; IDs present only on the incoming slide fade in through clones. Untagged slide content still crossfades as part of the slide layers. Honeydeck does not diff arbitrary DOM, text, or tag names, and equal text with different IDs must not match. During magic transitions, Honeydeck hides original tagged elements on both participating slides, copies computed styles recursively onto overlay clones, removes IDs from clones to avoid duplicate document IDs, and accounts for current slide scale when sizing and transforming clones. The magic overlay restores originals and removes itself when animations finish, when navigation interrupts the transition, or after a short timeout fallback. If clone or Web Animations API setup fails, Honeydeck leaves tagged originals visible and uses the layer crossfade. Backward navigation with `transition: magic` falls back to the layer crossfade without overlay matching.
 
 Participating slide layers receive CSS variables: `--honeydeck-transition-duration`, `--honeydeck-transition-easing`, and `--honeydeck-transition-direction` (`1` forward, `-1` backward). Built-in `slide-left` uses the direction variable so backward navigation reverses direction. Custom transition CSS can use the same variable for opt-in reverse awareness. Reduced-motion preferences disable slide transition animations.
 

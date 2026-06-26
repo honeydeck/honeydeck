@@ -38,7 +38,7 @@ Includes:
 - Color mode toggle that also updates audience views and cast receivers
 - Blank screen toggle (`b`) that makes audience and cast views black while presenter mode shows a `Screen blanked (b)` indicator
 - Button to cast the audience view to a secondary display when supported; the same control becomes a stop button while casting. Unsupported browsers show a visibly disabled-looking button with hover/accessible text explaining why casting is unavailable.
-- Navigation buttons that move through the timeline while staying in presenter mode on mobile. Desktop presenter mode uses keyboard shortcuts instead.
+- Desktop keyboard shortcuts that move through the timeline while staying in presenter mode.
 
 ## Speaker Notes
 
@@ -68,7 +68,7 @@ Content here.
 ## Opening Presenter Mode
 
 - Keyboard shortcut `p` from normal presentation → opens presenter mode in the current tab.
-- Navigation controls button in normal presentation.
+- Navigation controls button in normal presentation on `md` and wider screens.
 - Direct URL: `/#/presenter/1/0`
 
 Pressing `p` opens presenter mode in the **current tab**. In presenter mode, press `p` or `Escape` to return to the audience slide view at the same slide and step.
@@ -84,7 +84,7 @@ Presenter mode uses the same timeline keyboard shortcuts as normal slide view:
 | `↓` / `s` | Next slide |
 | `↑` / `w` | Previous slide |
 
-Keyboard navigation and presenter navigation buttons keep the URL under `/#/presenter/...`. Presenter controls use `lucide-react` icons imported from suffixed `...Icon` exports.
+Keyboard navigation keeps the URL under `/#/presenter/...`. Presenter controls use `lucide-react` icons imported from suffixed `...Icon` exports.
 
 The `Next` preview shows the next timeline state, not just the next slide. Reveals and code step-through highlights therefore preview exactly what the audience will see after the next forward navigation.
 
@@ -111,9 +111,4 @@ This supports the common laptop/projector setup.
 
 ## Mobile Presenter Mode
 
-On mobile, presenter mode shows:
-- Current slide
-- Notes
-- Navigation buttons
-
-No next slide preview (space constraint).
+Presenter mode is not supported below Tailwind's `md` breakpoint. The navigation bar hides the presenter-mode button on mobile. If someone opens a `/#/presenter/...` URL on mobile, Honeydeck shows a full-page hint and a **Go to slide** button that returns to the same slide and step in audience view.
