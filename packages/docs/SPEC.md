@@ -46,6 +46,7 @@ Documentation pages must use Fumadocs UI as much as practical:
 - The docs start page uses Fumadocs `HomeLayout` so it gets the shared lightweight home navbar instead of the heavier docs shell.
 - Package-local CTA controls use the shared docs `Button` component/variants for consistent button styling, including the home page CTAs and theme toggle.
 - Component docs may render package-local interactive playground components for Honeydeck primitives such as `Keyboard`, `ListStyle`, `BrowserFrame`, and `Notes`.
+- Interactive playground selectors that switch between example variants render as accessible tab controls, with a tablist, selected tab state, and keyboard arrow navigation instead of CTA-style button groups.
 - Search uses a custom Fumadocs search dialog backed by a static Orama index.
 - Markdown copy uses the Fumadocs copy page control.
 - The docs page Open popover is a package-local page control that only links to the page source on GitHub and the generated Markdown view; it must not include third-party AI provider shortcuts.

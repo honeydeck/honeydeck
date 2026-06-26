@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Button } from "@/components/Button";
+import { PlaygroundTabs } from "@/components/PlaygroundTabs";
 
 function Playground({
 	title,
@@ -64,20 +64,15 @@ export function KeyboardPlayground() {
 			code={`<Keyboard keys={${JSON.stringify(shortcut.keys)}} />`}
 		>
 			<div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
-				<div className="flex flex-wrap gap-2">
-					{shortcuts.map((item, index) => (
-						<Button
-							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
-							data-active={active === index}
-							key={item.label}
-							onClick={() => setActive(index)}
-							size="sm"
-							type="button"
-						>
-							{item.label}
-						</Button>
-					))}
-				</div>
+				<PlaygroundTabs
+					ariaLabel="Shortcut examples"
+					onValueChange={setActive}
+					options={shortcuts.map((item, index) => ({
+						label: item.label,
+						value: index,
+					}))}
+					value={active}
+				/>
 				<p className="text-2xl font-black leading-10">
 					Press <Keyboard keys={shortcut.keys} /> to open {shortcut.label}.
 				</p>
@@ -105,20 +100,15 @@ export function ListStylePlayground() {
 			code={`<ListStyle bullets={${mode.label === "Markerless" ? "false" : mode.label === "Arrows" ? '["→", "–", "·"]' : "[<CheckIcon />, <CircleIcon />]"}}>\n  <ul>...</ul>\n</ListStyle>`}
 		>
 			<div className="flex h-full flex-col gap-5 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
-				<div className="flex flex-wrap gap-2">
-					{modes.map((item, index) => (
-						<Button
-							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
-							data-active={active === index}
-							key={item.label}
-							onClick={() => setActive(index)}
-							size="sm"
-							type="button"
-						>
-							{item.label}
-						</Button>
-					))}
-				</div>
+				<PlaygroundTabs
+					ariaLabel="List style examples"
+					onValueChange={setActive}
+					options={modes.map((item, index) => ({
+						label: item.label,
+						value: index,
+					}))}
+					value={active}
+				/>
 				<ListStyle bullets={mode.bullets} className="text-lg leading-8">
 					<ul>
 						<li>Open with a clear story</li>
@@ -163,20 +153,15 @@ export function BrowserFramePlayground() {
 			code={`<BrowserFrame\n  src="about:blank"\n  addressBar="${page.address}"\n/>`}
 		>
 			<div className="flex h-full flex-col gap-4">
-				<div className="flex flex-wrap gap-2">
-					{pages.map((item, index) => (
-						<Button
-							className="border-[color:var(--honeydeck-color-border)] data-[active=true]:bg-[color:var(--honeydeck-color-primary)] data-[active=true]:text-[color:var(--honeydeck-color-primary-foreground)]"
-							data-active={active === index}
-							key={item.label}
-							onClick={() => setActive(index)}
-							size="sm"
-							type="button"
-						>
-							{item.label}
-						</Button>
-					))}
-				</div>
+				<PlaygroundTabs
+					ariaLabel="Browser preview examples"
+					onValueChange={setActive}
+					options={pages.map((item, index) => ({
+						label: item.label,
+						value: index,
+					}))}
+					value={active}
+				/>
 				<div className="h-72 text-[28px]">
 					<BrowserFrame
 						addressBar={page.address}
