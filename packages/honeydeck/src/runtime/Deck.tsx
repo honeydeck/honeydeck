@@ -376,12 +376,21 @@ export function Deck() {
 		}
 		if (previousRoute.slide === currentSlide) {
 			previousRouteRef.current = { slide: currentSlide, step: currentStep };
+			setSlideTransition((active) =>
+				active?.to === currentSlide && active.toStep !== currentStep
+					? null
+					: active,
+			);
 			return;
 		}
 
 		const previousSlide = previousRoute.slide;
 		const direction: 1 | -1 = currentSlide > previousSlide ? 1 : -1;
-		const options = getTransitionOptions(currentSlide - 1);
+		const rawOptions = getTransitionOptions(currentSlide - 1);
+		const options =
+			rawOptions.name === "magic" && direction === -1
+				? { ...rawOptions, name: "fade", className: "fade" }
+				: rawOptions;
 		previousRouteRef.current = { slide: currentSlide, step: currentStep };
 
 		if (options.name === "none" || options.duration === 0) {
@@ -407,15 +416,13 @@ export function Deck() {
 		};
 		setSlideTransition(nextTransition);
 
-		const cleanupDelay =
-			options.name === "magic" ? options.duration + 120 : options.duration;
 		const timeout = window.setTimeout(() => {
 			setSlideTransition((active) =>
 				active?.from === nextTransition.from && active.to === nextTransition.to
 					? null
 					: active,
 			);
-		}, cleanupDelay);
+		}, options.duration);
 
 		return () => window.clearTimeout(timeout);
 	}, [currentSlide, currentStep, reducedMotion, route.view]);

@@ -54,6 +54,94 @@ export function startMagicTransition({
 	overlay.style.overflow = "visible";
 	overlay.style.contain = "layout style paint";
 
+	let plans: MagicClonePlan[];
+	try {
+		plans = createMagicClonePlans(ids, fromElements, toElements, scale);
+	} catch {
+		overlay.remove();
+		return () => {};
+	}
+
+	if (plans.length === 0) return () => {};
+	if (typeof plans[0]?.wrapper.animate !== "function") return () => {};
+
+	const hiddenOriginals = hideOriginals(fromElements, toElements);
+	const animations: Animation[] = [];
+	let cleaned = false;
+	let timeout: number | null = null;
+
+	function cleanup() {
+		if (cleaned) return;
+		cleaned = true;
+		if (timeout !== null) {
+			window.clearTimeout(timeout);
+			timeout = null;
+		}
+		for (const animation of animations) {
+			if (animation.playState !== "finished") animation.cancel();
+		}
+		restoreOriginals(hiddenOriginals);
+		overlay.remove();
+	}
+
+	try {
+		document.body.appendChild(overlay);
+
+		for (const plan of plans) {
+			overlay.appendChild(plan.wrapper);
+			const offset = alignCloneToRect(plan.wrapper, plan.fromRect, scale);
+			applyCloneFrame(
+				plan.wrapper,
+				plan.fromRect,
+				plan.fromOpacity,
+				scale,
+				offset,
+			);
+			const animation = animateClone({
+				...plan,
+				duration,
+				easing,
+				scale,
+				offsetX: offset.x,
+				offsetY: offset.y,
+			});
+			if (!animation) throw new Error("Magic transition animation failed");
+			animations.push(animation);
+		}
+	} catch {
+		cleanup();
+		return () => {};
+	}
+
+	void Promise.allSettled(
+		animations.map((animation) => animation.finished),
+	).then(cleanup);
+	timeout = window.setTimeout(cleanup, duration + 50);
+
+	return cleanup;
+}
+
+function collectMagicElements(
+	root: HTMLElement,
+): Map<string, MagicElementSnapshot> {
+	const elements = new Map<string, MagicElementSnapshot>();
+	for (const element of root.querySelectorAll<HTMLElement>(MAGIC_SELECTOR)) {
+		const id = element.dataset.magicId?.trim();
+		if (!id || elements.has(id)) continue;
+
+		const rect = element.getBoundingClientRect();
+		if (rect.width <= 0 && rect.height <= 0) continue;
+		elements.set(id, { element, rect });
+	}
+	return elements;
+}
+
+function createMagicClonePlans(
+	ids: Set<string>,
+	fromElements: Map<string, MagicElementSnapshot>,
+	toElements: Map<string, MagicElementSnapshot>,
+	scale: number,
+): MagicClonePlan[] {
 	const plans: MagicClonePlan[] = [];
 	for (const id of ids) {
 		const from = fromElements.get(id);
@@ -90,57 +178,7 @@ export function startMagicTransition({
 			});
 		}
 	}
-
-	if (plans.length === 0) return () => {};
-
-	const hiddenOriginals = hideOriginals(fromElements, toElements);
-	const animations: Animation[] = [];
-	document.body.appendChild(overlay);
-
-	for (const plan of plans) {
-		overlay.appendChild(plan.wrapper);
-		const offset = alignCloneToRect(plan.wrapper, plan.fromRect, scale);
-		applyCloneFrame(
-			plan.wrapper,
-			plan.fromRect,
-			plan.fromOpacity,
-			scale,
-			offset,
-		);
-		animations.push(
-			animateClone({
-				...plan,
-				duration,
-				easing,
-				scale,
-				offsetX: offset.x,
-				offsetY: offset.y,
-			}),
-		);
-	}
-
-	return () => {
-		for (const animation of animations) {
-			animation.cancel();
-		}
-		restoreOriginals(hiddenOriginals);
-		overlay.remove();
-	};
-}
-
-function collectMagicElements(
-	root: HTMLElement,
-): Map<string, MagicElementSnapshot> {
-	const elements = new Map<string, MagicElementSnapshot>();
-	for (const element of root.querySelectorAll<HTMLElement>(MAGIC_SELECTOR)) {
-		const id = element.dataset.magicId?.trim();
-		if (!id || elements.has(id)) continue;
-
-		const rect = element.getBoundingClientRect();
-		if (rect.width <= 0 && rect.height <= 0) continue;
-		elements.set(id, { element, rect });
-	}
-	return elements;
+	return plans;
 }
 
 function hideOriginals(
@@ -193,6 +231,9 @@ function createMagicClone(
 	const sourceDisplay = window.getComputedStyle(source).display;
 	copyComputedStyles(source, clone);
 	clone.removeAttribute("id");
+	for (const descendant of clone.querySelectorAll("[id]")) {
+		descendant.removeAttribute("id");
+	}
 	clone.style.boxSizing = "border-box";
 	clone.style.transform = "none";
 	if (sourceDisplay === "inline") {
@@ -279,7 +320,7 @@ function animateClone({
 	scale: number;
 	offsetX: number;
 	offsetY: number;
-}): Animation {
+}): Animation | null {
 	const keyframes: Keyframe[] = [
 		{
 			width: `${fromRect.width / scale}px`,
@@ -295,6 +336,8 @@ function animateClone({
 		},
 	];
 
+	if (typeof wrapper.animate !== "function") return null;
+
 	try {
 		return wrapper.animate(keyframes, {
 			duration,
@@ -302,11 +345,15 @@ function animateClone({
 			fill: "both",
 		});
 	} catch {
-		return wrapper.animate(keyframes, {
-			duration,
-			easing: "ease",
-			fill: "both",
-		});
+		try {
+			return wrapper.animate(keyframes, {
+				duration,
+				easing: "ease",
+				fill: "both",
+			});
+		} catch {
+			return null;
+		}
 	}
 }
 
