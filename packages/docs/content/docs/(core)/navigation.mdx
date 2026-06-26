@@ -33,7 +33,7 @@ Boundary behavior:
 - Hidden by default for clean presentation.
 - Appears on cursor hover near bottom edge.
 - Positioned bottom-left.
-- Contains: current slide number, navigation arrows, overview button, presenter button, fullscreen button, color mode switch (system / dark / light).
+- Contains: current slide number, navigation arrows, overview button, presenter button on `md` and wider screens, fullscreen button, color mode switch (system / dark / light).
 - Built-in controls use `lucide-react` icons, imported from the suffixed `...Icon` exports (for example `ChevronLeftIcon`), not inline SVG paths or unsuffixed aliases.
 
 When `showSlideNumbers: true`, the current slide number is also shown as a single viewer overlay aligned to the bottom-right corner of the slide canvas. It is not part of individual slide content, so it does not animate during slide transitions. It renders as themed foreground text without a background container.
@@ -64,7 +64,7 @@ Mobile uses touch-specific controls. See the full [Mobile and Touch](/docs/mobil
   - Swipe down → previous slide
 - Pinch zoom enlarges slide content up to `5x`; dragging pans while zoomed.
 - Slide text selection is off by default on touch devices; the navigation bar includes a toggle to enable selection when needed.
-- Presenter mode on mobile shows only current slide, notes, and navigation buttons (no next slide preview).
+- Presenter mode is not supported on mobile. Direct presenter URLs show a full-page hint with a button back to the same slide and step in audience view.
 
 ## Overview Mode
 

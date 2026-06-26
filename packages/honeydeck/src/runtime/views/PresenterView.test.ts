@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -51,6 +52,22 @@ describe("<PresenterCastButton>", () => {
 		assert.match(html, /cursor-not-allowed/);
 		assert.doesNotMatch(html, /disabled=""/);
 		assert.doesNotMatch(html, /aria-live/);
+	});
+});
+
+describe("<PresenterView>", () => {
+	it("shows a mobile unsupported hint and keeps desktop layout md-gated", () => {
+		const source = readFileSync(
+			new URL("./PresenterView.tsx", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(source, /Presenter mode is not supported on mobile\./);
+		assert.match(source, />\s*Go to slide\s*</);
+		assert.match(source, /md:hidden/);
+		assert.match(source, /md:grid/);
+		assert.doesNotMatch(source, /usePresenterMobile/);
+		assert.doesNotMatch(source, /useSwipeNav/);
 	});
 });
 

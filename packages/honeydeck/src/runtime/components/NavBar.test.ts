@@ -34,6 +34,16 @@ describe("<NavBar>", () => {
 		}
 	});
 
+	it("hides presenter mode on mobile", () => {
+		const source = readFileSync(
+			new URL("./NavBar.tsx", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(source, /label="Presenter mode \(p\)"/);
+		assert.match(source, /hidden md:block/);
+	});
+
 	it("keeps the floating controls bounded and wrappable on narrow screens", () => {
 		const source = readFileSync(
 			new URL("./NavBar.tsx", import.meta.url),
