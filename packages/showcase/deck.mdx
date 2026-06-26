@@ -805,6 +805,75 @@ transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
 - Honeydeck exposes `--honeydeck-transition-direction` for reverse-aware CSS.
 
 ---
+
+# Magic Transition · Source ✨
+
+Tagged elements are the only things Honeydeck matches:
+
+<div className="mt-8 grid grid-cols-[1.1fr_0.9fr] gap-8 items-center">
+  <div className="space-y-5">
+    <p className="text-5xl font-black">
+      Before: <span data-magic-id="magic-world" className="rounded-xl bg-primary px-4 py-2 text-primary-foreground">World</span>
+    </p>
+    <p className="text-2xl text-surface-foreground/75">Untagged copy fades with the slide layer.</p>
+    <p><span data-magic-id="same-text-before" className="rounded-lg border border-border px-4 py-2">Same text</span> has a different ID later.</p>
+  </div>
+  <div data-magic-id="magic-card" className="rounded-3xl border border-border bg-surface p-8 shadow-xl">
+    <div className="text-sm uppercase tracking-[0.25em] text-surface-foreground/60">shared id</div>
+    <div className="mt-3 text-4xl font-black">Card moves</div>
+  </div>
+</div>
+
+<div data-magic-id="magic-old-only" className="mt-8 inline-flex rounded-full bg-amber-400 px-5 py-2 font-bold text-black">Previous-only fades out</div>
+
+---
+transition: magic
+transitionDuration: 700
+transitionEasing: ease-in-out
+---
+
+# Magic Transition · Move + Fades 🪄
+
+<div className="mt-8 grid grid-cols-[0.85fr_1.15fr] gap-8 items-center">
+  <div data-magic-id="magic-card" className="rounded-3xl border border-primary bg-primary/12 p-10 shadow-2xl">
+    <div className="text-sm uppercase tracking-[0.25em] text-primary">same id</div>
+    <div className="mt-3 text-5xl font-black">Card moved</div>
+  </div>
+  <div className="space-y-5 text-right">
+    <p className="text-5xl font-black">
+      After: <span data-magic-id="magic-world" className="rounded-xl bg-primary px-4 py-2 text-primary-foreground">World</span>
+    </p>
+    <p className="text-2xl text-surface-foreground/75">This untagged line fades in.</p>
+    <p><span data-magic-id="same-text-after" className="rounded-lg border border-border px-4 py-2">Same text</span> does not match the previous ID.</p>
+  </div>
+</div>
+
+<div data-magic-id="magic-new-only" className="mt-8 inline-flex rounded-full bg-emerald-400 px-5 py-2 font-bold text-black">Incoming-only fades in</div>
+
+---
+transition: magic
+transitionDuration: 800
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Magic Transition · Inline + Resize
+
+<p className="max-w-4xl text-5xl font-black leading-tight">
+  Inline tags work too: <span data-magic-id="magic-world" className="rounded-xl bg-primary px-4 py-2 text-primary-foreground">World</span> moves inside text.
+</p>
+
+<div className="mt-10 flex items-end justify-between gap-8">
+  <div className="max-w-xl space-y-4">
+    <p className="text-2xl text-surface-foreground/75">Overlay clones copy computed styles, so colors, font weight, and line height stay stable while slide content crossfades behind them.</p>
+    <div data-magic-id="magic-inline-new" className="inline-flex rounded-full border border-border bg-surface px-5 py-2 font-bold">New inline pill fades in</div>
+  </div>
+  <div data-magic-id="magic-card" className="w-[620px] rounded-3xl border border-primary bg-surface p-10 shadow-2xl">
+    <div className="text-sm uppercase tracking-[0.25em] text-primary">same card id</div>
+    <div className="mt-3 text-6xl font-black">Resized</div>
+  </div>
+</div>
+
+---
 transition: honey-spin
 transitionDuration: 700
 transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)

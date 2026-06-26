@@ -29,6 +29,7 @@ Built-in transition names:
 - `fade` — default crossfade
 - `none` — no slide transition
 - `slide-left` — horizontal slide, reverse-aware when navigating backward
+- `magic` — explicit `data-magic-id` element movement with FLIP overlay clones
 
 ## Slide overrides
 
@@ -45,6 +46,38 @@ transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
 ```
 
 Slides without transition frontmatter use the deck defaults.
+
+## Magic transition
+
+`transition: magic` moves only elements you explicitly tag with matching `data-magic-id` values. Honeydeck keeps the outgoing and incoming slides mounted, measures tagged elements at runtime, hides the original tagged elements, animates fixed-position overlay clones, then restores the real slide DOM after the transition.
+
+```mdx
+# Before
+
+<span data-magic-id="world">World</span>
+
+---
+transition: magic
+transitionDuration: 600
+transitionEasing: ease-in-out
+---
+
+# After
+
+Hello <span data-magic-id="world">World</span>
+```
+
+Matching rules:
+
+- Same `data-magic-id` on both slides → the element moves.
+- ID only on the previous slide → the element fades out.
+- ID only on the incoming slide → the element fades in.
+- Untagged content crossfades with the slide layers.
+- Different IDs never match, even when the text is identical.
+
+Magic is forward-only. When navigating backward into a slide that uses `transition: magic`, Honeydeck falls back to the layer crossfade instead of guessing a reverse morph.
+
+Honeydeck does not perform automatic DOM diffing or text/tag heuristics. Layout chrome such as the navigation bar and global slide numbers is outside slide content and switches immediately unless you explicitly tag slide content yourself.
 
 ## Custom transitions
 
