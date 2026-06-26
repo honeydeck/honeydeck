@@ -6,3 +6,41 @@
 [data-honeydeck-color-mode="dark"] img {
 	opacity: 0.9;
 }
+
+.honeydeck-slide-layer.honeydeck-transition-honey-spin.honeydeck-transition-enter {
+	animation-name: showcase-honey-spin-enter;
+	animation-duration: var(--honeydeck-transition-duration);
+	animation-timing-function: var(--honeydeck-transition-easing);
+	animation-fill-mode: both;
+}
+
+.honeydeck-slide-layer.honeydeck-transition-honey-spin.honeydeck-transition-exit {
+	animation-name: showcase-honey-spin-exit;
+	animation-duration: var(--honeydeck-transition-duration);
+	animation-timing-function: var(--honeydeck-transition-easing);
+	animation-fill-mode: both;
+}
+
+@keyframes showcase-honey-spin-enter {
+	from {
+		opacity: 0;
+		transform: translateY(16%) rotate(-4deg) scale(0.94);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) rotate(0) scale(1);
+	}
+}
+
+@keyframes showcase-honey-spin-exit {
+	from {
+		opacity: 1;
+		transform: translateY(0) rotate(0) scale(1);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(-8%) rotate(3deg) scale(0.98);
+	}
+}

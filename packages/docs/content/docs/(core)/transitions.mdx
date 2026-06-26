@@ -1,0 +1,130 @@
+---
+title: "Transitions"
+description: "Configure built-in and custom slide transitions in Honeydeck."
+slug: "transitions"
+---
+
+# Transitions
+
+Honeydeck uses named slide transitions. Set a deck-wide default in the first frontmatter block, then override individual slides when needed.
+
+## Deck defaults
+
+```yaml
+---
+transition: fade
+transitionDuration: 200
+transitionEasing: ease
+---
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `transition` | `string \| boolean` | `fade` | Named transition for slide changes |
+| `transitionDuration` | `number` | `200` | Duration in milliseconds |
+| `transitionEasing` | `string` | `ease` | CSS timing function |
+
+Built-in transition names:
+
+- `fade` — default crossfade
+- `none` — no slide transition
+- `slide-left` — horizontal slide, reverse-aware when navigating backward
+
+## Slide overrides
+
+Slide frontmatter controls the transition **into that slide**:
+
+```mdx
+---
+transition: slide-left
+transitionDuration: 500
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# A slide with a custom entrance
+```
+
+Slides without transition frontmatter use the deck defaults.
+
+## Custom transitions
+
+Any transition name that is not built in becomes a CSS hook. For example:
+
+```mdx
+---
+transition: honey-spin
+transitionDuration: 700
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Custom CSS Transition
+```
+
+Honeydeck adds classes to only the entering and exiting slide layers:
+
+```html
+<div class="honeydeck-slide-layer honeydeck-transition-honey-spin honeydeck-transition-enter">
+```
+
+```html
+<div class="honeydeck-slide-layer honeydeck-transition-honey-spin honeydeck-transition-exit">
+```
+
+Scope your CSS to both the transition name and enter/exit class:
+
+```css
+.honeydeck-slide-layer.honeydeck-transition-honey-spin.honeydeck-transition-enter {
+  animation-name: honey-spin-enter;
+  animation-duration: var(--honeydeck-transition-duration);
+  animation-timing-function: var(--honeydeck-transition-easing);
+  animation-fill-mode: both;
+}
+
+.honeydeck-slide-layer.honeydeck-transition-honey-spin.honeydeck-transition-exit {
+  animation-name: honey-spin-exit;
+  animation-duration: var(--honeydeck-transition-duration);
+  animation-timing-function: var(--honeydeck-transition-easing);
+  animation-fill-mode: both;
+}
+```
+
+## Reverse-aware CSS
+
+Honeydeck provides a direction variable:
+
+```css
+--honeydeck-transition-direction: 1;  /* forward */
+--honeydeck-transition-direction: -1; /* backward */
+```
+
+Use it in transform math when your custom transition should reverse with navigation direction:
+
+```css
+@keyframes custom-enter {
+  from {
+    opacity: 0;
+    transform: translateX(calc(40% * var(--honeydeck-transition-direction)));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes custom-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(-20% * var(--honeydeck-transition-direction)));
+  }
+}
+```
+
+Honeydeck cannot safely invert arbitrary custom keyframes automatically, so reverse behavior is opt-in through CSS variables.
+
+## Reduced motion
+
+If the viewer has `prefers-reduced-motion: reduce`, Honeydeck disables slide transition animations.

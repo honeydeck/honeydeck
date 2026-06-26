@@ -223,11 +223,19 @@ Build output is a single-page application. The app preserves client-side slide t
 
 ### Slide Transitions
 
-Honeydeck includes a single subtle crossfade (~200ms) between slides. Disabled with:
+Honeydeck uses a named slide transition system. Deck-level frontmatter sets defaults, and slide-level frontmatter overrides the transition **into that slide**:
 
 ```yaml
-transition: false
+transition: fade
+transitionDuration: 200
+transitionEasing: ease
 ```
+
+Built-in transition names are `fade`, `none`, and `slide-left`. Any other string is exposed as a custom CSS hook on the participating slide layers. Legacy `transition: true` maps to `fade`, and `transition: false` maps to `none`.
+
+During slide navigation, Honeydeck keeps the outgoing and incoming slide layers mounted inside a scaled slide-sized clipping viewport, applies `honeydeck-slide-layer`, `honeydeck-transition-{name}`, and either `honeydeck-transition-enter` or `honeydeck-transition-exit` only to those two layers, then clears transition state after the configured duration. Transition visuals are clipped to the slide canvas area and must not animate into letterbox or pillarbox bars around the slide. If the next transition is `none` or navigation is interrupted, stale transition state is cleared/replaced so old slides do not remain visible. Outgoing layers are visible during the transition but have pointer events disabled. The built-in `fade` transition uses keyframes and, when a fade is interrupted, starts the next fade from the participating layers' current computed opacity so quick back-and-forth navigation stays close to the old opacity-transition behavior.
+
+Participating slide layers receive CSS variables: `--honeydeck-transition-duration`, `--honeydeck-transition-easing`, and `--honeydeck-transition-direction` (`1` forward, `-1` backward). Built-in `slide-left` uses the direction variable so backward navigation reverses direction. Custom transition CSS can use the same variable for opt-in reverse awareness. Reduced-motion preferences disable slide transition animations.
 
 ### Aspect Ratio
 

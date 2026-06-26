@@ -531,6 +531,91 @@
 	font-size: var(--honeydeck-font-size-code);
 }
 
+/* ── Slide transitions ───────────────────────────────────────────────────── */
+
+.honeydeck-slide-layer.honeydeck-transition-fade.honeydeck-transition-enter {
+	animation-name: honeydeck-transition-fade-enter;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+.honeydeck-slide-layer.honeydeck-transition-fade.honeydeck-transition-exit {
+	animation-name: honeydeck-transition-fade-exit;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+@keyframes honeydeck-transition-fade-enter {
+	from {
+		opacity: var(--honeydeck-transition-enter-from-opacity, 0);
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes honeydeck-transition-fade-exit {
+	from {
+		opacity: var(--honeydeck-transition-exit-from-opacity, 1);
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+.honeydeck-slide-layer.honeydeck-transition-slide-left.honeydeck-transition-enter {
+	animation-name: honeydeck-transition-slide-left-enter;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+.honeydeck-slide-layer.honeydeck-transition-slide-left.honeydeck-transition-exit {
+	animation-name: honeydeck-transition-slide-left-exit;
+	animation-duration: var(--honeydeck-transition-duration, 200ms);
+	animation-timing-function: var(--honeydeck-transition-easing, ease);
+	animation-fill-mode: both;
+}
+
+@keyframes honeydeck-transition-slide-left-enter {
+	from {
+		opacity: 1;
+		transform: translateX(
+			calc(100% * var(--honeydeck-transition-direction, 1))
+		);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes honeydeck-transition-slide-left-exit {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(
+			calc(-100% * var(--honeydeck-transition-direction, 1))
+		);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.honeydeck-slide-layer.honeydeck-transition-enter,
+	.honeydeck-slide-layer.honeydeck-transition-exit {
+		animation: none;
+	}
+}
+
 /* ── Documentation Markdown typography ──────────────────────────────────────
    Rendered README/docs pages use plain MDX elements. Keep their typography
    here instead of in DocsView so the React view stays structural.             */

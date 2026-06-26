@@ -46,9 +46,14 @@ describe("init templates", () => {
 		assert.doesNotMatch(source, /Honeydeck Starter/);
 	});
 
-	it("documents the default layout and theme swap options", () => {
+	it("documents the default layout, transitions, and theme swap options", () => {
 		const styles = generateStylesCss();
 
+		assert.match(source, /transition: fade/);
+		assert.match(source, /transitionDuration: 200/);
+		assert.match(source, /transitionEasing: ease/);
+		assert.match(source, /transition: slide-left/);
+		assert.match(source, /transition: none/);
 		assert.match(source, /layouts: "@honeydeck\/honeydeck\/layouts"/);
 		assert.match(source, /layouts: "\.\/layouts"/);
 		assert.match(source, /layouts: "@honeydeck\/honeydeck\/layouts\/bee"/);

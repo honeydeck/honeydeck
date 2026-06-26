@@ -9,7 +9,9 @@ date: 2026
 aspectRatio: "16:9"
 colorMode: system
 pdfSteps: all
-transition: true
+transition: fade
+transitionDuration: 200
+transitionEasing: ease-in-out
 showSlideNumbers: true
 ---
 
@@ -58,7 +60,9 @@ defaultLayout: Default
 aspectRatio: "16:9"
 colorMode: system
 pdfSteps: all
-transition: true
+transition: fade
+transitionDuration: 200
+transitionEasing: ease
 showSlideNumbers: true
 ---
 ```
@@ -777,6 +781,46 @@ Honeydeck uses hash routes:
 - [Docs](https://honeydeck.dev)
 
 Shared URLs restore slide number and step index.
+
+---
+transition: slide-left
+transitionDuration: 500
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Built-in Slide Transitions
+
+This slide uses the `slide-left` transition.
+
+```yaml
+---
+transition: slide-left
+transitionDuration: 500
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+```
+
+- Forward: incoming slide enters from the right.
+- Backward: incoming slide enters from the left.
+- Honeydeck exposes `--honeydeck-transition-direction` for reverse-aware CSS.
+
+---
+transition: honey-spin
+transitionDuration: 700
+transitionEasing: cubic-bezier(0.22, 1, 0.36, 1)
+---
+
+# Custom CSS Transition 🍯
+
+This slide uses a custom transition named `honey-spin`.
+
+```css
+.honeydeck-transition-honey-spin.honeydeck-transition-enter {
+  animation-name: showcase-honey-spin-enter;
+}
+```
+
+Custom transitions are normal CSS hooks on the incoming and outgoing slide layers.
 
 ---
 

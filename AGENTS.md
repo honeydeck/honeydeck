@@ -30,7 +30,8 @@ When changing behavior:
 1. Research the codebase.
 2. Update the owning colocated `SPEC.md` first.
 3. Implement code/tests/docs.
-4. Run the relevant workspace quality gates.
+4. If the behavior is user-facing, update the canonical reader-facing docs in `packages/docs/content/docs` and the relevant docs `meta.json` navigation when adding a page.
+5. Run the relevant workspace quality gates.
 
 ## Common commands
 
