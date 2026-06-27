@@ -9,7 +9,7 @@ slug: "timeline-steps"
 Use `<TimelineSteps>` when an imported React component should control part of a slide timeline.
 
 ```mdx
-import { Reveal, TimelineSteps } from '@honeydeck/honeydeck'
+import { Reveal, TimelineSteps } from '@honeydeck/runtime'
 import { AccordionDemo } from './AccordionDemo'
 
 <Reveal>Before the custom component</Reveal>
@@ -24,7 +24,7 @@ import { AccordionDemo } from './AccordionDemo'
 Inside the custom component, read local step state with `useTimelineSteps()`:
 
 ```tsx
-import { useTimelineSteps } from '@honeydeck/honeydeck'
+import { useTimelineSteps } from '@honeydeck/runtime'
 
 export function AccordionDemo() {
   const { phase, stepIndex, stepCount, isPdfFinalRender } = useTimelineSteps()

@@ -1,0 +1,107 @@
+{
+	"name": "@honeydeck/runtime",
+	"version": "0.11.2",
+	"description": "Honeydeck runtime, app shell, layouts, components, and themes.",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/honeydeck/honeydeck.git"
+	},
+	"homepage": "https://honeydeck.dev",
+	"bugs": {
+		"url": "https://github.com/honeydeck/honeydeck/issues"
+	},
+	"keywords": [
+		"presentations",
+		"slides",
+		"mdx",
+		"react",
+		"vite",
+		"tailwindcss"
+	],
+	"type": "module",
+	"engines": {
+		"node": ">=22.18.0"
+	},
+	"files": [
+		"src",
+		"!src/**/*.test.ts",
+		"!src/**/*.test.tsx",
+		"!src/**/fixtures",
+		"!src/**/fixtures/**",
+		"SPEC.md"
+	],
+	"exports": {
+		".": "./src/runtime/index.ts",
+		"./app-shell": "./src/runtime/app-shell/main.tsx",
+		"./types": "./src/runtime/types.ts",
+		"./aspectRatio": "./src/runtime/aspectRatio.ts",
+		"./layouts": "./src/layouts/index.ts",
+		"./layouts/ColorModeImage": "./src/layouts/ColorModeImage.tsx",
+		"./layouts/Blank": "./src/layouts/clean/Blank.tsx",
+		"./layouts/Default": "./src/layouts/clean/Default.tsx",
+		"./layouts/Cover": "./src/layouts/clean/Cover.tsx",
+		"./layouts/Section": "./src/layouts/clean/Section.tsx",
+		"./layouts/TwoCol": "./src/layouts/clean/TwoCol.tsx",
+		"./layouts/Image": "./src/layouts/clean/Image/Image.tsx",
+		"./layouts/ImageLeft": "./src/layouts/clean/ImageLeft.tsx",
+		"./layouts/ImageRight": "./src/layouts/clean/ImageRight.tsx",
+		"./layouts/placeholders": "./src/layouts/placeholders.ts",
+		"./layouts/bee": "./src/layouts/bee/index.ts",
+		"./layouts/bee/Blank": "./src/layouts/bee/Blank.tsx",
+		"./layouts/bee/Default": "./src/layouts/bee/Default.tsx",
+		"./layouts/bee/Cover": "./src/layouts/bee/Cover.tsx",
+		"./layouts/bee/Section": "./src/layouts/bee/Section.tsx",
+		"./layouts/bee/TwoCol": "./src/layouts/bee/TwoCol.tsx",
+		"./layouts/bee/Image": "./src/layouts/bee/Image/Image.tsx",
+		"./layouts/bee/ImageLeft": "./src/layouts/bee/ImageLeft.tsx",
+		"./layouts/bee/ImageRight": "./src/layouts/bee/ImageRight.tsx",
+		"./layouts/clean": "./src/layouts/clean/index.ts",
+		"./layouts/clean/Blank": "./src/layouts/clean/Blank.tsx",
+		"./layouts/clean/Default": "./src/layouts/clean/Default.tsx",
+		"./layouts/clean/Cover": "./src/layouts/clean/Cover.tsx",
+		"./layouts/clean/Section": "./src/layouts/clean/Section.tsx",
+		"./layouts/clean/TwoCol": "./src/layouts/clean/TwoCol.tsx",
+		"./layouts/clean/Image": "./src/layouts/clean/Image/Image.tsx",
+		"./layouts/clean/ImageLeft": "./src/layouts/clean/ImageLeft.tsx",
+		"./layouts/clean/ImageRight": "./src/layouts/clean/ImageRight.tsx",
+		"./theme.css": "./src/theme/base.css",
+		"./themes/base.css": "./src/theme/base.css",
+		"./themes/clean.css": "./src/theme/clean.css",
+		"./themes/bee.css": "./src/theme/bee.css",
+		"./components": "./src/runtime/components/index.ts",
+		"./components/code-block": "./src/runtime/components/CodeBlock.tsx",
+		"./components/code-block/normal": "./src/runtime/components/NormalCodeBlock.tsx",
+		"./components/code-block/magic": "./src/runtime/components/MagicCodeBlock.tsx"
+	},
+	"scripts": {
+		"format": "biome check --write",
+		"lint": "biome check",
+		"pack:dry-run": "npm pack --dry-run",
+		"test": "node --test --import tsx \"src/**/*.test.ts\" \"src/**/*.test.tsx\"",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@shikijs/magic-move": "^4.2.0",
+		"lucide-react": "^1.16.0"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"tailwindcss": "^4.0.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.15",
+		"@types/node": "^25.6.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"tailwindcss": "^4.3.0",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
+	}
+}

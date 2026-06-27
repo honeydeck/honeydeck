@@ -3,6 +3,11 @@
 	"compilerOptions": {
 		"rootDir": "."
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/**/*.d.ts",
+		"../runtime/src/**/*.d.ts"
+	],
 	"exclude": ["dist", "node_modules"]
 }

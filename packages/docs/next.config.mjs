@@ -6,7 +6,7 @@ const withMDX = createMDX();
 const config = {
 	reactStrictMode: true,
 	devIndicators: false,
-	transpilePackages: ["@honeydeck/honeydeck"],
+	transpilePackages: ["@honeydeck/runtime"],
 };
 
 export default withMDX(config);

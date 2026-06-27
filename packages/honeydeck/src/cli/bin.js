@@ -2,4 +2,4 @@
 import { register } from "tsx/esm/api";
 
 register();
-await import("./index.ts");
+await import("@honeydeck/cli/cli");

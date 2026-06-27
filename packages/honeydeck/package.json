@@ -1,7 +1,7 @@
 {
 	"name": "@honeydeck/honeydeck",
 	"version": "0.11.2",
-	"description": "MDX and React-based presentation framework for AI-friendly slide decks.",
+	"description": "Compatibility facade for Honeydeck runtime and CLI.",
 	"license": "MIT",
 	"publishConfig": {
 		"access": "public"
@@ -31,10 +31,6 @@
 	},
 	"files": [
 		"src",
-		"!src/**/*.test.ts",
-		"!src/**/*.test.tsx",
-		"!src/**/fixtures",
-		"!src/**/fixtures/**",
 		"skills",
 		"docs",
 		"Readme.md",
@@ -43,19 +39,19 @@
 		"AGENTS.md"
 	],
 	"exports": {
-		".": "./src/runtime/index.ts",
-		"./app-shell": "./src/runtime/app-shell/main.tsx",
-		"./types": "./src/runtime/types.ts",
-		"./layouts": "./src/layouts/index.ts",
+		".": "./src/runtime-compat.ts",
+		"./app-shell": "./src/app-shell-compat.ts",
+		"./types": "./src/types-compat.ts",
+		"./layouts": "./src/layouts-compat.ts",
 		"./layouts/ColorModeImage": "./src/layouts/ColorModeImage.tsx",
-		"./layouts/Blank": "./src/layouts/clean/Blank.tsx",
-		"./layouts/Default": "./src/layouts/clean/Default.tsx",
-		"./layouts/Cover": "./src/layouts/clean/Cover.tsx",
-		"./layouts/Section": "./src/layouts/clean/Section.tsx",
-		"./layouts/TwoCol": "./src/layouts/clean/TwoCol.tsx",
-		"./layouts/Image": "./src/layouts/clean/Image/Image.tsx",
-		"./layouts/ImageLeft": "./src/layouts/clean/ImageLeft.tsx",
-		"./layouts/ImageRight": "./src/layouts/clean/ImageRight.tsx",
+		"./layouts/Blank": "./src/layouts/Blank.tsx",
+		"./layouts/Default": "./src/layouts/Default.tsx",
+		"./layouts/Cover": "./src/layouts/Cover.tsx",
+		"./layouts/Section": "./src/layouts/Section.tsx",
+		"./layouts/TwoCol": "./src/layouts/TwoCol.tsx",
+		"./layouts/Image": "./src/layouts/Image.tsx",
+		"./layouts/ImageLeft": "./src/layouts/ImageLeft.tsx",
+		"./layouts/ImageRight": "./src/layouts/ImageRight.tsx",
 		"./layouts/placeholders": "./src/layouts/placeholders.ts",
 		"./layouts/bee": "./src/layouts/bee/index.ts",
 		"./layouts/bee/Blank": "./src/layouts/bee/Blank.tsx",
@@ -63,7 +59,7 @@
 		"./layouts/bee/Cover": "./src/layouts/bee/Cover.tsx",
 		"./layouts/bee/Section": "./src/layouts/bee/Section.tsx",
 		"./layouts/bee/TwoCol": "./src/layouts/bee/TwoCol.tsx",
-		"./layouts/bee/Image": "./src/layouts/bee/Image/Image.tsx",
+		"./layouts/bee/Image": "./src/layouts/bee/Image.tsx",
 		"./layouts/bee/ImageLeft": "./src/layouts/bee/ImageLeft.tsx",
 		"./layouts/bee/ImageRight": "./src/layouts/bee/ImageRight.tsx",
 		"./layouts/clean": "./src/layouts/clean/index.ts",
@@ -72,28 +68,21 @@
 		"./layouts/clean/Cover": "./src/layouts/clean/Cover.tsx",
 		"./layouts/clean/Section": "./src/layouts/clean/Section.tsx",
 		"./layouts/clean/TwoCol": "./src/layouts/clean/TwoCol.tsx",
-		"./layouts/clean/Image": "./src/layouts/clean/Image/Image.tsx",
+		"./layouts/clean/Image": "./src/layouts/clean/Image.tsx",
 		"./layouts/clean/ImageLeft": "./src/layouts/clean/ImageLeft.tsx",
 		"./layouts/clean/ImageRight": "./src/layouts/clean/ImageRight.tsx",
-		"./theme.css": "./src/theme/base.css",
-		"./themes/base.css": "./src/theme/base.css",
-		"./themes/clean.css": "./src/theme/clean.css",
-		"./themes/bee.css": "./src/theme/bee.css",
-		"./components": "./src/runtime/components/index.ts",
-		"./components/code-block": "./src/runtime/components/CodeBlock.tsx",
-		"./components/code-block/normal": "./src/runtime/components/NormalCodeBlock.tsx",
-		"./components/code-block/magic": "./src/runtime/components/MagicCodeBlock.tsx",
-		"./remark/shiki-code-blocks": "./src/remark/shiki-code-blocks.ts"
-	},
-	"imports": {
-		"#cli/*": "./src/cli/*",
-		"#runtime/*": "./src/runtime/*",
-		"#remark/*": "./src/remark/*",
-		"#vite-plugin/*": "./src/vite-plugin/*"
+		"./theme.css": "./src/theme.css",
+		"./themes/base.css": "./src/themes/base.css",
+		"./themes/clean.css": "./src/themes/clean.css",
+		"./themes/bee.css": "./src/themes/bee.css",
+		"./components": "./src/components-compat.ts",
+		"./components/code-block": "./src/components/code-block.ts",
+		"./components/code-block/normal": "./src/components/code-block-normal.ts",
+		"./components/code-block/magic": "./src/components/code-block-magic.ts",
+		"./remark/shiki-code-blocks": "./src/remark/shiki-code-blocks.ts",
+		"./vite-plugin": "./src/vite-plugin.ts"
 	},
 	"scripts": {
-		"dev": "node --import tsx ./src/cli/index.ts dev --deck src/cli/templates/starter/deck.mdx",
-		"dev:init": "node --import tsx ./src/cli/index.ts dev --deck src/cli/templates/starter/deck.mdx",
 		"format": "biome check --write",
 		"lint": "biome check",
 		"prepack": "npm -w @honeydeck/docs run export:package-docs",
@@ -104,22 +93,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@clack/prompts": "^1.3.0",
-		"@mdx-js/mdx": "^3.1.1",
-		"@mdx-js/rollup": "^3.1.1",
-		"@shikijs/magic-move": "^4.2.0",
-		"@tailwindcss/vite": "^4.3.0",
-		"lucide-react": "^1.16.0",
-		"pdf-lib": "^1.17.1",
-		"playwright": "^1.59.1",
-		"remark-frontmatter": "^5.0.0",
-		"remark-gfm": "^4.0.1",
-		"shiki": "^4.0.2",
-		"tsx": "^4.21.0",
-		"typescript": "^6.0.3",
-		"unified": "^11.0.5",
-		"unist-util-visit": "^5.1.0",
-		"vite": "^8.0.11"
+		"@honeydeck/runtime": "0.11.2",
+		"@honeydeck/cli": "0.11.2"
 	},
 	"peerDependencies": {
 		"react": "^19.0.0",
@@ -129,10 +104,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.4.15",
 		"@types/node": "^25.6.2",
-		"@types/react": "^19.2.14",
-		"@types/react-dom": "^19.2.3",
-		"react": "^19.2.6",
-		"react-dom": "^19.2.6",
-		"tailwindcss": "^4.3.0"
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
 	}
 }

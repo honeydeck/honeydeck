@@ -3,6 +3,8 @@
 	"private": true,
 	"type": "module",
 	"workspaces": [
+		"packages/runtime",
+		"packages/cli",
 		"packages/honeydeck",
 		"packages/docs",
 		"packages/showcase",
@@ -25,5 +27,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.15"
+	},
+	"optionalDependencies": {
+		"@rolldown/binding-linux-x64-gnu": "^1.0.3",
+		"@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
+		"lightningcss-linux-x64-gnu": "^1.32.0"
 	}
 }

@@ -7,7 +7,7 @@ Honeydeck helps you create polished, interactive presentations from plain-text M
 ## Quick start
 
 ```bash
-npx @honeydeck/honeydeck init --name awesome-talk
+npx @honeydeck/cli init --name awesome-talk
 cd awesome-talk
 npm run dev
 ```

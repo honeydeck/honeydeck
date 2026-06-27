@@ -16,11 +16,11 @@ showSlideNumbers: true
 ---
 
 import './styles.css'
-import { BrowserFrame, ColorModeImage, Fade, FadeGroup, FadeWith, Keyboard, ListStyle, Notes, Reveal, RevealGroup, RevealWith, TimelineSteps } from '@honeydeck/honeydeck'
+import { BrowserFrame, ColorModeImage, Fade, FadeGroup, FadeWith, Keyboard, ListStyle, Notes, Reveal, RevealGroup, RevealWith, TimelineSteps } from '@honeydeck/runtime'
 import { CheckIcon, CircleIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react'
 import { TimelineAccordion } from './TimelineAccordion.tsx'
-import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
-import { imagePlaceholder, imagePlaceholderDark, verticalImagePlaceholder, verticalImagePlaceholderDark } from '@honeydeck/honeydeck/layouts/placeholders'
+import { Left, Right } from '@honeydeck/runtime/layouts/bee/TwoCol'
+import { imagePlaceholder, imagePlaceholderDark, verticalImagePlaceholder, verticalImagePlaceholderDark } from '@honeydeck/runtime/layouts/placeholders'
 import ImportedSlides from './imported-slides.mdx'
 
 # Honeydeck Feature Showcase 🐝
@@ -220,7 +220,7 @@ layout: TwoCol
 ## Left slot
 
 ```mdx
-import { Left } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
+import { Left } from '@honeydeck/runtime/layouts/bee/TwoCol'
 ```
 
 - Direct MDX children become grid columns.
@@ -233,7 +233,7 @@ import { Left } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
 ## Right slot
 
 ```mdx
-import { Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
+import { Right } from '@honeydeck/runtime/layouts/bee/TwoCol'
 ```
 
 - Great for comparisons.
@@ -330,8 +330,8 @@ Showcase CSS imports Tailwind plus Honeydeck theme layers:
 
 ```css
 @import "tailwindcss";
-@import "@honeydeck/honeydeck/theme.css";
-@import "@honeydeck/honeydeck/themes/bee.css";
+@import "@honeydeck/runtime/theme.css";
+@import "@honeydeck/runtime/themes/bee.css";
 ```
 
 Honeydeck never auto-injects theme CSS. Authors choose imports explicitly.
@@ -534,7 +534,7 @@ Open presenter mode with <Keyboard>p</Keyboard> to see notes.
 
 Open the [components reference](#/components).
 
-- Generated from public exports in `@honeydeck/honeydeck/components`.
+- Generated from public exports in `@honeydeck/runtime/components`.
 - Pulls docs from component JSDoc.
 - Shows prop tables and MDX usage examples.
 

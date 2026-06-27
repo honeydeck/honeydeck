@@ -1,4 +1,4 @@
-import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
+import type { LayoutDemo, LayoutProps } from "@honeydeck/runtime/types";
 
 export default function DiagonalSplit({ title, children }: LayoutProps) {
 	return (

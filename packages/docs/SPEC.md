@@ -24,7 +24,7 @@ Authored docs content must include:
 - frontmatter title, description, and slug
 - Fumadocs `meta.json` files that define curated sidebar groups, item order, and group labels
 
-Docs content is tracked source and may use docs-package MDX components such as interactive playgrounds. Do not hand-author public docs pages in the published `@honeydeck/honeydeck` package.
+Docs content is tracked source and may use docs-package MDX components such as interactive playgrounds. Do not hand-author public docs pages in the published `@honeydeck/runtime` package.
 
 When a docs page explains behavior owned by `packages/honeydeck`, update the owning Honeydeck colocated `SPEC.md` first, then update the docs page. Specs remain the closest source for observable implementation behavior; `packages/docs/content/docs` owns reader-facing guides, examples, and playgrounds. Core slide-transition behavior is documented by `/docs/transitions`, including deck defaults, slide overrides, built-in transition names, custom CSS hooks, timing variables, and reverse-aware custom CSS.
 
@@ -58,7 +58,7 @@ Wide docs pages must show the Fumadocs sidebar on the left and the in-page table
 The start page should use the warm Honeydeck docs mood:
 
 - bee/Dex visual treatment using local static assets
-- primary command CTA: `npx @honeydeck/honeydeck init`
+- primary command CTA: `npx @honeydeck/cli init`
 - docs CTA to `/docs/getting-started`
 - package/GitHub links
 - Honeydeck base and bee tokens where useful, layered with Fumadocs CSS variables

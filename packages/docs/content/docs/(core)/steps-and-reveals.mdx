@@ -22,7 +22,7 @@ Honeydeck has a first-class step concept. Each slide has a timeline built from `
 ## Reveal
 
 ```mdx
-import { Reveal } from '@honeydeck/honeydeck'
+import { Reveal } from '@honeydeck/runtime'
 
 # Why Honeydeck?
 
@@ -50,7 +50,7 @@ code highlight, group item, Magic Code state, or custom `TimelineSteps` state.
 It never adds a new step.
 
 ````mdx
-import { Reveal, RevealWith } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith } from '@honeydeck/runtime'
 
 <Reveal name="headline">Headline appears first</Reveal>
 <RevealWith target="headline">Supporting detail appears with it</RevealWith>
@@ -75,7 +75,7 @@ Rules:
 `Fade` is the inverse of `Reveal`: content starts visible and fades out at its timeline step.
 
 ```mdx
-import { Fade } from '@honeydeck/honeydeck'
+import { Fade } from '@honeydeck/runtime'
 
 <Fade>Visible at step 0, gone at step 1</Fade>
 <Fade ephemeral>Gone at step 2 and no longer reserves space</Fade>
@@ -94,7 +94,7 @@ Behavior:
 Use `FadeWith` for a fade-out controlled by an explicit target step or named reveal target without adding its own timeline step:
 
 ```mdx
-import { FadeWith } from '@honeydeck/honeydeck'
+import { FadeWith } from '@honeydeck/runtime'
 
 <FadeWith target={3}>Disappears when step 3 is active</FadeWith>
 <FadeWith at={2}>Disappears with slide step 2</FadeWith>
@@ -108,7 +108,7 @@ Reveals each direct child as its own step. If a direct child is a list, each
 top-level list item is revealed as its own step:
 
 ```mdx
-import { RevealGroup } from '@honeydeck/honeydeck'
+import { RevealGroup } from '@honeydeck/runtime'
 
 <RevealGroup>
   - Markdown-first
@@ -162,7 +162,7 @@ Timeline:
 `FadeGroup` is the inverse of `RevealGroup`: each meaningful direct child starts visible and fades out one by one. Direct lists are preserved, and each list item gets its own fade-out step. Fade group targets must not contain nested timeline producers.
 
 ```mdx
-import { FadeGroup } from '@honeydeck/honeydeck'
+import { FadeGroup } from '@honeydeck/runtime'
 
 <FadeGroup ephemeral>
   - Remove this at step 1
@@ -177,7 +177,7 @@ Use `TimelineSteps` when an imported React component should control part of
 the slide timeline, such as an accordion, tab set, or diagram walkthrough:
 
 ```mdx
-import { Reveal, TimelineSteps } from '@honeydeck/honeydeck'
+import { Reveal, TimelineSteps } from '@honeydeck/runtime'
 import { AccordionDemo } from './AccordionDemo'
 
 <Reveal>Before the custom component</Reveal>
@@ -192,7 +192,7 @@ import { AccordionDemo } from './AccordionDemo'
 Inside the custom component:
 
 ```tsx
-import { useTimelineSteps } from '@honeydeck/honeydeck'
+import { useTimelineSteps } from '@honeydeck/runtime'
 
 export function AccordionDemo() {
   const { phase, stepIndex, stepCount, isPdfFinalRender } = useTimelineSteps()

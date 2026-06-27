@@ -1,5 +1,5 @@
-import { DefaultLayout } from "@honeydeck/honeydeck/layouts";
-import type { LayoutMap } from "@honeydeck/honeydeck/types";
+import { DefaultLayout } from "@honeydeck/runtime/layouts";
+import type { LayoutMap } from "@honeydeck/runtime/types";
 import BeeCover from "./layouts/BeeCover.tsx";
 import Brutalist from "./layouts/Brutalist.tsx";
 import DiagonalSplit from "./layouts/DiagonalSplit.tsx";

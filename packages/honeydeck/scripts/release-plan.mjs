@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "../../..");
+const publishablePackages = [
+	"packages/runtime",
+	"packages/cli",
+	"packages/honeydeck",
+];
 const packageJsonPath = resolve(repoRoot, "packages/honeydeck/package.json");
 const packageLockPath = resolve(repoRoot, "package-lock.json");
 const releaseNotesPath = resolve(repoRoot, "RELEASE_NOTES.md");
@@ -44,7 +49,12 @@ const tag = `v${nextVersion}`;
 const notes = createReleaseNotes(nextVersion, latestTag, conventionalCommits);
 
 if (shouldWrite) {
-	writePackageVersion(packageJsonPath, nextVersion);
+	for (const packageDir of publishablePackages) {
+		writePackageVersion(
+			resolve(repoRoot, packageDir, "package.json"),
+			nextVersion,
+		);
+	}
 	writePackageLockVersion(packageLockPath, nextVersion);
 	writeFileSync(releaseNotesPath, notes);
 }
@@ -173,11 +183,21 @@ function writePackageVersion(path, version) {
 
 function writePackageLockVersion(path, version) {
 	const data = readJson(path);
-	if (data.packages?.["packages/honeydeck"]) {
-		data.packages["packages/honeydeck"].version = version;
+	for (const packageDir of publishablePackages) {
+		if (data.packages?.[packageDir]) {
+			data.packages[packageDir].version = version;
+		}
 	}
-	if (data.packages?.["node_modules/@honeydeck/honeydeck"]) {
-		data.packages["node_modules/@honeydeck/honeydeck"].version = version;
+	const packageNames = [
+		"@honeydeck/runtime",
+		"@honeydeck/cli",
+		"@honeydeck/honeydeck",
+	];
+	for (const packageName of packageNames) {
+		const lockPath = `node_modules/${packageName}`;
+		if (data.packages?.[lockPath]) {
+			data.packages[lockPath].version = version;
+		}
 	}
 	writeJson(path, data);
 }

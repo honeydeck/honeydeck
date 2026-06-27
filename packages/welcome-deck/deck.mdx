@@ -5,7 +5,7 @@ layout: BeeCover
 ---
 
 import './styles.css'
-import { Reveal, RevealGroup, Keyboard } from '@honeydeck/honeydeck'
+import { Reveal, RevealGroup, Keyboard } from '@honeydeck/runtime'
 
 # Honeydeck
 
@@ -78,7 +78,7 @@ layout: HexGrid
     <span className="ml-3 font-mono text-xs text-surface-foreground/50">terminal</span>
   </div>
   <div className="bg-surface/30 p-6 font-mono text-sm text-surface-foreground/80 space-y-2">
-    <p><span className="text-primary">$</span> npx @honeydeck/honeydeck init --name my-talk</p>
+    <p><span className="text-primary">$</span> npx @honeydeck/cli init --name my-talk</p>
     <p><span className="text-primary">$</span> cd my-talk && npm run dev</p>
     <p className="text-accent mt-3">✓ Edit deck.mdx · Hot-reload · Present · Export PDF</p>
   </div>

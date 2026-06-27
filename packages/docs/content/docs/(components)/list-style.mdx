@@ -13,7 +13,7 @@ Use `<ListStyle>` to style Markdown, HTML, or JSX lists inside a wrapper.
 By default it removes native markers:
 
 ```mdx
-import { ListStyle } from '@honeydeck/honeydeck'
+import { ListStyle } from '@honeydeck/runtime'
 
 <ListStyle>
   - No marker
@@ -24,7 +24,7 @@ import { ListStyle } from '@honeydeck/honeydeck'
 Pass `bullets` to render custom markers:
 
 ```mdx
-import { ListStyle } from '@honeydeck/honeydeck'
+import { ListStyle } from '@honeydeck/runtime'
 import { CheckIcon, CircleIcon } from 'lucide-react'
 
 <ListStyle bullets={[<CheckIcon />, <CircleIcon />]}>

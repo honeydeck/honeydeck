@@ -5,15 +5,15 @@
 ## Package role
 
 - The showcase is not published to npm.
-- It depends on the local `@honeydeck/honeydeck` workspace through `file:../honeydeck` and imports public runtime APIs through scoped `@honeydeck/honeydeck/...` paths.
+- It depends on the local `@honeydeck/runtime` workspace through `file:../honeydeck` and imports public runtime APIs through scoped `@honeydeck/runtime/...` paths.
 - It demonstrates Honeydeck features with a real MDX deck, local React components, local layouts, Tailwind v4 utilities, Honeydeck theme CSS, runtime reference pages, and PDF export.
 
 ## Deck behavior
 
 - `deck.mdx` is the showcase entrypoint.
-- `styles.css` explicitly imports Tailwind, `@honeydeck/honeydeck/theme.css`, and `@honeydeck/honeydeck/themes/bee.css`.
+- `styles.css` explicitly imports Tailwind, `@honeydeck/runtime/theme.css`, and `@honeydeck/runtime/themes/bee.css`.
 - `layouts: "./layouts"` loads the package-local layout map.
-- The package-local layout map extends `@honeydeck/honeydeck/layouts/bee` and adds `Poster` plus an unused `UnusedShowcase` layout for the layout reference page.
+- The package-local layout map extends `@honeydeck/runtime/layouts/bee` and adds `Poster` plus an unused `UnusedShowcase` layout for the layout reference page.
 - `imported-slides.mdx` is imported by the root deck and expands a slide group at the import location.
 - `TimelineAccordion.tsx` demonstrates custom component-controlled timeline steps through `useTimelineSteps`.
 - Timeline slides demonstrate reveal, fade, explicit target, grouped, and ephemeral timeline behavior.

@@ -1,4 +1,4 @@
-import { useTimelineSteps } from "@honeydeck/honeydeck";
+import { useTimelineSteps } from "@honeydeck/runtime";
 
 const items = [
 	{

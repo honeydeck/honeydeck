@@ -3,7 +3,7 @@
 import {
 	type ColorMode,
 	ColorModeCycleButton,
-} from "@honeydeck/honeydeck/components";
+} from "@honeydeck/runtime/components";
 import type { ThemeSwitchProps } from "fumadocs-ui/layouts/shared/slots/theme-switch";
 import { useTheme } from "fumadocs-ui/provider/base";
 import { useEffect, useState } from "react";

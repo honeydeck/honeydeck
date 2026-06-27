@@ -7,33 +7,27 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const tempRoot = mkdtempSync(join(tmpdir(), "honeydeck-packed-smoke-"));
+const smokePackages = [
+	"@honeydeck/runtime",
+	"@honeydeck/cli",
+	"@honeydeck/honeydeck",
+];
 
 try {
-	const packOutput = run(
-		"npm",
-		[
-			"pack",
-			"--workspace",
-			"@honeydeck/honeydeck",
-			"--pack-destination",
-			tempRoot,
-			"--json",
-		],
-		repoRoot,
+	const tarballPaths = smokePackages.map((workspace) =>
+		packWorkspace(workspace),
 	);
-	const [packed] = parseNpmPackOutput(packOutput.stdout);
-	const tarballPath = join(tempRoot, basename(packed.filename));
 	const projectRoot = join(tempRoot, "smoke");
 
 	run("npm", ["init", "-y"], tempRoot);
-	run("npm", ["install", tarballPath], tempRoot);
+	run("npm", ["install", ...tarballPaths], tempRoot);
 	run("npx", ["honeydeck", "--help"], tempRoot);
 	run(
 		"npx",
 		["honeydeck", "init", "--name", "smoke", "--skip-install", "--skip-skill"],
 		tempRoot,
 	);
-	run("npm", ["install", tarballPath], projectRoot);
+	run("npm", ["install", ...tarballPaths], projectRoot);
 	run("npm", ["run", "build"], projectRoot);
 
 	console.log("✅ Packed install smoke passed");
@@ -43,6 +37,23 @@ try {
 	} else {
 		console.log(`Kept smoke temp directory: ${tempRoot}`);
 	}
+}
+
+function packWorkspace(workspace) {
+	const packOutput = run(
+		"npm",
+		[
+			"pack",
+			"--workspace",
+			workspace,
+			"--pack-destination",
+			tempRoot,
+			"--json",
+		],
+		repoRoot,
+	);
+	const [packed] = parseNpmPackOutput(packOutput.stdout);
+	return join(tempRoot, basename(packed.filename));
 }
 
 function parseNpmPackOutput(stdout) {

@@ -6,14 +6,14 @@ slug: "skills"
 
 # Skills
 
-Honeydeck ships optional agent skills that help AI coding agents work with presentations more reliably. They are plain skill files bundled with the `@honeydeck/honeydeck` package, so you can install them into a deck project or into your global agent setup.
+Honeydeck ships optional agent skills that help AI coding agents work with presentations more reliably. They are plain skill files bundled with the `@honeydeck/runtime` package, so you can install them into a deck project or into your global agent setup.
 
 ## Install skills
 
 New projects can open the skills installer during init:
 
 ```bash
-npx @honeydeck/honeydeck init --name my-talk --install-skill
+npx @honeydeck/cli init --name my-talk --install-skill
 ```
 
 Existing projects can run:
@@ -52,7 +52,7 @@ For example, an agent with the `honeydeck` skill should prefer:
 - `deck.mdx` as the entry file
 - exact `---` slide separators
 - slide frontmatter for layouts
-- explicit imports from `@honeydeck/honeydeck`
+- explicit imports from `@honeydeck/runtime`
 - `<Notes>` for speaker notes
 - `<Reveal>`, `<RevealGroup>`, code metadata, and Magic Code for steps
 - `honeydeck pdf` for PDF export
@@ -64,7 +64,7 @@ The skills also point agents back to the packaged docs and specs, so generated d
 Skills are copied into the target scope when you install them. Re-run the installer after upgrading Honeydeck if you want the latest bundled instructions:
 
 ```bash
-npm update @honeydeck/honeydeck
+npm update @honeydeck/runtime @honeydeck/cli
 honeydeck skill
 ```
 

@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "@honeydeck/runtime/theme.css";
+
+/*
+ * honeydeck/theme.css is the clean black/white/grey default.
+ * Bee theme: uncomment the next line.
+ * Custom theme: import your CSS here or override --honeydeck-* tokens below.
+ */
+/* @import "@honeydeck/runtime/themes/bee.css"; */
+
+/* Slightly dim images in dark mode */
+[data-honeydeck-color-mode="dark"] img {
+	opacity: 0.9;
+}

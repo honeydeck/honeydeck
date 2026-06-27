@@ -1,4 +1,4 @@
-import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
+import type { LayoutDemo, LayoutProps } from "@honeydeck/runtime/types";
 
 type PosterFrontmatter = {
 	/** Small uppercase label shown above the poster title. */

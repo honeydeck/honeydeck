@@ -137,7 +137,7 @@ For the full reference, see [Configuration](/docs/configuration) and [Transition
 Core runtime components are explicit imports from `honeydeck`.
 
 ```mdx
-import { Reveal, RevealWith, RevealGroup, TimelineSteps, BrowserFrame, Notes } from '@honeydeck/honeydeck'
+import { Reveal, RevealWith, RevealGroup, TimelineSteps, BrowserFrame, Notes } from '@honeydeck/runtime'
 ```
 
 ### Reveal steps
@@ -276,11 +276,11 @@ See [Navigation](/docs/navigation), [Mobile and touch](/docs/mobile), [Presenter
 
 Honeydeck uses CSS custom properties with relative `oklch` color derivations. All colors derive from `--honeydeck-primary`.
 
-`@honeydeck/honeydeck/theme.css` is the clean black/white/grey default. Override tokens in your CSS:
+`@honeydeck/runtime/theme.css` is the clean black/white/grey default. Override tokens in your CSS:
 
 ```css
 @import "tailwindcss";
-@import "@honeydeck/honeydeck/theme.css";
+@import "@honeydeck/runtime/theme.css";
 
 [data-honeydeck-color-mode="light"] {
   --honeydeck-primary: oklch(55% 0.25 145);
@@ -295,15 +295,15 @@ Use the bundled Bee theme by layering it after the base theme:
 
 ```css
 @import "tailwindcss";
-@import "@honeydeck/honeydeck/theme.css";
-@import "@honeydeck/honeydeck/themes/bee.css";
+@import "@honeydeck/runtime/theme.css";
+@import "@honeydeck/runtime/themes/bee.css";
 ```
 
 Pair it with the Bee layout set:
 
 ```yaml
 ---
-layouts: "@honeydeck/honeydeck/layouts/bee"
+layouts: "@honeydeck/runtime/layouts/bee"
 ---
 ```
 
@@ -368,17 +368,17 @@ Package Markdown guides live on the Honeydeck docs site and in the package `docs
 ## Types and exports
 
 ```ts
-import { Reveal, RevealWith, RevealGroup, Notes } from '@honeydeck/honeydeck'
-import type { LayoutProps, LayoutMap, LayoutDemo } from '@honeydeck/honeydeck/types'
+import { Reveal, RevealWith, RevealGroup, Notes } from '@honeydeck/runtime'
+import type { LayoutProps, LayoutMap, LayoutDemo } from '@honeydeck/runtime/types'
 
-import defaultLayouts from '@honeydeck/honeydeck/layouts'
-import beeLayouts from '@honeydeck/honeydeck/layouts/bee'
+import defaultLayouts from '@honeydeck/runtime/layouts'
+import beeLayouts from '@honeydeck/runtime/layouts/bee'
 
-import { Left, Right } from '@honeydeck/honeydeck/layouts/TwoCol'
-import { Left as BeeLeft, Right as BeeRight } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
+import { Left, Right } from '@honeydeck/runtime/layouts/TwoCol'
+import { Left as BeeLeft, Right as BeeRight } from '@honeydeck/runtime/layouts/bee/TwoCol'
 
-import '@honeydeck/honeydeck/theme.css'
-import '@honeydeck/honeydeck/themes/bee.css'
+import '@honeydeck/runtime/theme.css'
+import '@honeydeck/runtime/themes/bee.css'
 ```
 
 `LayoutProps<F>` describes the props passed to layout components:

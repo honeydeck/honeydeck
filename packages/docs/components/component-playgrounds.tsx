@@ -4,7 +4,7 @@ import {
 	BrowserFrame,
 	Keyboard,
 	ListStyle,
-} from "@honeydeck/honeydeck/components";
+} from "@honeydeck/runtime/components";
 import {
 	CheckIcon,
 	CircleIcon,

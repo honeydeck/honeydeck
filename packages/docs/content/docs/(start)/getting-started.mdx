@@ -13,7 +13,7 @@ Honeydeck helps you create polished, interactive presentations using MDX. Write 
 Create a deck:
 
 ```bash
-npx @honeydeck/honeydeck init --name awesome-talk
+npx @honeydeck/cli init --name awesome-talk
 cd awesome-talk
 npm run dev
 ```
@@ -27,7 +27,7 @@ npm run build
 npm run pdf
 ```
 
-`npx @honeydeck/honeydeck` to see cli help.
+`npx @honeydeck/cli` to see cli help.
 
 ## Your first deck
 
@@ -48,7 +48,7 @@ Start with Markdown.
 layout: TwoCol
 ---
 
-import { Left, Right } from '@honeydeck/honeydeck/layouts/TwoCol'
+import { Left, Right } from '@honeydeck/runtime/layouts/TwoCol'
 
 <Left>
 

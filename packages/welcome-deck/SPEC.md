@@ -5,7 +5,7 @@
 ## Package role
 
 - The welcome-deck package is not published to npm.
-- It depends on the local `@honeydeck/honeydeck` workspace through `file:../honeydeck` and imports public runtime APIs through scoped `@honeydeck/honeydeck/...` paths.
+- It depends on the local `@honeydeck/runtime` workspace through `file:../honeydeck` and imports public runtime APIs through scoped `@honeydeck/runtime/...` paths.
 - It provides a short, polished deck that highlights Honeydeck authoring, code highlighting, theme tokens, and getting started.
 
 ## Deck behavior

@@ -1,12 +1,2 @@
-import type { LayoutDemo, LayoutProps } from "../../runtime/types.ts";
-import { SlideFrame } from "../SlideFrame.tsx";
-
-export default function CleanBlankLayout(props: LayoutProps) {
-	return <SlideFrame>{props.children}</SlideFrame>;
-}
-
-export const demo: LayoutDemo = {
-	mdx: `---
-layout: Blank
----`,
-};
+export * from "@honeydeck/runtime/layouts/clean/Blank";
+export { default } from "@honeydeck/runtime/layouts/clean/Blank";
