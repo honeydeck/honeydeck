@@ -69,7 +69,7 @@ React components and built-in layouts may also import image assets through Vite 
 
 ### Timeline-aware MDX Components
 
-Honeydeck's MDX compilation assigns slide-local timeline steps to built-in timeline components.
+Honeydeck's MDX compilation assigns slide-local timeline steps to built-in timeline components. During development, Honeydeck runtime imports from `@honeydeck/honeydeck` must resolve to the same source module graph as the app shell and must be excluded from Vite dependency pre-bundling, so context-backed timeline components such as `<Reveal>` read the active slide timeline instead of a duplicate default runtime context.
 
 Rules:
 
