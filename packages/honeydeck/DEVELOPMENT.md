@@ -228,7 +228,7 @@ Honeydeck owns Vite config programmatically. Users do not provide `index.html` o
 - Vite root is the user project root.
 - The dev server binds to `0.0.0.0` so the printed Network URL is reachable from other devices on the same LAN.
 - Honeydeck serves its internal app shell from `src/runtime/app-shell/index.html`.
-- The app shell entry script points at `src/runtime/app-shell/main.tsx` via Vite `/@fs/` absolute-file serving.
+- The app shell entry imports `@honeydeck/honeydeck/app-shell`, so the shell and deck-authored imports share the same Honeydeck package module graph.
 - `server.fs.allow` includes the Honeydeck package root so package source can be served even when outside the user root.
 - HMR is provided by Vite plus Honeydeck virtual module invalidation.
 
