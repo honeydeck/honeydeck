@@ -26,6 +26,9 @@
  */
 
 import { config } from "virtual:honeydeck/config";
+// Keep the slide timeline provider on the public package graph so deck-authored
+// components that import @honeydeck/honeydeck read the same React context.
+import { TimelineProvider } from "@honeydeck/honeydeck";
 import {
 	type CSSProperties,
 	useCallback,
@@ -62,7 +65,6 @@ import {
 	slideData,
 } from "./slideData.ts";
 import { useSync } from "./sync.ts";
-import { TimelineProvider } from "./TimelineContext.tsx";
 import { useKeyboardNav } from "./useKeyboardNav.ts";
 import { useSwipeNav } from "./useSwipeNav.ts";
 import { DocsView } from "./views/DocsView.tsx";

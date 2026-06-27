@@ -8,8 +8,8 @@
  *
  *   `honeydeck:app-shell` plugin
  *     → intercepts GET / and serves src/runtime/app-shell/index.html
- *     → replaces the MAIN_ENTRY placeholder with `/@fs/<abs-path>/main.tsx`
- *     → Vite's /@fs/ handler serves files outside the configured root
+ *     → replaces the app-shell placeholder with `@honeydeck/honeydeck/app-shell`
+ *     → Vite resolves the app shell through the package entry system
  *
  *   `honeydeckPlugin()` (virtual modules + MDX + Tailwind)
  *     → splits the selected deck entry, serves virtual:honeydeck/* modules, compiles MDX
@@ -18,7 +18,8 @@
  *   Vite root controls where CSS/assets/components resolve. Setting it to
  *   the deck dir lets users `@import './styles.css'` etc. normally.
  *   The app shell (main.tsx, Deck.tsx) lives inside the honeydeck package and
- *   is accessed via /@fs/ — Vite's escape hatch for files outside the root.
+ *   is loaded through the `@honeydeck/honeydeck/app-shell` package subpath so
+ *   it shares one Honeydeck runtime module graph with deck-authored imports.
  */
 
 import { readFileSync } from "node:fs";
@@ -26,6 +27,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer, type Plugin, searchForWorkspaceRoot } from "vite";
 import { honeydeckPlugin } from "#vite-plugin/index.ts";
+import { injectHoneydeckAppShellEntry } from "./app-shell-entry.ts";
 import { hasHelpFlag } from "./args.ts";
 import { formatCommandBanner } from "./banner.ts";
 import {
@@ -45,24 +47,20 @@ const __dirname = dirname(__filename);
 /** Absolute path to src/runtime/app-shell/ */
 const APP_SHELL_DIR = resolve(__dirname, "../runtime/app-shell");
 
-/** Absolute path to src/runtime/app-shell/main.tsx */
-const MAIN_TSX_PATH = resolve(APP_SHELL_DIR, "main.tsx");
-
 /** Absolute path to src/runtime/app-shell/index.html (the template) */
 const INDEX_HTML_PATH = resolve(APP_SHELL_DIR, "index.html");
 
 /**
  * Absolute path to the honeydeck package root (the directory that contains src/).
- * Passed to `server.fs.allow` so that Vite's /@fs/ handler can serve
- * files under src/ even when the Vite root is set to the deck dir.
+ * Passed to `server.fs.allow` so Vite can serve package source when the
+ * Honeydeck package is symlinked from a workspace outside the deck root.
  */
 const PACKAGE_ROOT = resolve(__dirname, "../..");
 
 /**
  * Bare dependencies imported by the Honeydeck app shell/runtime before any
- * user-authored HTML entry exists. Vite cannot discover these reliably from
- * its normal HTML scan because `honeydeck dev` serves a custom app shell from
- * /@fs/, so keep the CommonJS/large ESM deps pre-bundled explicitly.
+ * user-authored HTML entry exists. Keep the CommonJS/large ESM deps
+ * pre-bundled explicitly.
  */
 const DEV_OPTIMIZE_DEPS = [
 	"react",
@@ -163,12 +161,12 @@ export function parseDevArgs(args: string[]): DevOptions {
  * `honeydeck:app-shell` — serves the Honeydeck index.html for the root route.
  *
  * Handles two concerns:
- *  1. `config` hook: broadens `server.fs.allow` so /@fs/ can reach the
- *     app shell files which live outside the user's project root.
+ *  1. `config` hook: broadens `server.fs.allow` so symlinked package source can
+ *     be served when Honeydeck is developed from a workspace.
  *  2. `configureServer` hook: registers a connect middleware that intercepts
- *     GET / (and /index.html), reads the HTML template, injects the correct
- *     /@fs/ script src, and lets Vite's `transformIndexHtml` pipeline apply
- *     any further HTML transforms (e.g. inject the HMR client).
+ *     GET / (and /index.html), reads the HTML template, injects the package
+ *     app-shell entry, and lets Vite's `transformIndexHtml` pipeline apply any
+ *     further HTML transforms (e.g. inject the HMR client).
  */
 function appShellPlugin(projectRoot: string): Plugin {
 	return {
@@ -180,8 +178,8 @@ function appShellPlugin(projectRoot: string): Plugin {
 					fs: {
 						// Setting server.fs.allow replaces Vite's default allow list.
 						// Keep the user's workspace root allowed for normal node_modules
-						// serving, then add the Honeydeck package root so /@fs/ can reach
-						// src/runtime/app-shell/main.tsx when it lives outside that root.
+						// serving, then add the Honeydeck package root for workspace-linked
+						// package source that may live outside that root.
 						allow: [searchForWorkspaceRoot(projectRoot), PACKAGE_ROOT],
 					},
 				},
@@ -199,14 +197,11 @@ function appShellPlugin(projectRoot: string): Plugin {
 				}
 
 				try {
-					// Read the template and replace the placeholder script src.
-					// The /@fs/ prefix tells Vite to serve the file by absolute path,
-					// bypassing the root restriction for this single module.
+					// Read the template and replace the placeholder with the package
+					// app-shell entry. This keeps Honeydeck runtime imports canonical
+					// across app shell, built-in components, and user components.
 					let html = readFileSync(INDEX_HTML_PATH, "utf-8");
-					html = html.replace(
-						"__HONEYDECK_MAIN_ENTRY__",
-						`/@fs${MAIN_TSX_PATH}`,
-					);
+					html = injectHoneydeckAppShellEntry(html);
 
 					// Let Vite's HTML transform pipeline run (injects HMR client, etc.)
 					const transformed = await server.transformIndexHtml(url, html);
