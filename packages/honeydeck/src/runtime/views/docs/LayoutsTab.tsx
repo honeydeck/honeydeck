@@ -1,8 +1,10 @@
 import * as layoutReference from "virtual:honeydeck/layouts";
+// Keep docs preview timeline providers on the public package graph so previewed
+// deck components read the same React context as normal slide renders.
+import { TimelineProvider } from "@honeydeck/honeydeck";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BASE_HEIGHT, BASE_WIDTH, resolveLayout } from "../../slideData.ts";
-import { TimelineProvider } from "../../TimelineContext.tsx";
 import type { CompiledLayoutDemo, LayoutPropDoc } from "../../types.ts";
 import { Intro } from "./Intro.tsx";
 

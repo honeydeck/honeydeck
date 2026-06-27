@@ -5,9 +5,9 @@
  * injected by index.html.
  *
  * This file is intentionally minimal — all presentation logic lives in Deck.
- * The path to this file is embedded at dev-time by the `honeydeck:app-shell` Vite
- * plugin using Vite's `/@fs/` file-system access mechanism, so it can live
- * outside the user's project root.
+ * This file is loaded through the package subpath
+ * `@honeydeck/honeydeck/app-shell` so it shares the same Honeydeck package
+ * module graph as deck-authored imports from `@honeydeck/honeydeck`.
  */
 
 import { config } from "virtual:honeydeck/config";

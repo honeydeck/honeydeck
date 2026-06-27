@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Plugin, UserConfig } from "vite";
-import {
-	HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
-	honeydeckPlugin,
-} from "../vite-plugin/index.ts";
+import { honeydeckPlugin } from "../vite-plugin/index.ts";
 
 function findPlugin(name: string): Plugin {
 	const plugin = honeydeckPlugin().find(
@@ -19,15 +16,30 @@ function findPlugin(name: string): Plugin {
 	return plugin;
 }
 
+type AliasEntry = { find: string | RegExp; replacement: string };
+
+function getAliasEntries(config: UserConfig): AliasEntry[] {
+	const alias = config.resolve?.alias;
+	assert.ok(Array.isArray(alias), "aliases should be an ordered array");
+	return alias as AliasEntry[];
+}
+
 describe("honeydeck Vite plugin", () => {
-	it("excludes Honeydeck from Vite dependency pre-bundling", () => {
-		const aliases = findPlugin("honeydeck:aliases");
-		assert.equal(typeof aliases.config, "function");
+	it("aliases the package app shell before the bare runtime entry", () => {
+		const aliasesPlugin = findPlugin("honeydeck:aliases");
+		assert.equal(typeof aliasesPlugin.config, "function");
 
-		const config = (aliases.config as () => UserConfig)();
+		const config = (aliasesPlugin.config as () => UserConfig)();
+		const aliases = getAliasEntries(config);
+		const appShellIndex = aliases.findIndex(
+			(alias) => alias.find === "@honeydeck/honeydeck/app-shell",
+		);
+		const runtimeIndex = aliases.findIndex(
+			(alias) => alias.find === "@honeydeck/honeydeck",
+		);
 
-		assert.deepEqual(config.optimizeDeps?.exclude, [
-			...HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
-		]);
+		assert.notEqual(appShellIndex, -1);
+		assert.notEqual(runtimeIndex, -1);
+		assert.ok(appShellIndex < runtimeIndex);
 	});
 });

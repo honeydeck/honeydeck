@@ -10,6 +10,9 @@
  * so that surrounding layout can measure and position it correctly.
  */
 
+// Keep preview timeline providers on the public package graph so previewed deck
+// components read the same React context as normal slide renders.
+import { TimelineProvider } from "@honeydeck/honeydeck";
 import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
@@ -17,7 +20,6 @@ import {
 	resolveLayout,
 	slideData,
 } from "./slideData.ts";
-import { TimelineProvider } from "./TimelineContext.tsx";
 
 // ---------------------------------------------------------------------------
 // Types
