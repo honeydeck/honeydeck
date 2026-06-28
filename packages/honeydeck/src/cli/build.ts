@@ -11,9 +11,10 @@
  *   root to the directory that *owns* our shell HTML we get clean output paths
  *   without having to configure `rollupOptions.input` to an unusual path.
  *
- * The `__HONEYDECK_MAIN_ENTRY__` placeholder in index.html is replaced with
- * `./main.tsx` by the `buildHtmlPlugin`. Vite resolves this relative to the
- * HTML file's location (APP_SHELL_DIR), finding `app-shell/main.tsx`. ✓
+ * The `__HONEYDECK_APP_SHELL_ENTRY__` placeholder in index.html is replaced
+ * with `@honeydeck/honeydeck/app-shell` by the `buildHtmlPlugin`. Vite then
+ * resolves the app shell through the same package entry system that user decks
+ * use for `@honeydeck/honeydeck` imports.
  *
  * User project files (deck entry, CSS, components) are outside APP_SHELL_DIR
  * but are accessed via absolute paths by `honeydeckPlugin`'s virtual module
@@ -41,6 +42,7 @@ import type { Plugin } from "vite";
 import { build } from "vite";
 import { loadDeck } from "#vite-plugin/deck-loader.ts";
 import { honeydeckPlugin } from "#vite-plugin/index.ts";
+import { injectHoneydeckAppShellEntry } from "./app-shell-entry.ts";
 import { hasHelpFlag } from "./args.ts";
 import { formatCommandBanner } from "./banner.ts";
 import {
@@ -65,13 +67,10 @@ export const APP_SHELL_DIR = resolve(__dirname, "../runtime/app-shell");
 // ---------------------------------------------------------------------------
 
 /**
- * Replaces `__HONEYDECK_MAIN_ENTRY__` in index.html with `./main.tsx`.
- *
- * During build (root = APP_SHELL_DIR), `./main.tsx` is resolved relative to
- * the HTML file's directory, which is APP_SHELL_DIR — exactly where main.tsx
- * lives. This allows the same index.html template to be used for both the
- * dev server (which injects an `/@fs/` absolute path) and the production
- * build (which uses a normal relative module path).
+ * Replaces `__HONEYDECK_APP_SHELL_ENTRY__` in index.html with the Honeydeck
+ * package app-shell subpath. Both development and production builds load the
+ * app shell through the package entry system, keeping the runtime module graph
+ * canonical for context-backed components.
  */
 export function buildHtmlPlugin(): Plugin {
 	return {
@@ -81,7 +80,7 @@ export function buildHtmlPlugin(): Plugin {
 		transformIndexHtml: {
 			order: "pre",
 			handler(html: string): string {
-				return html.replace("__HONEYDECK_MAIN_ENTRY__", "./main.tsx");
+				return injectHoneydeckAppShellEntry(html);
 			},
 		},
 	};
