@@ -1,5 +1,5 @@
+import { useTimeline } from "@honeydeck/honeydeck";
 import { useMemo } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
 import { CodeBlock } from "./CodeBlock.tsx";
 import { parseJsonProp, type StepGroup } from "./CodeBlockShared.ts";
 

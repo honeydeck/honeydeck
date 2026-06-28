@@ -1,3 +1,4 @@
+import { useTimeline } from "@honeydeck/honeydeck";
 import {
 	Children,
 	type CSSProperties,
@@ -8,7 +9,6 @@ import {
 	type ReactElement,
 	type ReactNode,
 } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
 import { Reveal } from "./Reveal.tsx";
 
 // ---------------------------------------------------------------------------
