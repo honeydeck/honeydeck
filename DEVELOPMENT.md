@@ -1,6 +1,6 @@
 # Honeydeck Monorepo Development Guide
 
-This repository is an npm workspace monorepo.
+This repository is a pnpm workspace monorepo.
 
 ## Packages
 
@@ -17,36 +17,38 @@ Root `SPEC.md` maps product behavior specs. Package-level and colocated `SPEC.md
 ## Setup
 
 ```bash
-npm install
+corepack enable
+corepack prepare pnpm@10.34.4 --activate
+pnpm install
 ```
 
 ## Root scripts
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Run package dev servers together: showcase deck and Fumadocs docs site |
-| `npm run lint` | Biome validation for the monorepo |
-| `npm run typecheck` | Typecheck all workspaces |
-| `npm test` | Run workspace test suites |
-| `npm run build` | Run build scripts for workspaces that define one |
-| `npm run pack:dry-run` | Dry-run package contents for shippable workspaces |
+| `pnpm run dev` | Run package dev servers together: showcase deck and Fumadocs docs site |
+| `pnpm run lint` | Biome validation for the monorepo |
+| `pnpm run typecheck` | Typecheck all workspaces |
+| `pnpm test` | Run workspace test suites |
+| `pnpm run build` | Run build scripts for workspaces that define one |
+| `pnpm run pack:dry-run` | Dry-run package contents for shippable workspaces |
 
-Target a workspace directly with npm workspaces:
+Target a workspace directly with pnpm filters:
 
 ```bash
-npm -w @honeydeck/honeydeck run dev          # starter template smoke-test deck
-npm -w @honeydeck/honeydeck run test
-npm -w @honeydeck/honeydeck run typecheck
-npm -w @honeydeck/showcase run dev
-npm -w @honeydeck/showcase run build
-npm -w @honeydeck/showcase run pdf
-npm -w @honeydeck/showcase run pdf:steps
-npm -w @honeydeck/welcome-deck run dev
-npm -w @honeydeck/welcome-deck run build
-npm -w @honeydeck/welcome-deck run pdf
-npm -w @honeydeck/docs run dev
-npm -w @honeydeck/docs run search:index
-npm -w @honeydeck/docs run build
+pnpm --filter @honeydeck/honeydeck run dev          # starter template smoke-test deck
+pnpm --filter @honeydeck/honeydeck run test
+pnpm --filter @honeydeck/honeydeck run typecheck
+pnpm --filter @honeydeck/showcase run dev
+pnpm --filter @honeydeck/showcase run build
+pnpm --filter @honeydeck/showcase run pdf
+pnpm --filter @honeydeck/showcase run pdf:steps
+pnpm --filter @honeydeck/welcome-deck run dev
+pnpm --filter @honeydeck/welcome-deck run build
+pnpm --filter @honeydeck/welcome-deck run pdf
+pnpm --filter @honeydeck/docs run dev
+pnpm --filter @honeydeck/docs run search:index
+pnpm --filter @honeydeck/docs run build
 ```
 
 ## Docs flow
@@ -54,7 +56,7 @@ npm -w @honeydeck/docs run build
 Canonical reader-facing Honeydeck docs live in `packages/docs/content/docs` as authored MDX. The docs package generates only derived search data before dev/build:
 
 ```bash
-npm -w @honeydeck/docs run search:index
+pnpm --filter @honeydeck/docs run search:index
 ```
 
 Edit `packages/docs/content/docs/*` directly for docs prose and playground usage. When changing documented Honeydeck behavior, update the owning colocated `SPEC.md` near the implementation first.
@@ -68,11 +70,11 @@ The public npm release is for the `@honeydeck/honeydeck` workspace only. Root CI
 Before finishing broad changes, run:
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build        # builds only workspaces that define a build script
-npm run pack:dry-run
+pnpm run lint
+pnpm run typecheck
+pnpm test
+pnpm run build        # builds only workspaces that define a build script
+pnpm run pack:dry-run
 ```
 
 For UI work, also run browser QA with `agent-browser` against the relevant dev server or built preview.

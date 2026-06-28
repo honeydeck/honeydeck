@@ -49,7 +49,7 @@ Behavior:
 - If cancellation or interruption happens after `honeydeck init` created a new project directory, Honeydeck cleans up that generated project directory before exiting; it never deletes a directory that existed before init started
 - Opens the same interactive `npx skills add <honeydeck-package-source> --copy` flow as `honeydeck skill`, so the `skills` CLI owns skill selection, scope selection, and agent selection
 - `--install-skill` opens the Honeydeck agent skills installer without the preceding Honeydeck confirmation prompt
-- The success outro lists `cd <project>` and `npm run dev` as next steps; it does not include `npm install` because init already attempted dependency installation unless `--skip-install` was used
+- The success outro lists `cd <project>` and `pnpm run dev` as next steps; it does not include `pnpm install` because init already attempted dependency installation unless `--skip-install` was used
 - Terminal output is clean, guided, and tasteful with emojis
 
 ### `honeydeck skill`

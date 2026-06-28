@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "../../..");
 const packageJsonPath = resolve(repoRoot, "packages/honeydeck/package.json");
-const packageLockPath = resolve(repoRoot, "package-lock.json");
 const releaseNotesPath = resolve(repoRoot, "RELEASE_NOTES.md");
 
 const args = new Set(process.argv.slice(2));
@@ -45,7 +44,7 @@ const notes = createReleaseNotes(nextVersion, latestTag, conventionalCommits);
 
 if (shouldWrite) {
 	writePackageVersion(packageJsonPath, nextVersion);
-	writePackageLockVersion(packageLockPath, nextVersion);
+	refreshPnpmLockfile();
 	writeFileSync(releaseNotesPath, notes);
 }
 
@@ -171,15 +170,11 @@ function writePackageVersion(path, version) {
 	writeJson(path, data);
 }
 
-function writePackageLockVersion(path, version) {
-	const data = readJson(path);
-	if (data.packages?.["packages/honeydeck"]) {
-		data.packages["packages/honeydeck"].version = version;
-	}
-	if (data.packages?.["node_modules/@honeydeck/honeydeck"]) {
-		data.packages["node_modules/@honeydeck/honeydeck"].version = version;
-	}
-	writeJson(path, data);
+function refreshPnpmLockfile() {
+	execFileSync("pnpm", ["install", "--lockfile-only"], {
+		cwd: repoRoot,
+		stdio: "inherit",
+	});
 }
 
 function readJson(path) {

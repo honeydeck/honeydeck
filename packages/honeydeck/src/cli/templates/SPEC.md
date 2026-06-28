@@ -29,7 +29,7 @@ The `package.json` includes package metadata (`name`, `version`, `private`, `typ
 }
 ```
 
-`honeydeck init` installs dependencies with `npm install` by default and can skip installation with `--skip-install`. It also offers to open the Honeydeck agent skills installer and tells users that accepting runs `npx skills add`. Users can skip the prompt with `--skip-skill`, open the installer without the Honeydeck confirmation prompt with `--install-skill`, install from the local package with `honeydeck skill`, or install the same skills later from the Honeydeck repository with `npx skills add <honeydeck-repo-url> --copy`.
+`honeydeck init` generates a pnpm-marked starter `package.json`, installs dependencies with `pnpm install` by default, and can skip installation with `--skip-install`. It also offers to open the Honeydeck agent skills installer and tells users that accepting runs `npx skills add`. Users can skip the prompt with `--skip-skill`, open the installer without the Honeydeck confirmation prompt with `--install-skill`, install from the local package with `honeydeck skill`, or install the same skills later from the Honeydeck repository with `npx skills add <honeydeck-repo-url> --copy`.
 
 ---
 

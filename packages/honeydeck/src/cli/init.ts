@@ -8,7 +8,7 @@
  *  3. Prompt for project name (skipped with --name flag).
  *  4. Create project directory + subdirectories.
  *  5. Write all template files.
- *  6. Install dependencies with npm (skipped with --skip-install flag).
+ *  6. Install dependencies with pnpm (skipped with --skip-install flag).
  *  7. Optionally install Honeydeck agent skills.
  *  8. outro() — success message with next steps.
  */
@@ -32,7 +32,7 @@ import { generateStylesCss } from "./templates/styles-css.ts";
 export type InitOptions = {
 	/** Explicit project name — skips the interactive prompt. */
 	name: string | null;
-	/** Skip running npm install. */
+	/** Skip running pnpm install. */
 	skipInstall: boolean;
 	/** Open the Honeydeck agent skills installer; null means ask first. */
 	installSkill: boolean | null;
@@ -47,7 +47,7 @@ export function printInitHelp(): void {
 
   Options:
     --name <name>      Project name (skips interactive prompt)
-    --skip-install     Skip running npm install
+    --skip-install     Skip running pnpm install
     --skip-skill       Skip the Honeydeck agent skills installer
     --install-skill    Open the Honeydeck agent skills installer via npx skills add
     -h, --help         Show this help page
@@ -99,7 +99,7 @@ export function parseInitArgs(args: string[]): InitOptions {
 // Package manager commands
 // ---------------------------------------------------------------------------
 
-const INSTALL_COMMAND = "npm install";
+const INSTALL_COMMAND = "pnpm install";
 
 function runCommand(command: string, cwd: string): Promise<void> {
 	return new Promise((resolveCommand, rejectCommand) => {
@@ -264,7 +264,7 @@ export async function runInit(args: string[]): Promise<void> {
 	process.once("SIGINT", handleInterrupt);
 
 	// ── Step 3: Package manager ────────────────────────────────────────────────
-	p.log.step("Using npm");
+	p.log.step("Using pnpm");
 
 	// ── Step 4: Create project files ───────────────────────────────────────────
 	const spinner = p.spinner();
@@ -305,7 +305,7 @@ export async function runInit(args: string[]): Promise<void> {
 	// ── Step 5: Install dependencies ───────────────────────────────────────────
 	if (!opts.skipInstall) {
 		const installSpinner = p.spinner();
-		installSpinner.start("Installing dependencies with npm…");
+		installSpinner.start("Installing dependencies with pnpm…");
 
 		try {
 			await runCommand(INSTALL_COMMAND, projectDir);
@@ -370,7 +370,7 @@ export async function runInit(args: string[]): Promise<void> {
 			"  Next steps:",
 			"",
 			`    cd ${projectName}`,
-			"    npm run dev",
+			"    pnpm run dev",
 			"",
 			"  Happy presenting! 🐝",
 			"",

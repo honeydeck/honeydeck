@@ -11,7 +11,7 @@ Create a new Honeydeck deck with the published package:
 ```bash
 npx @honeydeck/honeydeck init --name awesome-talk
 cd awesome-talk
-npm run dev
+pnpm run dev
 ```
 
 Open the local URL printed by the dev server, edit `deck.mdx`, and your slides update instantly.
@@ -60,9 +60,9 @@ Built-in layouts include `Blank`, `Default`, `Cover`, `Section`, `TwoCol`, `Imag
 ## Common commands
 
 ```bash
-npm run dev       # present locally with hot reload
-npm run build     # build a static deck into dist/
-npm run pdf       # export deck.pdf
+pnpm run dev       # present locally with hot reload
+pnpm run build     # build a static deck into dist/
+pnpm run pdf       # export deck.pdf
 ```
 
 ## Use the Bee 🐝 theme
@@ -91,7 +91,7 @@ layouts: "@honeydeck/honeydeck/layouts/bee"
 import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
 ```
 
-Restart `npm run dev`.
+Restart `pnpm run dev`.
 
 ## Learn more
 
