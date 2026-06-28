@@ -1,5 +1,5 @@
-import { useTimeline } from "@honeydeck/honeydeck";
 import { createContext, type ReactNode, useContext } from "react";
+import { useTimeline } from "../TimelineContext.tsx";
 
 export type TimelineStepsPhase = "before" | "active" | "after";
 

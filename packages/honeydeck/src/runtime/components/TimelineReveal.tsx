@@ -1,5 +1,5 @@
-import { useTimeline } from "@honeydeck/honeydeck";
 import type { CSSProperties, ReactNode } from "react";
+import { useTimeline } from "../TimelineContext.tsx";
 
 export type TimelineRevealElement = "div" | "span";
 

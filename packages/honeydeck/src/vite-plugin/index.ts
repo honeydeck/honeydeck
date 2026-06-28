@@ -39,6 +39,11 @@ import { virtualModulesPlugin } from "./virtual-modules.ts";
 // ESM-safe equivalent of __dirname
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+export const HONEYDECK_OPTIMIZE_DEPS_EXCLUDE = [
+	"@honeydeck/honeydeck",
+	"@honeydeck/honeydeck/app-shell",
+] as const;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -339,6 +344,12 @@ export function honeydeckPlugin(
 								replacement: resolve(__dirname, "../runtime/index.ts"),
 							},
 						],
+					},
+					optimizeDeps: {
+						// Keep Honeydeck source imports in one module graph. If Vite
+						// pre-bundles the published package separately, context-backed
+						// components such as <Reveal> can read a duplicate TimelineContext.
+						exclude: [...HONEYDECK_OPTIMIZE_DEPS_EXCLUDE],
 					},
 				};
 			},

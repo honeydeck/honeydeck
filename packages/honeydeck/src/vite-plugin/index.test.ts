@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Plugin, UserConfig } from "vite";
-import { honeydeckPlugin } from "../vite-plugin/index.ts";
+import {
+	HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
+	honeydeckPlugin,
+} from "../vite-plugin/index.ts";
 
 function findPlugin(name: string): Plugin {
 	const plugin = honeydeckPlugin().find(
@@ -41,5 +44,15 @@ describe("honeydeck Vite plugin", () => {
 		assert.notEqual(appShellIndex, -1);
 		assert.notEqual(runtimeIndex, -1);
 		assert.ok(appShellIndex < runtimeIndex);
+	});
+
+	it("keeps Honeydeck package entries out of dependency pre-bundling", () => {
+		const aliasesPlugin = findPlugin("honeydeck:aliases");
+		assert.equal(typeof aliasesPlugin.config, "function");
+
+		const config = (aliasesPlugin.config as () => UserConfig)();
+		assert.deepEqual(config.optimizeDeps?.exclude, [
+			...HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
+		]);
 	});
 });
