@@ -191,6 +191,7 @@ Development-only folders and files should not be published:
 ```txt
 honeydeck
 ├── .                      → src/runtime/index.ts
+├── ./app-shell            → src/runtime/app-shell/main.tsx
 ├── ./types                → src/runtime/types.ts
 ├── ./theme.css            → src/theme/base.css
 ├── ./themes/
@@ -238,6 +239,20 @@ Honeydeck owns Vite config programmatically. Users do not provide `index.html` o
 - Build output goes to the user project `dist/` unless overridden internally by PDF export.
 - A Honeydeck HTML plugin rewrites the app-shell script placeholder before Vite bundles.
 - The user project `public/` directory is copied to the build root.
+
+### Runtime module graph invariant
+
+Context-backed runtime state must have exactly one module instance in a running deck. Examples include `TimelineContext`, `SlideScaleContext`, and `EffectiveColorModeContext`.
+
+Principles:
+
+- Honeydeck-owned source files import shared runtime state through relative/internal source paths.
+- Honeydeck-owned source files must not self-import public package entries such as `@honeydeck/honeydeck` to access shared runtime state.
+- Public package imports are for user-authored decks, custom components, layouts, generated MDX, and reserved CLI/app-shell entry points.
+- If app shell code and deck-authored imports need to meet at the same runtime state, solve it in Vite/package resolution: alias package subpaths to the same source files and prevent dependency pre-bundling from creating a second Honeydeck runtime graph.
+- Packed-package smoke tests should inspect real installed-package behavior, not only workspace behavior. Workspace aliases can hide duplicate-runtime bugs.
+
+Reason: React contexts are module-instance scoped. If Vite serves one `TimelineContext.tsx` from package source and also pre-bundles another copy through `@honeydeck/honeydeck`, providers and consumers can silently use different contexts. Navigation can advance the correct step count while reveal components remain stuck at their default context state.
 
 ---
 
