@@ -82,6 +82,10 @@ Rules:
 - `<RevealWith at={n}>` targets an existing 1-based step on the same slide. Non-literal, non-positive, and out-of-range values are compile errors.
 - In development, invalid timeline component usage is surfaced with clear terminal and browser diagnostics without permanently killing the dev server. Production builds fail.
 
+### Dependency Resolution
+
+Honeydeck treats React and React DOM as project-owned peer dependencies. The Vite plugin resolves `react`, `react/jsx-runtime`, `react/jsx-dev-runtime`, `react-dom`, `react-dom/client`, and `react-dom/server` from the deck project root for both user-authored files and Honeydeck runtime source. This keeps symlinked Honeydeck source, built-in components, third-party Honeydeck dependencies, and deck-local components on one React module instance and avoids invalid hook calls from duplicate React copies.
+
 ### Markdown Features
 
 Slide MDX supports GitHub-flavored Markdown pipe tables. Pipe tables render as real HTML tables in slides. The base theme styles slide tables with compact, full-width, token-based horizontal rules, bold headers, and light horizontal cell spacing so table Markdown is presentation-ready without custom CSS.

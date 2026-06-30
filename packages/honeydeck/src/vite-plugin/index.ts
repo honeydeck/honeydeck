@@ -22,6 +22,7 @@
  * `.mdx` and the filter passes — no special configuration needed.
  */
 
+import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import mdx from "@mdx-js/rollup";
@@ -43,6 +44,28 @@ export const HONEYDECK_OPTIMIZE_DEPS_EXCLUDE = [
 	"@honeydeck/honeydeck",
 	"@honeydeck/honeydeck/app-shell",
 ] as const;
+
+export const HONEYDECK_REACT_DEDUPE_DEPENDENCIES = [
+	"react",
+	"react/jsx-runtime",
+	"react/jsx-dev-runtime",
+	"react-dom",
+	"react-dom/client",
+	"react-dom/server",
+] as const;
+
+function escapeRegExp(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function createProjectDependencyAliases(root: string) {
+	const requireFromProject = createRequire(resolve(root, "package.json"));
+
+	return HONEYDECK_REACT_DEDUPE_DEPENDENCIES.map((specifier) => ({
+		find: new RegExp(`^${escapeRegExp(specifier)}$`),
+		replacement: requireFromProject.resolve(specifier),
+	}));
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -126,6 +149,7 @@ export function honeydeckPlugin(
 	const root = resolve(options.root ?? process.cwd());
 	const entry = options.entry ?? DEFAULT_DECK_ENTRY;
 	const entryPath = resolve(root, entry);
+	const projectDependencyAliases = createProjectDependencyAliases(root);
 
 	return [
 		// ── Layer 0: package aliases ───────────────────────────────────────
@@ -141,6 +165,9 @@ export function honeydeckPlugin(
 						// Use an array so more-specific subpath entries are matched before
 						// the bare 'honeydeck' entry (Vite processes array aliases in order).
 						alias: [
+							// React is a peer dependency and must come from the deck project,
+							// even when Honeydeck itself is symlinked from a monorepo checkout.
+							...projectDependencyAliases,
 							{
 								find: "@honeydeck/honeydeck/app-shell",
 								replacement: resolve(

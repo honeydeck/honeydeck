@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import type { Plugin, UserConfig } from "vite";
 import {
 	HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
+	HONEYDECK_REACT_DEDUPE_DEPENDENCIES,
 	honeydeckPlugin,
 } from "../vite-plugin/index.ts";
 
@@ -28,6 +29,25 @@ function getAliasEntries(config: UserConfig): AliasEntry[] {
 }
 
 describe("honeydeck Vite plugin", () => {
+	it("aliases React peer dependencies before Honeydeck package entries", () => {
+		const aliasesPlugin = findPlugin("honeydeck:aliases");
+		assert.equal(typeof aliasesPlugin.config, "function");
+
+		const config = (aliasesPlugin.config as () => UserConfig)();
+		const aliases = getAliasEntries(config);
+		const appShellIndex = aliases.findIndex(
+			(alias) => alias.find === "@honeydeck/honeydeck/app-shell",
+		);
+
+		for (const specifier of HONEYDECK_REACT_DEDUPE_DEPENDENCIES) {
+			const aliasIndex = aliases.findIndex(
+				(alias) => alias.find instanceof RegExp && alias.find.test(specifier),
+			);
+			assert.notEqual(aliasIndex, -1, `${specifier} should be aliased`);
+			assert.ok(aliasIndex < appShellIndex, `${specifier} should be first`);
+		}
+	});
+
 	it("aliases the package app shell before the bare runtime entry", () => {
 		const aliasesPlugin = findPlugin("honeydeck:aliases");
 		assert.equal(typeof aliasesPlugin.config, "function");
