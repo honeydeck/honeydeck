@@ -1,0 +1,90 @@
+---
+title: LaTeX demo
+description: Rendering LaTeX in Honeydeck with a deck-local KaTeX component.
+---
+
+import './styles.css'
+import { BlockLatex, InlineLatex } from './components/LaTeX'
+
+# LaTeX in user space
+
+Honeydeck can render LaTeX through a normal project dependency and a tiny deck-local React component.
+
+<div className="grid gap-5 text-[0.9em]">
+  <p>
+    Inline math stays in prose: <InlineLatex source={String.raw`E = mc^2`} /> and <InlineLatex source={String.raw`a^2 + b^2 = c^2`} />.
+  </p>
+
+  <BlockLatex source={String.raw`\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}`} />
+</div>
+
+---
+
+# Display equations
+
+Use a block component when the equation is the point of the slide.
+
+<BlockLatex source={String.raw`
+\begin{aligned}
+\nabla \cdot \vec{E} &= \frac{\rho}{\varepsilon_0} \\
+\nabla \cdot \vec{B} &= 0 \\
+\nabla \times \vec{E} &= -\frac{\partial \vec{B}}{\partial t} \\
+\nabla \times \vec{B} &= \mu_0\vec{J} + \mu_0\varepsilon_0\frac{\partial \vec{E}}{\partial t}
+\end{aligned}
+`} />
+
+---
+
+# Source beside result
+
+<div className="grid grid-cols-2 items-center gap-5 max-[900px]:grid-cols-1">
+  <div className="grid gap-3">
+
+    ```tex
+    \mathbb{P}(A \mid B) =
+    \frac{
+      \mathbb{P}(B \mid A)\,\mathbb{P}(A)
+    }{
+      \mathbb{P}(B)
+    }
+    ```
+
+
+    <p>
+      The component calls <code>katex.renderToString</code> and loads KaTeX CSS from the demo project.
+    </p>
+
+  </div>
+
+  <div className="self-start">
+    <BlockLatex source={String.raw`
+    \mathbb{P}(A \mid B) =
+    \frac{
+      \mathbb{P}(B \mid A)\,\mathbb{P}(A)
+    }{
+      \mathbb{P}(B)
+    }
+    `} />
+  </div>
+</div>
+
+---
+
+# Theme-friendly cards
+
+The math component is local, so normal Honeydeck theme tokens and Tailwind utilities still apply.
+
+<div className="grid grid-cols-3 gap-3 max-[900px]:grid-cols-1">
+  <div className="rounded-honeydeck border border-border bg-surface p-4 text-center text-surface-foreground">
+    <div className="mb-3 text-[0.55em] uppercase tracking-[0.14em]">Series</div>
+    <BlockLatex source={String.raw`e^x = \sum_{n=0}^{\infty}\frac{x^n}{n!}`} className="compact" />
+  </div>
+  <div className="rounded-honeydeck border border-border bg-surface p-4 text-center text-surface-foreground">
+    <div className="mb-3 text-[0.55em] uppercase tracking-[0.14em]">Vector</div>
+    <BlockLatex source={String.raw`\vec{F} = m\vec{a}`} className="compact" />
+  </div>
+  <div className="rounded-honeydeck border border-border bg-surface p-4 text-center text-surface-foreground">
+    <div className="mb-3 text-[0.55em] uppercase tracking-[0.14em]">Matrix</div>
+    <BlockLatex source={String.raw`\begin{bmatrix} a & b \\ c & d \end{bmatrix}`} className="compact" />
+  </div>
+</div>

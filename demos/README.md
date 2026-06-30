@@ -28,4 +28,5 @@ pnpm run dev
 
 ## Available demos
 
+- [`latex`](./latex/) — LaTeX rendered through a deck-local React component and normal project dependency.
 - [`mermaid`](./mermaid/) — Mermaid diagrams rendered through a deck-local React component and normal project dependency.

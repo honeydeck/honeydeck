@@ -1,0 +1,21 @@
+{
+	"name": "@honeydeck/demo-latex",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "honeydeck dev",
+		"build": "honeydeck build"
+	},
+	"dependencies": {
+		"@honeydeck/honeydeck": "file:../../packages/honeydeck",
+		"katex": "^0.16.47",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3"
+	}
+}
