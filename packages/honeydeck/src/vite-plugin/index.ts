@@ -22,9 +22,7 @@
  * `.mdx` and the filter passes — no special configuration needed.
  */
 
-import { createRequire } from "node:module";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import mdx from "@mdx-js/rollup";
 import tailwindcss from "@tailwindcss/vite";
 import remarkFrontmatter from "remark-frontmatter";
@@ -37,35 +35,19 @@ import { remarkStepNumbering } from "../remark/step-numbering.ts";
 import { tokenManifestPlugin } from "./token-manifest.ts";
 import { virtualModulesPlugin } from "./virtual-modules.ts";
 
-// ESM-safe equivalent of __dirname
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 export const HONEYDECK_OPTIMIZE_DEPS_EXCLUDE = [
 	"@honeydeck/honeydeck",
 	"@honeydeck/honeydeck/app-shell",
+	"@honeydeck/honeydeck/components",
+	"@honeydeck/honeydeck/components/code-block",
+	"@honeydeck/honeydeck/components/code-block/normal",
+	"@honeydeck/honeydeck/components/code-block/magic",
 ] as const;
 
 export const HONEYDECK_REACT_DEDUPE_DEPENDENCIES = [
 	"react",
-	"react/jsx-runtime",
-	"react/jsx-dev-runtime",
 	"react-dom",
-	"react-dom/client",
-	"react-dom/server",
 ] as const;
-
-function escapeRegExp(value: string): string {
-	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function createProjectDependencyAliases(root: string) {
-	const requireFromProject = createRequire(resolve(root, "package.json"));
-
-	return HONEYDECK_REACT_DEDUPE_DEPENDENCIES.map((specifier) => ({
-		find: new RegExp(`^${escapeRegExp(specifier)}$`),
-		replacement: requireFromProject.resolve(specifier),
-	}));
-}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -149,228 +131,17 @@ export function honeydeckPlugin(
 	const root = resolve(options.root ?? process.cwd());
 	const entry = options.entry ?? DEFAULT_DECK_ENTRY;
 	const entryPath = resolve(root, entry);
-	const projectDependencyAliases = createProjectDependencyAliases(root);
 
 	return [
-		// ── Layer 0: package aliases ───────────────────────────────────────
-		//
-		// Maps the bare `honeydeck` specifier (used in user deck.mdx) to the
-		// local runtime components, so Vite can resolve it without a published
-		// package on npm.
+		// ── Layer 0: Vite-native dependency policy ───────────────────────
 		{
-			name: "honeydeck:aliases",
+			name: "honeydeck:dependency-policy",
 			config() {
 				return {
 					resolve: {
-						// Use an array so more-specific subpath entries are matched before
-						// the bare 'honeydeck' entry (Vite processes array aliases in order).
-						alias: [
-							// React is a peer dependency and must come from the deck project,
-							// even when Honeydeck itself is symlinked from a monorepo checkout.
-							...projectDependencyAliases,
-							{
-								find: "@honeydeck/honeydeck/app-shell",
-								replacement: resolve(
-									__dirname,
-									"../runtime/app-shell/main.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/components/code-block/normal",
-								replacement: resolve(
-									__dirname,
-									"../runtime/components/NormalCodeBlock.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/components/code-block/magic",
-								replacement: resolve(
-									__dirname,
-									"../runtime/components/MagicCodeBlock.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/components/code-block",
-								replacement: resolve(
-									__dirname,
-									"../runtime/components/CodeBlock.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/ColorModeImage",
-								replacement: resolve(
-									__dirname,
-									"../layouts/ColorModeImage.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/Blank",
-								replacement: resolve(__dirname, "../layouts/bee/Blank.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/Default",
-								replacement: resolve(__dirname, "../layouts/bee/Default.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/Cover",
-								replacement: resolve(__dirname, "../layouts/bee/Cover.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/Section",
-								replacement: resolve(__dirname, "../layouts/bee/Section.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/TwoCol",
-								replacement: resolve(__dirname, "../layouts/bee/TwoCol.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/ImageLeft",
-								replacement: resolve(__dirname, "../layouts/bee/ImageLeft.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/ImageRight",
-								replacement: resolve(
-									__dirname,
-									"../layouts/bee/ImageRight.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee/Image",
-								replacement: resolve(
-									__dirname,
-									"../layouts/bee/Image/Image.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/bee",
-								replacement: resolve(__dirname, "../layouts/bee/index.ts"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/Blank",
-								replacement: resolve(__dirname, "../layouts/clean/Blank.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/Default",
-								replacement: resolve(__dirname, "../layouts/clean/Default.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/Cover",
-								replacement: resolve(__dirname, "../layouts/clean/Cover.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/Section",
-								replacement: resolve(__dirname, "../layouts/clean/Section.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/TwoCol",
-								replacement: resolve(__dirname, "../layouts/clean/TwoCol.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/ImageLeft",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/ImageLeft.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/ImageRight",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/ImageRight.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean/Image",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/Image/Image.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/clean",
-								replacement: resolve(__dirname, "../layouts/clean/index.ts"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/Blank",
-								replacement: resolve(__dirname, "../layouts/clean/Blank.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/Default",
-								replacement: resolve(__dirname, "../layouts/clean/Default.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/placeholders",
-								replacement: resolve(__dirname, "../layouts/placeholders.ts"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/Cover",
-								replacement: resolve(__dirname, "../layouts/clean/Cover.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/Section",
-								replacement: resolve(__dirname, "../layouts/clean/Section.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/TwoCol",
-								replacement: resolve(__dirname, "../layouts/clean/TwoCol.tsx"),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/ImageLeft",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/ImageLeft.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/ImageRight",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/ImageRight.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts/Image",
-								replacement: resolve(
-									__dirname,
-									"../layouts/clean/Image/Image.tsx",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck/layouts",
-								replacement: resolve(__dirname, "../layouts/index.ts"),
-							},
-							{
-								find: "@honeydeck/honeydeck/types",
-								replacement: resolve(__dirname, "../runtime/types.ts"),
-							},
-							{
-								find: "@honeydeck/honeydeck/theme.css",
-								replacement: resolve(__dirname, "../theme/base.css"),
-							},
-							{
-								find: "@honeydeck/honeydeck/themes/base.css",
-								replacement: resolve(__dirname, "../theme/base.css"),
-							},
-							{
-								find: "@honeydeck/honeydeck/themes/clean.css",
-								replacement: resolve(__dirname, "../theme/clean.css"),
-							},
-							{
-								find: "@honeydeck/honeydeck/themes/bee.css",
-								replacement: resolve(__dirname, "../theme/bee.css"),
-							},
-							{
-								find: "@honeydeck/honeydeck/components",
-								replacement: resolve(
-									__dirname,
-									"../runtime/components/index.ts",
-								),
-							},
-							{
-								find: "@honeydeck/honeydeck",
-								replacement: resolve(__dirname, "../runtime/index.ts"),
-							},
-						],
+						// React is a peer dependency. Ask Vite to keep linked package
+						// source and deck-authored code on the project-root copy.
+						dedupe: [...HONEYDECK_REACT_DEDUPE_DEPENDENCIES],
 					},
 					optimizeDeps: {
 						// Keep Honeydeck source imports in one module graph. If Vite
@@ -384,9 +155,9 @@ export function honeydeckPlugin(
 
 		// ── Layer 1a: Tailwind source injection ────────────────────────────────
 		//
-		// `honeydeck build` / `honeydeck pdf` use the package app-shell as Vite root, so
-		// Tailwind's default scanner would otherwise miss project-local MDX/TSX
-		// files. Add an explicit @source to every user Tailwind entry stylesheet.
+		// Add the project root as an explicit source to every user Tailwind entry
+		// stylesheet so generated virtual modules and deck-local components are
+		// visible to Tailwind's scanner.
 		tailwindUserSourcePlugin(root),
 
 		// ── Layer 1b: token manifest ────────────────────────────────────────────

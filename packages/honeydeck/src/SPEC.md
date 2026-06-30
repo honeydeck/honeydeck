@@ -7,6 +7,9 @@
 ### Import Patterns
 
 ```ts
+// Optional ejected Vite setup
+import { honeydeckPlugin } from '@honeydeck/honeydeck/vite'
+
 // Core components
 import { Reveal, RevealWith, RevealGroup, Fade, FadeWith, FadeGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes, ColorModeImage } from '@honeydeck/honeydeck'
 

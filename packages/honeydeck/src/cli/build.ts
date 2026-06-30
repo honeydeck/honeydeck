@@ -3,26 +3,17 @@
  *
  * ### Architecture
  *
- * Vite root is set to `src/runtime/app-shell/` so that `index.html` lives
- * at the root and Vite outputs it as `dist/index.html`.
+ * Vite root is set to the user deck directory so project-local files, assets,
+ * CSS, and peer dependencies resolve with normal Vite semantics.
  *
- *   Why APP_SHELL_DIR as root?
- *   Vite's default HTML entry resolution uses `<root>/index.html`. By setting
- *   root to the directory that *owns* our shell HTML we get clean output paths
- *   without having to configure `rollupOptions.input` to an unusual path.
- *
- * The `__HONEYDECK_APP_SHELL_ENTRY__` placeholder in index.html is replaced
- * with `@honeydeck/honeydeck/app-shell` by the `buildHtmlPlugin`. Vite then
- * resolves the app shell through the same package entry system that user decks
+ * The app-shell `index.html` lives in the Honeydeck package and is passed as
+ * Vite's explicit HTML input. The `__HONEYDECK_APP_SHELL_ENTRY__` placeholder
+ * in that HTML is replaced with `@honeydeck/honeydeck/app-shell` by the
+ * `buildHtmlPlugin`. Vite then resolves the app shell through the same package
+ * entry system that user decks
  * use for `@honeydeck/honeydeck` imports.
  *
- * User project files (deck entry, CSS, components) are outside APP_SHELL_DIR
- * but are accessed via absolute paths by `honeydeckPlugin`'s virtual module
- * resolver and resolveId hooks. Rollup (used by Vite during build) has no
- * file-system restrictions — all absolute paths are accessible.
- *
- * `outDir` points to `<userRoot>/dist` (outside the Vite root). Vite 5+
- * allows this when `emptyOutDir: true` is set explicitly.
+ * `outDir` points to `<userRoot>/dist`.
  *
  * ### Output structure
  * ```
@@ -35,8 +26,14 @@
  * ```
  */
 
-import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import {
+	existsSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import { build } from "vite";
@@ -59,8 +56,11 @@ const __dirname = dirname(__filename);
 // Paths
 // ---------------------------------------------------------------------------
 
-/** Absolute path to src/runtime/app-shell/ — used as Vite root for build. */
+/** Absolute path to src/runtime/app-shell/ — owns the packaged app HTML. */
 export const APP_SHELL_DIR = resolve(__dirname, "../runtime/app-shell");
+
+/** Absolute path to the packaged app-shell HTML input. */
+export const INDEX_HTML_PATH = resolve(APP_SHELL_DIR, "index.html");
 
 // ---------------------------------------------------------------------------
 // HTML fix plugin — shared with pdf.ts via the export below
@@ -82,6 +82,23 @@ export function buildHtmlPlugin(): Plugin {
 			handler(html: string): string {
 				return injectHoneydeckAppShellEntry(html);
 			},
+		},
+	};
+}
+
+function buildHtmlOutputPlugin(inputDirName: string): Plugin {
+	return {
+		name: "honeydeck:build-html-output",
+		enforce: "post",
+		generateBundle(_options, bundle) {
+			const prefix = `${inputDirName}/`;
+
+			for (const asset of Object.values(bundle)) {
+				if (asset.type !== "asset") continue;
+				if (asset.fileName === `${prefix}index.html`) {
+					asset.fileName = "index.html";
+				}
+			}
 		},
 	};
 }
@@ -114,26 +131,37 @@ export async function buildPresentation(config: BuildConfig): Promise<void> {
 	// Only pass publicDir when the project actually has a public/ folder,
 	// otherwise Vite logs a harmless-but-noisy "public dir does not exist" warning.
 	const publicDir = resolve(userRoot, "public");
+	const htmlInputDir = mkdtempSync(join(userRoot, ".honeydeck-build-"));
+	const htmlInputPath = join(htmlInputDir, "index.html");
+	writeFileSync(htmlInputPath, readFileSync(INDEX_HTML_PATH, "utf-8"));
 
-	await build({
-		// root = APP_SHELL_DIR: index.html is here, outputs to outDir/index.html.
-		root: APP_SHELL_DIR,
-		publicDir: existsSync(publicDir) ? publicDir : false,
-		logLevel,
+	try {
+		await build({
+			// root = userRoot: dependencies, CSS, assets, and local components resolve
+			// exactly as they would in an ejected Vite config.
+			root: userRoot,
+			publicDir: existsSync(publicDir) ? publicDir : false,
+			logLevel,
 
-		build: {
-			outDir,
-			// Explicit true so Vite honours it even though outDir is outside the root.
-			emptyOutDir: true,
-		},
+			build: {
+				outDir,
+				emptyOutDir: true,
+				rollupOptions: {
+					input: htmlInputPath,
+				},
+			},
 
-		plugins: [
-			// Replace HTML placeholder before Vite bundles the entry script.
-			buildHtmlPlugin(),
-			// Virtual slides + MDX compilation + Tailwind — user files via userRoot.
-			...honeydeckPlugin({ root: userRoot, entry }),
-		],
-	});
+			plugins: [
+				// Replace HTML placeholder before Vite bundles the entry script.
+				buildHtmlPlugin(),
+				buildHtmlOutputPlugin(basename(htmlInputDir)),
+				// Virtual slides + MDX compilation + Tailwind — user files via userRoot.
+				...honeydeckPlugin({ root: userRoot, entry }),
+			],
+		});
+	} finally {
+		rmSync(htmlInputDir, { recursive: true, force: true });
+	}
 }
 
 // ---------------------------------------------------------------------------

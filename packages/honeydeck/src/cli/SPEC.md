@@ -81,7 +81,7 @@ honeydeck dev --deck talk.mdx # use a different deck entry file
 ```
 
 Behavior:
-- Starts internal Vite dev server
+- Starts internal Vite dev server with the deck directory as Vite root
 - Binds the dev server to all local network interfaces so other devices on the same LAN can open the printed Network URL
 - HMR enabled for MDX/components/styles
 - Does not auto-open browser unless `--open` flag is used
@@ -119,6 +119,8 @@ dist/
     index-[hash].css
   (contents of project public/ copied to dist root)
 ```
+
+Production builds use the deck directory as Vite root so project assets, CSS, and dependencies resolve like a normal Vite app. The generated app shell still comes from Honeydeck and is emitted as `dist/index.html`.
 
 Deployable to any static host without server-side routing (hash-based URLs).
 

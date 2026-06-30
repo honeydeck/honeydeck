@@ -45,6 +45,7 @@
 	"exports": {
 		".": "./src/runtime/index.ts",
 		"./app-shell": "./src/runtime/app-shell/main.tsx",
+		"./vite": "./src/vite-plugin/index.ts",
 		"./types": "./src/runtime/types.ts",
 		"./layouts": "./src/layouts/index.ts",
 		"./layouts/ColorModeImage": "./src/layouts/ColorModeImage.tsx",
@@ -99,6 +100,7 @@
 		"prepack": "pnpm --filter @honeydeck/docs run export:package-docs",
 		"pack:dry-run": "pnpm pack --dry-run",
 		"pack:smoke": "node ./scripts/packed-smoke.mjs",
+		"smoke:file-link": "node ./scripts/file-link-smoke.mjs",
 		"release:plan": "node ./scripts/release-plan.mjs",
 		"test": "node --test --import tsx \"src/**/*.test.ts\" \"src/**/*.test.tsx\"",
 		"typecheck": "tsc --noEmit"

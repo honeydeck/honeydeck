@@ -20,57 +20,23 @@ function findPlugin(name: string): Plugin {
 	return plugin;
 }
 
-type AliasEntry = { find: string | RegExp; replacement: string };
-
-function getAliasEntries(config: UserConfig): AliasEntry[] {
-	const alias = config.resolve?.alias;
-	assert.ok(Array.isArray(alias), "aliases should be an ordered array");
-	return alias as AliasEntry[];
-}
-
 describe("honeydeck Vite plugin", () => {
-	it("aliases React peer dependencies before Honeydeck package entries", () => {
-		const aliasesPlugin = findPlugin("honeydeck:aliases");
-		assert.equal(typeof aliasesPlugin.config, "function");
+	it("dedupes React peer dependencies through Vite", () => {
+		const policyPlugin = findPlugin("honeydeck:dependency-policy");
+		assert.equal(typeof policyPlugin.config, "function");
 
-		const config = (aliasesPlugin.config as () => UserConfig)();
-		const aliases = getAliasEntries(config);
-		const appShellIndex = aliases.findIndex(
-			(alias) => alias.find === "@honeydeck/honeydeck/app-shell",
-		);
-
-		for (const specifier of HONEYDECK_REACT_DEDUPE_DEPENDENCIES) {
-			const aliasIndex = aliases.findIndex(
-				(alias) => alias.find instanceof RegExp && alias.find.test(specifier),
-			);
-			assert.notEqual(aliasIndex, -1, `${specifier} should be aliased`);
-			assert.ok(aliasIndex < appShellIndex, `${specifier} should be first`);
-		}
-	});
-
-	it("aliases the package app shell before the bare runtime entry", () => {
-		const aliasesPlugin = findPlugin("honeydeck:aliases");
-		assert.equal(typeof aliasesPlugin.config, "function");
-
-		const config = (aliasesPlugin.config as () => UserConfig)();
-		const aliases = getAliasEntries(config);
-		const appShellIndex = aliases.findIndex(
-			(alias) => alias.find === "@honeydeck/honeydeck/app-shell",
-		);
-		const runtimeIndex = aliases.findIndex(
-			(alias) => alias.find === "@honeydeck/honeydeck",
-		);
-
-		assert.notEqual(appShellIndex, -1);
-		assert.notEqual(runtimeIndex, -1);
-		assert.ok(appShellIndex < runtimeIndex);
+		const config = (policyPlugin.config as () => UserConfig)();
+		assert.deepEqual(config.resolve?.dedupe, [
+			...HONEYDECK_REACT_DEDUPE_DEPENDENCIES,
+		]);
+		assert.equal(config.resolve?.alias, undefined);
 	});
 
 	it("keeps Honeydeck package entries out of dependency pre-bundling", () => {
-		const aliasesPlugin = findPlugin("honeydeck:aliases");
-		assert.equal(typeof aliasesPlugin.config, "function");
+		const policyPlugin = findPlugin("honeydeck:dependency-policy");
+		assert.equal(typeof policyPlugin.config, "function");
 
-		const config = (aliasesPlugin.config as () => UserConfig)();
+		const config = (policyPlugin.config as () => UserConfig)();
 		assert.deepEqual(config.optimizeDeps?.exclude, [
 			...HONEYDECK_OPTIMIZE_DEPS_EXCLUDE,
 		]);

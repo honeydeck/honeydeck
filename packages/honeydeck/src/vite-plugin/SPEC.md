@@ -82,9 +82,13 @@ Rules:
 - `<RevealWith at={n}>` targets an existing 1-based step on the same slide. Non-literal, non-positive, and out-of-range values are compile errors.
 - In development, invalid timeline component usage is surfaced with clear terminal and browser diagnostics without permanently killing the dev server. Production builds fail.
 
-### Dependency Resolution
+### Vite Project Root and Dependency Resolution
 
-Honeydeck treats React and React DOM as project-owned peer dependencies. The Vite plugin resolves `react`, `react/jsx-runtime`, `react/jsx-dev-runtime`, `react-dom`, `react-dom/client`, and `react-dom/server` from the deck project root for both user-authored files and Honeydeck runtime source. This keeps symlinked Honeydeck source, built-in components, third-party Honeydeck dependencies, and deck-local components on one React module instance and avoids invalid hook calls from duplicate React copies.
+Honeydeck uses the deck directory as the Vite project root for both development and production builds. Deck-local files, assets, CSS, and installed dependencies therefore resolve with normal Vite semantics.
+
+Honeydeck treats React and React DOM as project-owned peer dependencies. The Vite plugin asks Vite to dedupe `react` and `react-dom` instead of manually aliasing them to concrete files. This keeps linked Honeydeck package source, built-in components, third-party Honeydeck dependencies, and deck-local components on one React module instance while preserving a clean ejected Vite configuration path.
+
+Honeydeck package subpaths are resolved through the package `exports` map. The Vite plugin must not alias public `@honeydeck/honeydeck/*` imports to private source paths unless a virtual-module feature cannot be represented by package metadata. Runtime/component Honeydeck package entries are excluded from Vite dependency pre-bundling so context-backed components stay in the same source module graph as the app shell.
 
 ### Markdown Features
 
