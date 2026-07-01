@@ -20,7 +20,8 @@ export default function WelcomeCover({ title, children }: LayoutProps) {
   });
 
   return (
-		<div className="grid h-full place-items-center">
+    // Sometimes the canvas scales to not fill the slide - in those cases, we place it centrally.
+		<div className="grid h-full place-items-center bg-black [&_.grainient-container]:grid [&_.grainient-container]:place-items-center">
 			<Grainient
 				color1={accent} // accent
 				color2={primary} // Primary
