@@ -8,7 +8,7 @@
 		"skipLibCheck": true,
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-    "resolvePackageJsonImports": true
+		"resolvePackageJsonImports": true
 	},
 	"include": ["**/*.ts", "**/*.tsx"]
 }

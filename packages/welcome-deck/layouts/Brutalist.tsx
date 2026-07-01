@@ -12,14 +12,8 @@ export default function Brutalist({ title, children }: LayoutProps) {
 			</div>
 
 			<div className="flex h-full flex-col justify-center w-3/4">
-				{title && (
-					<h1 className="uppercase">
-						{title}
-					</h1>
-				)}
-				<div className="[&_.honeydeck-code-block]:w-3/4">
-					{children}
-				</div>
+				{title && <h1 className="uppercase">{title}</h1>}
+				<div className="[&_.honeydeck-code-block]:w-3/4">{children}</div>
 			</div>
 		</div>
 	);
