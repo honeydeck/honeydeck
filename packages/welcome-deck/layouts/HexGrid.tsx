@@ -5,7 +5,7 @@ export default function HexGrid({ title, children }: LayoutProps) {
 	const patternId = `hex-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
 	return (
-		<div className="relative h-full overflow-hidden bg-background p-16">
+		<div className="h-full p-16">
 			{/* Hex pattern background */}
 			<svg
 				aria-hidden="true"
@@ -39,13 +39,13 @@ export default function HexGrid({ title, children }: LayoutProps) {
 				<rect width="100%" height="100%" fill={`url(#${patternId})`} />
 			</svg>
 
-			<div className="relative z-10 flex h-full flex-col justify-center">
+			<div className="flex h-full flex-col justify-center">
 				{title && (
-					<h1 className="mb-8 text-[3rem] font-black tracking-tight text-foreground">
+					<h1>
 						<span className="border-b-4 border-accent pb-2">{title}</span>
 					</h1>
 				)}
-				<div className="text-lg text-foreground/80">{children}</div>
+				<div>{children}</div>
 			</div>
 		</div>
 	);

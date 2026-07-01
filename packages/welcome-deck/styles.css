@@ -1,3 +1,6 @@
 @import "tailwindcss";
 @import "@honeydeck/honeydeck/theme.css";
 @import "@honeydeck/honeydeck/themes/bee.css";
+
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";

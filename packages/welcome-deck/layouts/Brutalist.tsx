@@ -2,7 +2,7 @@ import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
 
 export default function Brutalist({ title, children }: LayoutProps) {
 	return (
-		<div className="relative h-full overflow-hidden bg-accent p-12">
+		<div className="h-full overflow-hidden bg-accent p-16">
 			{/* Thick border frame */}
 			<div className="absolute inset-4 border-[6px] border-[#111111]" />
 
@@ -11,13 +11,13 @@ export default function Brutalist({ title, children }: LayoutProps) {
 				HONEY
 			</div>
 
-			<div className="relative z-10 flex h-full flex-col justify-center p-12">
+			<div className="flex h-full flex-col justify-center w-3/4">
 				{title && (
-					<h1 className="mb-8 text-[3.5rem] leading-[1] font-black uppercase text-[#111111]">
+					<h1 className="uppercase">
 						{title}
 					</h1>
 				)}
-				<div className="text-lg font-medium text-[#111111]/80 [&_.honeydeck-code-block]:w-1/2">
+				<div className="[&_.honeydeck-code-block]:w-3/4">
 					{children}
 				</div>
 			</div>
