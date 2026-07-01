@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+@import "@honeydeck/honeydeck/themes/bee.css";
+@import "katex/dist/katex.min.css";
+
+.latex-inline {
+	white-space: nowrap;
+}
+
+.latex-display {
+	margin: 0;
+	overflow-x: auto;
+	border: 1px solid var(--honeydeck-border);
+	border-radius: var(--honeydeck-border-radius);
+	background: var(--honeydeck-surface);
+	padding: 0.75em 1em;
+	color: var(--honeydeck-surface-foreground);
+	font-size: 1.1em;
+}
+
+.latex-display.compact {
+	padding: 0.6em;
+	font-size: 0.85em;
+}
+
+.latex-display .katex-display {
+	margin: 0;
+}
+
+.latex-display .katex {
+	max-width: 100%;
+}

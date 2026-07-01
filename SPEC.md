@@ -43,6 +43,7 @@ This root spec is the monorepo overview and navigation map. Detailed observable 
 | Fumadocs docs site | [`packages/docs/SPEC.md`](packages/docs/SPEC.md) | Public docs shell, canonical MDX docs content, start page, search, SEO/social/LLM routes |
 | Showcase deck | [`packages/showcase/SPEC.md`](packages/showcase/SPEC.md) | Feature showcase deck behavior and package-local demo layouts/components |
 | Welcome deck | [`packages/welcome-deck/SPEC.md`](packages/welcome-deck/SPEC.md) | Compact welcome deck behavior and package-local demo layouts |
+| Standalone demos | [`demos/SPEC.md`](demos/SPEC.md) | Standalone demo projects for user-space integrations |
 | Release governance | [`.github/SPEC.md`](.github/SPEC.md) | CI checks, PR title contract, npm publishing for `honeydeck` |
 | Development workflow | [`DEVELOPMENT.md`](DEVELOPMENT.md) | Monorepo commands and package boundaries |
 
