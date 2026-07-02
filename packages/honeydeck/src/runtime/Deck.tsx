@@ -32,6 +32,7 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -47,6 +48,10 @@ import {
 	type EffectiveColorMode,
 	EffectiveColorModeProvider,
 } from "./EffectiveColorModeContext.tsx";
+import {
+	HoneydeckProvider,
+	resolveHoneydeckConfig,
+} from "./HoneydeckContext.tsx";
 import { rememberSlideRoute } from "./lastSlideRoute.ts";
 import { startMagicTransition } from "./magicTransition.ts";
 import {
@@ -440,14 +445,34 @@ export function Deck() {
 		});
 	}, [magicTransitionScale, slideTransition]);
 
+	const currentSlideData = slideData[currentSlide - 1];
+	const honeydeckContextValue = useMemo(
+		() => ({
+			config: resolveHoneydeckConfig(config),
+			currentSlide: {
+				index: currentSlide,
+				step: currentStep,
+				maxSteps: currentSlideData?.stepCount ?? 0,
+				layout: currentSlideData?.layoutName ?? "Default",
+				layoutProps: currentSlideData?.frontmatter ?? {},
+			},
+			mode: effectiveColorMode,
+		}),
+		[currentSlide, currentStep, currentSlideData, effectiveColorMode],
+	);
+
 	// ── Reference mode: delegate to DocsView ─────────────────────────────
 	if (route.view === "kit") {
 		return (
-			<DocsView
-				tab={route.kitTab}
-				colorMode={colorMode}
-				onSetColorMode={setColorMode}
-			/>
+			<EffectiveColorModeProvider mode={effectiveColorMode}>
+				<HoneydeckProvider value={honeydeckContextValue}>
+					<DocsView
+						tab={route.kitTab}
+						colorMode={colorMode}
+						onSetColorMode={setColorMode}
+					/>
+				</HoneydeckProvider>
+			</EffectiveColorModeProvider>
 		);
 	}
 
@@ -483,202 +508,206 @@ export function Deck() {
 		route.view === "slide" &&
 		pointerLayout.isTouchDevice &&
 		!slideTextSelectionEnabled;
-
 	// ---------------------------------------------------------------------------
 	// Render
 	// ---------------------------------------------------------------------------
 
 	return (
 		<EffectiveColorModeProvider mode={effectiveColorMode}>
-			<div className="fixed inset-0 overflow-hidden bg-black">
-				{/* ── Sizing container: fills viewport for scale calc ──────── */}
-				<div
-					ref={stageRef}
-					className={`absolute inset-0 ${disableSlideTextSelection ? "select-none" : ""}`}
-				>
-					{/* ── Stage backdrop: themed bg at slide size, prevents flicker ──── */}
+			<HoneydeckProvider value={honeydeckContextValue}>
+				<div className="fixed inset-0 overflow-hidden bg-black">
+					{/* ── Sizing container: fills viewport for scale calc ──────── */}
 					<div
-						aria-hidden="true"
-						className="absolute inset-0 flex items-center justify-center"
+						ref={stageRef}
+						className={`absolute inset-0 ${disableSlideTextSelection ? "select-none" : ""}`}
 					>
+						{/* ── Stage backdrop: themed bg at slide size, prevents flicker ──── */}
 						<div
-							className="shrink-0 bg-background"
-							style={{
-								width: BASE_WIDTH,
-								height: BASE_HEIGHT,
-								transform: `scale(${scale})`,
-								transformOrigin: "center center",
-							}}
-						/>
-					</div>
-
-					{/* ── All slides (only current is visible) ──────────────────────── */}
-					{slideData.map((data, i) => {
-						const slideNumber = i + 1;
-						const isCurrent = slideNumber === currentSlide;
-						const activeTransition = slideTransition;
-						const transitionRole =
-							activeTransition?.to === slideNumber
-								? "enter"
-								: activeTransition?.from === slideNumber
-									? "exit"
-									: null;
-						const isVisible = isCurrent || transitionRole !== null;
-						const slideStepIndex =
-							transitionRole === "exit" && activeTransition
-								? activeTransition.fromStep
-								: transitionRole === "enter" && activeTransition
-									? activeTransition.toStep
-									: isCurrent
-										? currentStep
-										: 0;
-						const transitionLayerClass =
-							transitionRole && activeTransition
-								? `honeydeck-transition-${activeTransition.className} honeydeck-transition-${transitionRole}`
-								: "";
-						const layerStyle =
-							transitionRole && activeTransition
-								? ({
-										"--honeydeck-transition-duration": `${activeTransition.duration}ms`,
-										"--honeydeck-transition-easing": activeTransition.easing,
-										"--honeydeck-transition-direction":
-											activeTransition.direction,
-										"--honeydeck-transition-enter-from-opacity":
-											activeTransition.enterFromOpacity,
-										"--honeydeck-transition-exit-from-opacity":
-											activeTransition.exitFromOpacity,
-									} as CSSProperties)
-								: undefined;
-						const { Component, stepCount, title, frontmatter, layoutName } =
-							data;
-						const LayoutComponent = resolveLayout(layoutName);
-
-						return (
+							aria-hidden="true"
+							className="absolute inset-0 flex items-center justify-center"
+						>
 							<div
-								key={data.id}
-								aria-hidden={!isCurrent}
-								className={`absolute inset-0 flex items-center justify-center ${
-									isVisible ? "visible" : "invisible"
-								} ${isCurrent ? "pointer-events-auto" : "pointer-events-none"} ${
-									transitionRole === "enter"
-										? "z-2"
-										: transitionRole === "exit"
-											? "z-1"
-											: isCurrent
-												? "z-1"
-												: "z-0"
-								}`}
-							>
-								<div
-									className="shrink-0 overflow-hidden"
-									style={{
-										width: BASE_WIDTH,
-										height: BASE_HEIGHT,
-										transform: `scale(${scale})`,
-										transformOrigin: "center center",
-									}}
-								>
-									<div
-										ref={(element) => {
-											slideLayerRefs.current[slideNumber] = element;
-										}}
-										className={`honeydeck-slide-layer relative ${
-											isCurrent ? "opacity-100" : "opacity-0"
-										} ${transitionLayerClass}`}
-										style={{
-											width: BASE_WIDTH,
-											height: BASE_HEIGHT,
-											...layerStyle,
-										}}
-									>
-										<TimelineProvider
-											stepIndex={slideStepIndex}
-											stepCount={stepCount}
-										>
-											<SlideScaleProvider scale={activeSlideScale}>
-												<div
-													className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
-													style={{
-														width: BASE_WIDTH,
-														height: BASE_HEIGHT,
-														transform: zoomedSlideTransform,
-														transformOrigin: "center center",
-													}}
-												>
-													<ErrorBoundary slideNumber={slideNumber}>
-														<LayoutComponent
-															title={title || null}
-															frontmatter={frontmatter}
-															rawChildren={<Component />}
-														>
-															<Component />
-														</LayoutComponent>
-													</ErrorBoundary>
-												</div>
-											</SlideScaleProvider>
-										</TimelineProvider>
-									</div>
-								</div>
-							</div>
-						);
-					})}
-
-					{showSlideNumbers && (
-						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-							<div
-								className="honeydeck-slide-number-layer shrink-0 relative"
+								className="shrink-0 bg-background"
 								style={{
 									width: BASE_WIDTH,
 									height: BASE_HEIGHT,
-									transform: slideTransform,
+									transform: `scale(${scale})`,
 									transformOrigin: "center center",
 								}}
-							>
-								<SlideNumberBadge slide={currentSlide} />
-							</div>
+							/>
 						</div>
+
+						{/* ── All slides (only current is visible) ──────────────────────── */}
+						{slideData.map((data, i) => {
+							const slideNumber = i + 1;
+							const isCurrent = slideNumber === currentSlide;
+							const activeTransition = slideTransition;
+							const transitionRole =
+								activeTransition?.to === slideNumber
+									? "enter"
+									: activeTransition?.from === slideNumber
+										? "exit"
+										: null;
+							const isVisible = isCurrent || transitionRole !== null;
+							const slideStepIndex =
+								transitionRole === "exit" && activeTransition
+									? activeTransition.fromStep
+									: transitionRole === "enter" && activeTransition
+										? activeTransition.toStep
+										: isCurrent
+											? currentStep
+											: 0;
+							const transitionLayerClass =
+								transitionRole && activeTransition
+									? `honeydeck-transition-${activeTransition.className} honeydeck-transition-${transitionRole}`
+									: "";
+							const layerStyle =
+								transitionRole && activeTransition
+									? ({
+											"--honeydeck-transition-duration": `${activeTransition.duration}ms`,
+											"--honeydeck-transition-easing": activeTransition.easing,
+											"--honeydeck-transition-direction":
+												activeTransition.direction,
+											"--honeydeck-transition-enter-from-opacity":
+												activeTransition.enterFromOpacity,
+											"--honeydeck-transition-exit-from-opacity":
+												activeTransition.exitFromOpacity,
+										} as CSSProperties)
+									: undefined;
+							const { Component, stepCount, title, frontmatter, layoutName } =
+								data;
+							const LayoutComponent = resolveLayout(layoutName);
+
+							return (
+								<div
+									key={data.id}
+									aria-hidden={!isCurrent}
+									className={`absolute inset-0 flex items-center justify-center ${
+										isVisible ? "visible" : "invisible"
+									} ${isCurrent ? "pointer-events-auto" : "pointer-events-none"} ${
+										transitionRole === "enter"
+											? "z-2"
+											: transitionRole === "exit"
+												? "z-1"
+												: isCurrent
+													? "z-1"
+													: "z-0"
+									}`}
+								>
+									<div
+										className="shrink-0 overflow-hidden"
+										style={{
+											width: BASE_WIDTH,
+											height: BASE_HEIGHT,
+											transform: `scale(${scale})`,
+											transformOrigin: "center center",
+										}}
+									>
+										<div
+											ref={(element) => {
+												slideLayerRefs.current[slideNumber] = element;
+											}}
+											className={`honeydeck-slide-layer relative ${
+												isCurrent ? "opacity-100" : "opacity-0"
+											} ${transitionLayerClass}`}
+											style={{
+												width: BASE_WIDTH,
+												height: BASE_HEIGHT,
+												...layerStyle,
+											}}
+										>
+											<TimelineProvider
+												stepIndex={slideStepIndex}
+												stepCount={stepCount}
+											>
+												<SlideScaleProvider scale={activeSlideScale}>
+													<div
+														className="honeydeck-slide-canvas shrink-0 relative overflow-hidden box-border"
+														style={{
+															width: BASE_WIDTH,
+															height: BASE_HEIGHT,
+															transform: zoomedSlideTransform,
+															transformOrigin: "center center",
+														}}
+													>
+														<ErrorBoundary slideNumber={slideNumber}>
+															<LayoutComponent
+																title={title || null}
+																frontmatter={frontmatter}
+																rawChildren={<Component />}
+															>
+																<Component />
+															</LayoutComponent>
+														</ErrorBoundary>
+													</div>
+												</SlideScaleProvider>
+											</TimelineProvider>
+										</div>
+									</div>
+								</div>
+							);
+						})}
+
+						{showSlideNumbers && (
+							<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+								<div
+									className="honeydeck-slide-number-layer shrink-0 relative"
+									style={{
+										width: BASE_WIDTH,
+										height: BASE_HEIGHT,
+										transform: slideTransform,
+										transformOrigin: "center center",
+									}}
+								>
+									<SlideNumberBadge slide={currentSlide} />
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* ── Overview overlay ──────────────────────────────────────────── */}
+					{isOverview && (
+						<OverviewView
+							currentSlide={currentSlide}
+							currentStep={currentStep}
+							onClose={() =>
+								closeOverview(controlRoute, {
+									slideCount: slideData.length,
+									getStepCount,
+								})
+							}
+						/>
+					)}
+
+					{/* ── Black screen overlay (controlled by presenter) ────────── */}
+					{blankScreen === "black" && (
+						<div
+							className="fixed inset-0 bg-black z-[100]"
+							aria-hidden="true"
+						/>
+					)}
+
+					{/* ── Navigation bar ────────────────────────────────────────────── */}
+					{/* GAP-06: showSlideNumbers wired from config */}
+					{!isOverview && (
+						<NavBarWithHover
+							route={controlRoute}
+							isOverview={isOverview}
+							colorMode={colorMode}
+							onToggleOverview={toggleOverview}
+							onSetColorMode={setColorMode}
+							isZoomed={slideZoom > 1}
+							onResetZoom={resetZoom}
+							toggleSignal={navBarToggleSignal}
+							showTextSelectionToggle={pointerLayout.isTouchDevice}
+							isTextSelectionEnabled={slideTextSelectionEnabled}
+							onToggleTextSelection={() =>
+								setSlideTextSelectionEnabled((value) => !value)
+							}
+						/>
 					)}
 				</div>
-
-				{/* ── Overview overlay ──────────────────────────────────────────── */}
-				{isOverview && (
-					<OverviewView
-						currentSlide={currentSlide}
-						currentStep={currentStep}
-						onClose={() =>
-							closeOverview(controlRoute, {
-								slideCount: slideData.length,
-								getStepCount,
-							})
-						}
-					/>
-				)}
-
-				{/* ── Black screen overlay (controlled by presenter) ────────── */}
-				{blankScreen === "black" && (
-					<div className="fixed inset-0 bg-black z-[100]" aria-hidden="true" />
-				)}
-
-				{/* ── Navigation bar ────────────────────────────────────────────── */}
-				{/* GAP-06: showSlideNumbers wired from config */}
-				{!isOverview && (
-					<NavBarWithHover
-						route={controlRoute}
-						isOverview={isOverview}
-						colorMode={colorMode}
-						onToggleOverview={toggleOverview}
-						onSetColorMode={setColorMode}
-						isZoomed={slideZoom > 1}
-						onResetZoom={resetZoom}
-						toggleSignal={navBarToggleSignal}
-						showTextSelectionToggle={pointerLayout.isTouchDevice}
-						isTextSelectionEnabled={slideTextSelectionEnabled}
-						onToggleTextSelection={() =>
-							setSlideTextSelectionEnabled((value) => !value)
-						}
-					/>
-				)}
-			</div>
+			</HoneydeckProvider>
 		</EffectiveColorModeProvider>
 	);
 }

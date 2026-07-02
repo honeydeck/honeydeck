@@ -1,0 +1,70 @@
+---
+title: Runtime context
+description: Read deck config, current slide state, layout props, and color mode from custom components and layouts.
+---
+
+# Runtime context
+
+Use `useHoneydeck()` when custom components or custom layouts need to know where they are in the deck.
+
+```tsx
+import { useHoneydeck } from "@honeydeck/honeydeck"
+
+export function SlideStatus() {
+  const honeydeck = useHoneydeck()
+
+  return (
+    <div>
+      Slide {honeydeck.currentSlide.index}, step {honeydeck.currentSlide.step}/
+      {honeydeck.currentSlide.maxSteps} · {honeydeck.mode}
+    </div>
+  )
+}
+```
+
+## Returned value
+
+```ts
+const honeydeck = useHoneydeck()
+
+honeydeck.config
+honeydeck.currentSlide.index
+honeydeck.currentSlide.step
+honeydeck.currentSlide.maxSteps
+honeydeck.currentSlide.layout
+honeydeck.currentSlide.layoutProps
+honeydeck.mode
+```
+
+- `config` is the resolved [deck configuration](/docs/configuration) with Honeydeck defaults applied.
+- `currentSlide.index` is 1-based and matches the slide number in the URL.
+- `currentSlide.step` is 0-based and matches the step number in the URL.
+- `currentSlide.maxSteps` is the number of steps on the current slide.
+- `currentSlide.layout` is the current slide layout name.
+- `currentSlide.layoutProps` is the parsed slide frontmatter passed to the layout as `frontmatter`.
+- `mode` is the effective color mode: `"light"` or `"dark"`.
+
+## In custom layouts
+
+```tsx
+import type { ReactNode } from "react"
+import { useHoneydeck } from "@honeydeck/honeydeck"
+
+type FancyLayoutProps = {
+  children: ReactNode
+  frontmatter: Record<string, unknown>
+}
+
+export function FancyLayout({ children }: FancyLayoutProps) {
+  const honeydeck = useHoneydeck()
+
+  return (
+    <section data-mode={honeydeck.mode}>
+      <p>Layout: {honeydeck.currentSlide.layout}</p>
+      {children}
+    </section>
+  )
+}
+```
+
+`useHoneydeck()` must run inside a Honeydeck presentation runtime. Outside Honeydeck it throws a clear error.
