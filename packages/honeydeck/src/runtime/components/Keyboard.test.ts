@@ -4,8 +4,15 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Keyboard as BarrelKeyboard } from "../../runtime/components/index.ts";
 import { Keyboard } from "../../runtime/components/Keyboard.tsx";
+import {
+	type HotkeyDefinition,
+	handleHotkeyEvent,
+} from "../../runtime/hotkeys.ts";
 import { Keyboard as RootKeyboard } from "../../runtime/index.ts";
-import { isEditableKeyboardTarget } from "../../runtime/keyboardTarget.ts";
+import {
+	hasKeyboardModifier,
+	isEditableKeyboardTarget,
+} from "../../runtime/keyboardTarget.ts";
 
 describe("<Keyboard>", () => {
 	it("renders children as one <kbd>", () => {
@@ -53,6 +60,83 @@ describe("<Keyboard>", () => {
 	});
 });
 
+describe("hotkey helpers", () => {
+	function event(
+		overrides: Partial<Parameters<typeof handleHotkeyEvent>[0]> = {},
+	) {
+		let prevented = false;
+		return {
+			altKey: false,
+			ctrlKey: false,
+			key: "o",
+			metaKey: false,
+			preventDefault: () => {
+				prevented = true;
+			},
+			shiftKey: false,
+			target: null,
+			wasPrevented: () => prevented,
+			...overrides,
+		};
+	}
+
+	it("handles matching unmodified hotkeys", () => {
+		let called = false;
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "test.overview",
+				name: "Toggle overview",
+				description: "Open or close overview.",
+				keys: ["o"],
+				handler: () => {
+					called = true;
+				},
+			},
+		];
+		const keyboardEvent = event();
+
+		assert.equal(handleHotkeyEvent(keyboardEvent, hotkeys), true);
+		assert.equal(called, true);
+		assert.equal(keyboardEvent.wasPrevented(), true);
+	});
+
+	it("ignores modified hotkeys so native shortcuts can run", () => {
+		let called = false;
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "test.overview",
+				name: "Toggle overview",
+				description: "Open or close overview.",
+				keys: ["o"],
+				handler: () => {
+					called = true;
+				},
+			},
+		];
+		const keyboardEvent = event({ metaKey: true });
+
+		assert.equal(handleHotkeyEvent(keyboardEvent, hotkeys), false);
+		assert.equal(called, false);
+		assert.equal(keyboardEvent.wasPrevented(), false);
+	});
+
+	it("does not prevent default when a matching hotkey declines handling", () => {
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "test.noop",
+				name: "No-op",
+				description: "Declines to handle the matching key.",
+				keys: ["o"],
+				handler: () => false,
+			},
+		];
+		const keyboardEvent = event();
+
+		assert.equal(handleHotkeyEvent(keyboardEvent, hotkeys), false);
+		assert.equal(keyboardEvent.wasPrevented(), false);
+	});
+});
+
 describe("isEditableKeyboardTarget", () => {
 	class FakeHTMLElement extends EventTarget {
 		tagName: string;
@@ -92,6 +176,36 @@ describe("isEditableKeyboardTarget", () => {
 			false,
 		);
 		assert.equal(isEditableKeyboardTarget(null), false);
+	});
+
+	it("detects keyboard modifier keys", () => {
+		assert.equal(
+			hasKeyboardModifier({
+				altKey: false,
+				ctrlKey: false,
+				metaKey: false,
+				shiftKey: false,
+			}),
+			false,
+		);
+		assert.equal(
+			hasKeyboardModifier({
+				altKey: false,
+				ctrlKey: false,
+				metaKey: true,
+				shiftKey: false,
+			}),
+			true,
+		);
+		assert.equal(
+			hasKeyboardModifier({
+				altKey: false,
+				ctrlKey: false,
+				metaKey: false,
+				shiftKey: true,
+			}),
+			true,
+		);
 	});
 
 	it("returns false when HTMLElement is unavailable", () => {
