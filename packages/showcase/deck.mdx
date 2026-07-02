@@ -19,6 +19,7 @@ import './styles.css'
 import { BrowserFrame, ColorModeImage, Fade, FadeGroup, FadeWith, Keyboard, ListStyle, Notes, Reveal, RevealGroup, RevealWith, TimelineSteps } from '@honeydeck/honeydeck'
 import { CheckIcon, CircleIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react'
 import { TimelineAccordion } from './TimelineAccordion.tsx'
+import { HoneydeckContextBadge } from './HoneydeckContextBadge.tsx'
 import { Left, Right } from '@honeydeck/honeydeck/layouts/bee/TwoCol'
 import { imagePlaceholder, imagePlaceholderDark, verticalImagePlaceholder, verticalImagePlaceholderDark } from '@honeydeck/honeydeck/layouts/placeholders'
 import ImportedSlides from './imported-slides.mdx'
@@ -754,6 +755,16 @@ layout: Section
 ---
 
 # 7 · Runtime Views & Navigation
+
+---
+
+# Consumer Runtime Context
+
+Custom components and layouts can read live deck state with `useHoneydeck()`.
+
+<HoneydeckContextBadge />
+
+The badge reads resolved deck config, current slide/step, layout name, layout props, and effective color mode from context.
 
 ---
 
