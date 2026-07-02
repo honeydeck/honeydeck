@@ -20,8 +20,7 @@ export default function WelcomeCover({ title, children }: LayoutProps) {
 	});
 
 	return (
-		// Sometimes the canvas scales to not fill the slide - in those cases, we place it centrally.
-		<div className="grid h-full place-items-center bg-black [&_.grainient-container]:grid [&_.grainient-container]:place-items-center">
+		<div className="relative grid h-full w-full overflow-hidden bg-black">
 			<Grainient
 				color1={accent} // accent
 				color2={primary} // Primary
@@ -47,7 +46,7 @@ export default function WelcomeCover({ title, children }: LayoutProps) {
 				zoom={0.9}
 			/>
 
-			<div className="absolute h-full w-full grid place-items-center">
+			<div className="absolute inset-0 grid place-items-center">
 				<div className="text-center text-shadow-2xs">
 					{title && <h1>{title}</h1>}
 					<div className="text-foreground/80 dark:text-foreground">
