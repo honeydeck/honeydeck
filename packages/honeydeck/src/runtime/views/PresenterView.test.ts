@@ -66,6 +66,7 @@ describe("<PresenterView>", () => {
 		assert.match(source, />\s*Go to slide\s*</);
 		assert.match(source, /md:hidden/);
 		assert.match(source, /md:grid/);
+		assert.match(source, /className="bg-background"/);
 		assert.doesNotMatch(source, /usePresenterMobile/);
 		assert.doesNotMatch(source, /useSwipeNav/);
 	});
