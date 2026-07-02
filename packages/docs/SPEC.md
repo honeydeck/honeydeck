@@ -32,7 +32,7 @@ The docs package must provide `pnpm run export:package-docs` to export the autho
 
 ## Search
 
-Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from authored Fumadocs content using `pnpm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. The docs site must not use a server-side search API route.
+Cmd+K search must be frontend-only. The build/dev preparation phase must generate `public/search-index.json` from authored Fumadocs content using `pnpm run search:index`. The search dialog must asynchronously fetch that static index in the browser and show loading feedback while it is being downloaded and hydrated. After results have rendered once, later searches must keep the current results mounted while the next query is loading so the dialog does not flicker between the list and loading fallback. The docs site must not use a server-side search API route.
 
 ## Fumadocs layout
 
