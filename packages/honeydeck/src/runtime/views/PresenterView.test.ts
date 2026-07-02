@@ -66,6 +66,11 @@ describe("<PresenterView>", () => {
 		assert.match(source, />\s*Go to slide\s*</);
 		assert.match(source, /md:hidden/);
 		assert.match(source, /md:grid/);
+		assert.match(source, /\[&_\.honeydeck-code-block_\.line\]:transition-none/);
+		assert.match(
+			source,
+			/\[&_\.honeydeck-code-block_\.line\[data-highlight='1'\]\]:animate-none/,
+		);
 		assert.doesNotMatch(source, /usePresenterMobile/);
 		assert.doesNotMatch(source, /useSwipeNav/);
 	});

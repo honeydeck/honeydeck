@@ -123,7 +123,13 @@ function SlidePreview({
 	const visualH = BASE_HEIGHT * scale;
 
 	return (
-		<div className="flex flex-col gap-1.5 overflow-hidden">
+		<div
+			className={[
+				"flex flex-col gap-1.5 overflow-hidden",
+				"[&_.honeydeck-code-block_.line]:transition-none",
+				"[&_.honeydeck-code-block_.line[data-highlight='1']]:animate-none",
+			].join(" ")}
+		>
 			{label && (
 				<div className="text-xs font-semibold text-white/50 tracking-wider uppercase">
 					{label}
