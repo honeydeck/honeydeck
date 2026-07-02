@@ -43,6 +43,12 @@ export {
 	useTimelineSteps,
 } from "./components/TimelineSteps.tsx";
 export type {
+	HoneydeckContextValue,
+	HoneydeckCurrentSlide,
+	HoneydeckResolvedConfig,
+} from "./HoneydeckContext.tsx";
+export { useHoneydeck } from "./HoneydeckContext.tsx";
+export type {
 	TimelineContextValue,
 	TimelineProviderProps,
 } from "./TimelineContext.tsx";

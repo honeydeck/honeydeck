@@ -2,6 +2,22 @@
 
 > Observable behavior for timeline state, slide navigation, SPA behavior, and runtime errors.
 
+## Consumer runtime context
+
+`@honeydeck/honeydeck` exports `useHoneydeck()` for deck authors using custom components and custom layouts. Calling it outside a Honeydeck presentation runtime throws `useHoneydeck must be used inside a Honeydeck presentation runtime.`
+
+The hook returns a nested object:
+
+- `config`: resolved deck-level config with Honeydeck defaults applied and unknown authored keys preserved
+- `currentSlide.index`: 1-based current slide number, matching the URL
+- `currentSlide.step`: 0-based current step index, matching the URL
+- `currentSlide.maxSteps`: number of timeline steps on the current slide
+- `currentSlide.layout`: layout map key for the current slide
+- `currentSlide.layoutProps`: parsed slide frontmatter handed to the layout as `frontmatter`
+- `mode`: effective current color mode, either `"light"` or `"dark"`
+
+The context is available to slide content, custom layouts, overview thumbnails, and presenter previews. In presenter mode and preview surfaces, it describes the route's current slide/step, not the thumbnail's own preview target.
+
 ## Timeline & Steps
 
 ### Concept

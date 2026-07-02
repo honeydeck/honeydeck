@@ -5,6 +5,7 @@
 	"pages": [
 		"slides",
 		"configuration",
+		"runtime-context",
 		"transitions",
 		"steps-and-reveals",
 		"customization",
