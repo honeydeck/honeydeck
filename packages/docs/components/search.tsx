@@ -12,9 +12,10 @@ import {
 	SearchDialogInput,
 	SearchDialogList,
 	SearchDialogOverlay,
+	type SearchItemType,
 	type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
-import { isValidElement } from "react";
+import { isValidElement, useMemo, useRef } from "react";
 
 function initOrama() {
 	return create({
@@ -23,7 +24,7 @@ function initOrama() {
 	});
 }
 
-type SearchResult = {
+type SearchResult = SearchItemType & {
 	content?: unknown;
 	breadcrumbs?: unknown[];
 	type?: string;
@@ -102,17 +103,37 @@ function rerankSearchResults<T extends SearchResult>(
 }
 
 export function ClientSearchDialog(props: SharedProps) {
+	const searchClient = useMemo(
+		() =>
+			oramaStaticClient({
+				from: "/search-index.json",
+				initOrama,
+			}),
+		[],
+	);
 	const { search, setSearch, query } = useDocsSearch({
-		client: oramaStaticClient({
-			from: "/search-index.json",
-			initOrama,
-		}),
+		client: searchClient,
 	});
+	const cachedItemsRef = useRef<SearchResult[] | null>(null);
+	const hasSearch = search.trim().length > 0;
 	const isLoading = query.isLoading;
-	const items =
-		query.data && query.data !== "empty"
-			? rerankSearchResults(query.data, search)
-			: null;
+	const items = useMemo(() => {
+		if (!hasSearch) {
+			cachedItemsRef.current = null;
+			return null;
+		}
+
+		if (isLoading && cachedItemsRef.current) return cachedItemsRef.current;
+
+		if (query.data && query.data !== "empty") {
+			const nextItems = rerankSearchResults(query.data, search);
+			cachedItemsRef.current = nextItems;
+			return nextItems;
+		}
+
+		return null;
+	}, [hasSearch, isLoading, query.data, search]);
+	const showLoadingFallback = isLoading && items === null;
 
 	return (
 		<SearchDialog
@@ -128,7 +149,7 @@ export function ClientSearchDialog(props: SharedProps) {
 					<SearchDialogInput />
 					<SearchDialogClose />
 				</SearchDialogHeader>
-				{isLoading ? (
+				{showLoadingFallback ? (
 					<div className="px-4 py-8 text-center text-sm text-fd-muted-foreground">
 						Loading search index…
 					</div>
