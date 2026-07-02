@@ -138,7 +138,6 @@ function SlidePreview({
 					stepIndex={stepIndex}
 					scale={scale}
 					style={{ width: visualW, height: visualH }}
-					className="bg-background text-foreground"
 					showFutureSteps={showFutureSteps}
 				/>
 			</div>

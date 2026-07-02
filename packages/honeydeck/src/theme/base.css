@@ -212,6 +212,8 @@
    Applied inside slide canvases.                                              */
 
 .honeydeck-slide-canvas {
+	background: var(--honeydeck-background);
+	color: var(--honeydeck-foreground);
 	font-family: var(--honeydeck-font-body);
 }
 

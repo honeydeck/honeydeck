@@ -49,6 +49,8 @@ Typography tokens are **shared across color modes** (not redefined per light/dar
 
 The base font size seeds `rem` for the entire slide canvas (`font-size` on `:root`). All other sizes are expressed in `rem` so they scale proportionally.
 
+The `.honeydeck-slide-canvas` element establishes the themed slide surface by applying `--honeydeck-background` as its background, `--honeydeck-foreground` as its inherited text color, and `--honeydeck-font-body` as its font family. This keeps transparent layouts consistent across audience, presenter, overview, and reference previews instead of inheriting colors from surrounding runtime UI.
+
 ```css
 /* Font families */
 --honeydeck-font-heading
