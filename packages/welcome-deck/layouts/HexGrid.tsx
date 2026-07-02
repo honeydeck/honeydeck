@@ -1,9 +1,7 @@
 import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
-import { useId } from "react";
 import { HexGridBackground } from "../src/components/HexGridBackground";
 
 export default function HexGrid({ title, children }: LayoutProps) {
-	const patternId = `hex-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
 	return (
 		<div>

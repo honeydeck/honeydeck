@@ -138,7 +138,6 @@ const Grainient = ({
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
-		console.log(container);
 
 		const renderer = new Renderer({
 			webgl: 2,

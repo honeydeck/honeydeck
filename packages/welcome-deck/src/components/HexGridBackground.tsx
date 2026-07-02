@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 export const HexGridBackground = () => {
-	const patternId = `hex-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+	const patternId = useId();
 
 	return (
 		<svg
