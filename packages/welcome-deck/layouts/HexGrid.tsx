@@ -2,7 +2,6 @@ import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
 import { HexGridBackground } from "../src/components/HexGridBackground";
 
 export default function HexGrid({ title, children }: LayoutProps) {
-
 	return (
 		<div>
 			<HexGridBackground />
