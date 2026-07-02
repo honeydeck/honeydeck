@@ -5,6 +5,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { type HotkeyDefinition, handleHotkeyEvent } from "../hotkeys.ts";
 import { navigate } from "../router.ts";
 import { SlideCanvas } from "../SlideCanvas.tsx";
 import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
@@ -200,31 +201,62 @@ export function OverviewView({
 	}
 
 	function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-		switch (e.key) {
-			case "ArrowRight":
-			case "ArrowLeft":
-			case "ArrowDown":
-			case "ArrowUp":
-				e.preventDefault();
-				moveSelection(e.key);
-				break;
-			case "w":
-			case "a":
-			case "s":
-			case "d":
-				e.preventDefault();
-				break;
-			case "Enter":
-				if (e.target !== e.currentTarget) return;
-				e.preventDefault();
-				jumpTo(selected);
-				break;
-			case "o":
-			case "Escape":
-				e.preventDefault();
-				onClose();
-				break;
-		}
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "overview.selection.move-right",
+				name: "Move overview selection right",
+				description: "Move the selected overview thumbnail to the right.",
+				keys: ["ArrowRight"],
+				handler: () => moveSelection("ArrowRight"),
+			},
+			{
+				id: "overview.selection.move-left",
+				name: "Move overview selection left",
+				description: "Move the selected overview thumbnail to the left.",
+				keys: ["ArrowLeft"],
+				handler: () => moveSelection("ArrowLeft"),
+			},
+			{
+				id: "overview.selection.move-down",
+				name: "Move overview selection down",
+				description: "Move the selected overview thumbnail down.",
+				keys: ["ArrowDown"],
+				handler: () => moveSelection("ArrowDown"),
+			},
+			{
+				id: "overview.selection.move-up",
+				name: "Move overview selection up",
+				description: "Move the selected overview thumbnail up.",
+				keys: ["ArrowUp"],
+				handler: () => moveSelection("ArrowUp"),
+			},
+			{
+				id: "overview.timeline-keys.disabled",
+				name: "Disable timeline keys in overview",
+				description: "Keep WASD timeline shortcuts inactive in overview mode.",
+				keys: ["w", "a", "s", "d"],
+				handler: () => {},
+			},
+			{
+				id: "overview.selection.open",
+				name: "Open selected slide",
+				description: "Jump to the currently selected overview thumbnail.",
+				keys: ["Enter"],
+				handler: () => {
+					if (e.target !== e.currentTarget) return false;
+					jumpTo(selected);
+				},
+			},
+			{
+				id: "overview.close",
+				name: "Close overview",
+				description: "Exit overview mode.",
+				keys: ["o", "Escape"],
+				handler: onClose,
+			},
+		];
+
+		handleHotkeyEvent(e, hotkeys);
 	}
 
 	return (

@@ -50,6 +50,7 @@ import {
 	ColorModeCycleButton,
 } from "../components/ColorModeCycleButton.tsx";
 import { NotesContext } from "../components/Notes.tsx";
+import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
 import {
 	getSlideRouteFromRoute,
 	navigateTo,
@@ -231,21 +232,24 @@ export function PresenterView({
 	}, [isBlankScreen, broadcastBlankScreen, sendCastMessage]);
 
 	useEffect(() => {
-		function handlePresenterKeys(event: KeyboardEvent) {
-			if (event.key === "p" || event.key === "Escape") {
-				event.preventDefault();
-				closePresenter();
-				return;
-			}
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "presenter.close",
+				name: "Close presenter mode",
+				description: "Return from presenter mode to the audience slide view.",
+				keys: ["p", "Escape"],
+				handler: closePresenter,
+			},
+			{
+				id: "presenter.blank-screen.toggle",
+				name: "Toggle blank screen",
+				description: "Blank or restore the audience and cast screens.",
+				keys: ["b", "B"],
+				handler: toggleBlankScreen,
+			},
+		];
 
-			if (event.key === "b" || event.key === "B") {
-				event.preventDefault();
-				toggleBlankScreen();
-			}
-		}
-
-		window.addEventListener("keydown", handlePresenterKeys);
-		return () => window.removeEventListener("keydown", handlePresenterKeys);
+		return registerHotkeys(window, hotkeys);
 	}, [closePresenter, toggleBlankScreen]);
 
 	// ── Timer controls ──────────────────────────────────────────────────────

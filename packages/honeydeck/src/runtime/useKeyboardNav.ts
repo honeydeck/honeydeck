@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { isEditableKeyboardTarget } from "./keyboardTarget.ts";
+import { type HotkeyDefinition, registerHotkeys } from "./hotkeys.ts";
 import {
 	nextSlide,
 	nextStep,
@@ -46,68 +46,103 @@ export function useKeyboardNav({
 	useEffect(() => {
 		if (!enabled) return;
 
-		const handler = (e: KeyboardEvent) => {
-			if (isEditableKeyboardTarget(e.target)) return;
-
+		function currentNavigationState() {
 			const route: Route = parseHash(location.hash);
-			if (route.view === "kit") return;
-
-			const total = slideCountRef.current;
-			const options = {
-				slideCount: total,
-				getStepCount: getStepCountRef.current,
+			const slideCount = slideCountRef.current;
+			return {
+				inOverview: isOverviewRef.current,
+				options: {
+					slideCount,
+					getStepCount: getStepCountRef.current,
+				},
+				route,
+				slideCount,
 			};
-			const inOverview = isOverviewRef.current;
+		}
 
-			switch (e.key) {
-				case "ArrowRight":
-				case "d": {
-					e.preventDefault();
-					if (!inOverview) nextStep(route, options);
-					break;
-				}
+		function toggleOverviewFrom(route: Route) {
+			if (onToggleOverviewRef.current) {
+				onToggleOverviewRef.current();
+			} else {
+				toggleOverview(route);
+			}
+		}
 
-				case "ArrowLeft":
-				case "a": {
-					e.preventDefault();
-					if (!inOverview) previousStep(route, options);
-					break;
-				}
-
-				case "ArrowDown":
-				case "s": {
-					e.preventDefault();
-					if (!inOverview) nextSlide(route, { slideCount: total });
-					break;
-				}
-
-				case "ArrowUp":
-				case "w": {
-					e.preventDefault();
-					if (!inOverview) previousSlide(route);
-					break;
-				}
-
-				case "o": {
-					e.preventDefault();
-					if (onToggleOverviewRef.current) {
-						onToggleOverviewRef.current();
-					} else {
-						toggleOverview(route);
-					}
-					break;
-				}
-
-				case "p": {
-					if (route.view !== "presenter") {
-						e.preventDefault();
-						openPresenter(route);
-					}
-					break;
-				}
-
-				case "f": {
-					e.preventDefault();
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "timeline.next-step",
+				name: "Next step",
+				description: "Advance to the next timeline step.",
+				keys: ["ArrowRight", "d"],
+				handler: () => {
+					const { inOverview, options, route } = currentNavigationState();
+					if (route.view === "kit" || inOverview) return false;
+					nextStep(route, options);
+				},
+			},
+			{
+				id: "timeline.previous-step",
+				name: "Previous step",
+				description: "Move to the previous timeline step.",
+				keys: ["ArrowLeft", "a"],
+				handler: () => {
+					const { inOverview, options, route } = currentNavigationState();
+					if (route.view === "kit" || inOverview) return false;
+					previousStep(route, options);
+				},
+			},
+			{
+				id: "timeline.next-slide",
+				name: "Next slide",
+				description: "Jump to the next slide.",
+				keys: ["ArrowDown", "s"],
+				handler: () => {
+					const { inOverview, route, slideCount } = currentNavigationState();
+					if (route.view === "kit" || inOverview) return false;
+					nextSlide(route, { slideCount });
+				},
+			},
+			{
+				id: "timeline.previous-slide",
+				name: "Previous slide",
+				description: "Jump to the previous slide.",
+				keys: ["ArrowUp", "w"],
+				handler: () => {
+					const { inOverview, route } = currentNavigationState();
+					if (route.view === "kit" || inOverview) return false;
+					previousSlide(route);
+				},
+			},
+			{
+				id: "overview.toggle",
+				name: "Toggle overview",
+				description: "Open or close the slide overview.",
+				keys: ["o"],
+				handler: () => {
+					const { route } = currentNavigationState();
+					if (route.view === "kit") return false;
+					toggleOverviewFrom(route);
+				},
+			},
+			{
+				id: "presenter.open",
+				name: "Open presenter mode",
+				description: "Open presenter mode in the current tab.",
+				keys: ["p"],
+				handler: () => {
+					const { route } = currentNavigationState();
+					if (route.view === "kit" || route.view === "presenter") return false;
+					openPresenter(route);
+				},
+			},
+			{
+				id: "fullscreen.toggle",
+				name: "Toggle fullscreen",
+				description: "Enter or exit browser fullscreen.",
+				keys: ["f"],
+				handler: () => {
+					const { route } = currentNavigationState();
+					if (route.view === "kit") return false;
 					if (document.fullscreenElement) {
 						document.exitFullscreen();
 					} else {
@@ -115,24 +150,21 @@ export function useKeyboardNav({
 							// Fullscreen may be blocked (e.g. in iframes).
 						});
 					}
-					break;
-				}
+				},
+			},
+			{
+				id: "overview.close",
+				name: "Close overview",
+				description: "Exit overview mode.",
+				keys: ["Escape"],
+				handler: () => {
+					const { inOverview, route } = currentNavigationState();
+					if (route.view === "kit" || !inOverview) return false;
+					toggleOverviewFrom(route);
+				},
+			},
+		];
 
-				case "Escape": {
-					if (isOverviewRef.current) {
-						e.preventDefault();
-						if (onToggleOverviewRef.current) {
-							onToggleOverviewRef.current();
-						} else {
-							toggleOverview(route);
-						}
-					}
-					break;
-				}
-			}
-		};
-
-		window.addEventListener("keydown", handler);
-		return () => window.removeEventListener("keydown", handler);
+		return registerHotkeys(window, hotkeys);
 	}, [enabled]);
 }
