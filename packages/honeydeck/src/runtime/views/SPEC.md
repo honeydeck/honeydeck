@@ -48,6 +48,7 @@ Includes:
 - Timeline keyboard shortcuts (`→`/`←`/`↓`/`↑`, `d`/`a`/`s`/`w`) update the presenter route and keep the window in presenter mode on supported desktop layouts.
 - Presenter notes are scroll-owned regions: wheel, trackpad, touch scroll, and swipe gestures that start in notes scroll notes and never navigate slides, even at scroll boundaries.
 - Code step-through previews use the same timeline state as audience view, so the Next preview shows the upcoming highlighted code step.
+- Presenter previews render code highlight states statically without line-enter animations, so timer ticks and preview rerenders do not flicker highlighted code lines.
 - In the Next preview, reveal content from later timeline steps is visible at reduced opacity so the speaker can see what is still coming on that slide. Audience view and the Current preview keep future steps hidden.
 - When no next timeline state exists (final step of the final slide), the Next preview shows a placeholder (`No next step`) instead of trying to render a missing slide.
 
