@@ -33,6 +33,8 @@ honeydeck.currentSlide.step
 honeydeck.currentSlide.maxSteps
 honeydeck.currentSlide.layout
 honeydeck.currentSlide.layoutProps
+honeydeck.slideWidth
+honeydeck.slideHeight
 honeydeck.mode
 ```
 
@@ -42,7 +44,30 @@ honeydeck.mode
 - `currentSlide.maxSteps` is the number of steps on the current slide.
 - `currentSlide.layout` is the current slide layout name.
 - `currentSlide.layoutProps` is the parsed slide frontmatter passed to the layout as `frontmatter`.
+- `slideWidth` and `slideHeight` are the logical slide canvas dimensions after resolving `aspectRatio`.
 - `mode` is the effective color mode: `"light"` or `"dark"`.
+
+## Slide scale
+
+Use `useSlideScale()` when a component or layout needs the current CSS scale applied to the logical slide canvas.
+
+```tsx
+import { useHoneydeck, useSlideScale } from "@honeydeck/honeydeck"
+
+export function FullCanvasEffect() {
+  const { slideWidth, slideHeight } = useHoneydeck()
+  const slideScale = useSlideScale()
+
+  return (
+    <div
+      style={{
+        width: slideWidth / slideScale,
+        height: slideHeight / slideScale,
+      }}
+    />
+  )
+}
+```
 
 ## In custom layouts
 

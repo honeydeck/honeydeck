@@ -6,6 +6,8 @@
 
 `@honeydeck/honeydeck` exports `useHoneydeck()` for deck authors using custom components and custom layouts. Calling it outside a Honeydeck presentation runtime throws `useHoneydeck must be used inside a Honeydeck presentation runtime.`
 
+`@honeydeck/honeydeck` also exports `useSlideScale()` for components and layouts that need the current rendered slide scale. It returns the scale factor applied to the logical slide canvas in the current render surface.
+
 The hook returns a nested object:
 
 - `config`: resolved deck-level config with Honeydeck defaults applied and unknown authored keys preserved
@@ -14,6 +16,8 @@ The hook returns a nested object:
 - `currentSlide.maxSteps`: number of timeline steps on the current slide
 - `currentSlide.layout`: layout map key for the current slide
 - `currentSlide.layoutProps`: parsed slide frontmatter handed to the layout as `frontmatter`
+- `slideWidth`: logical slide canvas width in pixels after resolving deck `aspectRatio`
+- `slideHeight`: logical slide canvas height in pixels after resolving deck `aspectRatio`
 - `mode`: effective current color mode, either `"light"` or `"dark"`
 
 The context is available to slide content, custom layouts, overview thumbnails, and presenter previews. In presenter mode and preview surfaces, it describes the route's current slide/step, not the thumbnail's own preview target.
