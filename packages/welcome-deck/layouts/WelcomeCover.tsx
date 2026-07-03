@@ -24,6 +24,10 @@ export default function WelcomeCover({ title, children }: LayoutProps) {
 
 	return (
 		<div className="relative grid h-full w-full overflow-hidden bg-black">
+			{/* Grainient measures with getBoundingClientRect(), which includes
+			    Honeydeck's CSS slide scale. The inverse-sized wrapper makes that
+			    measurement resolve to the logical slide size and avoids double-scaling
+			    the canvas. */}
 			<div
 				className="absolute left-0 top-0"
 				style={{

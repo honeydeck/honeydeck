@@ -49,7 +49,15 @@ honeydeck.mode
 
 ## Slide scale
 
-Use `useSlideScale()` when a component or layout needs the current CSS scale applied to the logical slide canvas.
+Honeydeck renders each slide at logical canvas dimensions, then scales the full slide with CSS transforms to fit the current viewport or preview surface. Normal HTML and CSS content does not need to account for this scale.
+
+Use `useSlideScale()` only when a component or layout needs the current CSS scale applied to the logical slide canvas.
+
+## Transform-aware canvas and WebGL components
+
+Some canvas and WebGL libraries measure their container with `getBoundingClientRect()` and write that measured size back into the canvas style. Because `getBoundingClientRect()` includes CSS transforms, those libraries can accidentally apply Honeydeck's slide scale twice and render smaller than their wrapper.
+
+Wrap those components with an inverse-sized frame using `slideWidth`, `slideHeight`, and `useSlideScale()`:
 
 ```tsx
 import { useHoneydeck, useSlideScale } from "@honeydeck/honeydeck"
@@ -59,12 +67,17 @@ export function FullCanvasEffect() {
   const slideScale = useSlideScale()
 
   return (
-    <div
-      style={{
-        width: slideWidth / slideScale,
-        height: slideHeight / slideScale,
-      }}
-    />
+    <div className="absolute inset-0 overflow-hidden">
+      <div
+        className="absolute left-0 top-0"
+        style={{
+          width: slideWidth / slideScale,
+          height: slideHeight / slideScale,
+        }}
+      >
+        <CanvasOrWebGlEffect />
+      </div>
+    </div>
   )
 }
 ```
