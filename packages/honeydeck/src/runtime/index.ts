@@ -48,6 +48,7 @@ export type {
 	HoneydeckResolvedConfig,
 } from "./HoneydeckContext.tsx";
 export { useHoneydeck } from "./HoneydeckContext.tsx";
+export { useSlideScale } from "./SlideScaleContext.tsx";
 export type {
 	TimelineContextValue,
 	TimelineProviderProps,

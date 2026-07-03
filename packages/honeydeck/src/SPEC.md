@@ -10,8 +10,8 @@
 // Optional ejected Vite setup
 import { honeydeckPlugin } from '@honeydeck/honeydeck/vite'
 
-// Core components
-import { Reveal, RevealWith, RevealGroup, Fade, FadeWith, FadeGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes, ColorModeImage } from '@honeydeck/honeydeck'
+// Core components and runtime hooks
+import { Reveal, RevealWith, RevealGroup, Fade, FadeWith, FadeGroup, TimelineSteps, ListStyle, Keyboard, BrowserFrame, Notes, ColorModeImage, useHoneydeck, useSlideScale } from '@honeydeck/honeydeck'
 
 // Types for kit authors
 import type { LayoutProps, LayoutMap, LayoutDemo } from '@honeydeck/honeydeck/types'
