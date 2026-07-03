@@ -12,3 +12,4 @@ Demos are standalone example projects under `demos/`. They are intentionally out
 
 - `mermaid` demonstrates rendering Mermaid diagrams through a deck-local React component and a normal project dependency.
 - `latex` demonstrates rendering inline and display LaTeX through a deck-local React component and a normal project dependency.
+- `react-bits-backgrounds` demonstrates using a React Bits background installed through the shadcn registry with minimal shadcn wiring, including Beams as an edge-to-edge slide background through a custom layout.
