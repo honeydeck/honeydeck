@@ -3,3 +3,4 @@ packages:
   - packages/docs
   - packages/showcase
   - packages/welcome-deck
+  - demos/*

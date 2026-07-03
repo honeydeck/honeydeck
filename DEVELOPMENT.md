@@ -10,6 +10,11 @@ packages/
   docs/         private Fumadocs/Next documentation site package
   showcase/     private feature showcase deck package
   welcome-deck/ private compact welcome deck package
+
+demos/
+  latex/                  private LaTeX/KaTeX integration demo package
+  mermaid/                private Mermaid integration demo package
+  react-bits-backgrounds/ private React Bits/shadcn background demo package
 ```
 
 Root `SPEC.md` maps product behavior specs. Package-level and colocated `SPEC.md` files own detailed behavior.
@@ -49,6 +54,9 @@ pnpm --filter @honeydeck/welcome-deck run pdf
 pnpm --filter @honeydeck/docs run dev
 pnpm --filter @honeydeck/docs run search:index
 pnpm --filter @honeydeck/docs run build
+pnpm --filter @honeydeck/demo-latex run dev
+pnpm --filter @honeydeck/demo-mermaid run dev
+pnpm --filter @honeydeck/demo-react-bits-backgrounds run dev
 ```
 
 ## Docs flow
