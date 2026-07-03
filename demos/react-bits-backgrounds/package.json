@@ -1,0 +1,25 @@
+{
+	"name": "@honeydeck/demo-react-bits-backgrounds",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "honeydeck dev",
+		"build": "honeydeck build"
+	},
+	"dependencies": {
+		"@honeydeck/honeydeck": "file:../../packages/honeydeck",
+		"@react-three/drei": "^10.7.7",
+		"@react-three/fiber": "^9.6.1",
+		"clsx": "^2.1.1",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"tailwind-merge": "^3.6.0",
+		"three": "^0.180.0"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3"
+	}
+}

@@ -1,0 +1,116 @@
+---
+title: React Bits backgrounds demo
+layouts: "./layouts"
+layout: BeamsBackground
+---
+
+import './styles.css'
+import Beams from './components/Beams'
+
+# Beams as an entire slide background
+
+Use a background component in a custom layout when you want every pixel of the slide canvas to belong to the effect.
+
+---
+
+# React Bits backgrounds
+
+<div className="grid h-[720px] grid-cols-[1.2fr_0.8fr] gap-6">
+  <div className="relative min-h-0 overflow-hidden rounded-[2rem] border border-white/20 bg-black shadow-2xl">
+    <Beams
+      beamWidth={3}
+      beamHeight={30}
+      beamNumber={20}
+      lightColor="#ffffff"
+      speed={2}
+      noiseIntensity={1.75}
+      scale={0.2}
+      rotation={30}
+    />
+    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.22),transparent_30%),linear-gradient(to_top,rgba(0,0,0,0.62),transparent_55%)]" />
+    <div className="absolute bottom-8 left-8 right-8">
+      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/65">React Bits background</p>
+      <h2 className="mt-2 text-6xl font-black leading-none text-white">Beams</h2>
+    </div>
+  </div>
+
+  <div className="flex flex-col justify-center gap-5">
+    <p className="text-3xl font-semibold leading-tight text-foreground">Drop a React Bits background into Honeydeck like any React component.</p>
+    <ul className="grid gap-3 text-xl text-surface-foreground">
+      <li><code>shadcn add</code> pulls component code into your deck.</li>
+      <li>Dependencies stay in user space.</li>
+      <li>Props tune animation, density, color, and motion.</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+# Minimal setup
+
+```bash
+pnpm dlx shadcn@latest add @react-bits/Beams-JS-CSS
+```
+
+<div className="mt-8 grid grid-cols-[0.95fr_1.05fr] gap-5">
+  <div className="relative h-[420px] overflow-hidden rounded-[1.5rem] border border-white/20 bg-black">
+    <Beams
+      beamWidth={3}
+      beamHeight={30}
+      beamNumber={20}
+      lightColor="#ffffff"
+      speed={2}
+      noiseIntensity={1.75}
+      scale={0.2}
+      rotation={30}
+    />
+  </div>
+
+  <div className="rounded-[1.5rem] border border-border bg-surface p-6 text-lg leading-relaxed text-surface-foreground">
+    <p>This demo uses only minimal shadcn wiring:</p>
+    <ul className="mt-4 grid gap-2">
+      <li><code>components.json</code> with React Bits registry.</li>
+      <li><code>tsconfig.json</code> with <code>@/*</code> aliases.</li>
+      <li><code>lib/utils.ts</code> for shadcn-compatible utilities.</li>
+      <li>Tailwind + Honeydeck theme imports in <code>styles.css</code>.</li>
+    </ul>
+  </div>
+</div>
+
+---
+layout: TwoCol
+---
+
+import { Left, Right } from '@honeydeck/honeydeck/layouts/TwoCol'
+
+<Left>
+
+# Use Beams as slide background
+
+Honeydeck scales slides with CSS transforms.
+
+Canvas/WebGL backgrounds measure their container, so use inverse scaling.
+
+Result: the effect sees the logical slide size, not the transformed display size.
+
+</Left>
+<Right>
+
+```tsx
+const { slideWidth, slideHeight } = useHoneydeck();
+const slideScale = useSlideScale();
+
+<div
+  className="absolute left-0 top-0"
+  style={{
+    width: slideWidth / slideScale,
+    height: slideHeight / slideScale,
+  }}
+>
+  <Beams />
+</div>
+```
+
+</Right>
+
+Find more backgrounds at [reactbits.dev](https://reactbits.dev/get-started/introduction).

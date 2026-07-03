@@ -30,3 +30,4 @@ pnpm run dev
 
 - [`latex`](./latex/) — LaTeX rendered through a deck-local React component and normal project dependency.
 - [`mermaid`](./mermaid/) — Mermaid diagrams rendered through a deck-local React component and normal project dependency.
+- [`react-bits-backgrounds`](./react-bits-backgrounds/) — React Bits Beams background installed through shadcn registry with minimal shadcn setup.

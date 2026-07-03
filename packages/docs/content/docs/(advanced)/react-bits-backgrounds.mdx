@@ -1,0 +1,170 @@
+---
+title: "React Bits backgrounds"
+description: "Use React Bits animated backgrounds in Honeydeck with shadcn and transform-aware sizing."
+slug: "react-bits-backgrounds"
+---
+
+# React Bits backgrounds
+
+[React Bits](https://reactbits.dev/get-started/introduction) provides animated React backgrounds and effects. They are not part of Honeydeck core; install them into your deck like normal user-space components.
+
+This guide uses [Beams](https://reactbits.dev/backgrounds/beams) as the example background.
+
+## Minimal shadcn setup
+
+React Bits components can be added through the shadcn CLI. Honeydeck does not need a full app scaffold, but shadcn needs a small `components.json` and path aliases, matching the [manual shadcn setup](https://ui.shadcn.com/docs/installation/manual).
+
+Add a `components.json` file:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "styles.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@react-bits": "https://reactbits.dev/r/{name}.json"
+  }
+}
+```
+
+Add a matching alias to `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
+
+Some shadcn registry items expect a utility helper. If needed, create `lib/utils.ts`:
+
+```ts
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+Install the helper dependencies if your added component needs them:
+
+```bash
+npm install clsx tailwind-merge
+```
+
+## Add Beams
+
+Run the shadcn CLI from your deck project:
+
+```bash
+pnpm dlx shadcn@latest add @react-bits/Beams-JS-CSS
+```
+
+The command writes the component into your project and adds dependencies such as `three`, `@react-three/fiber`, and `@react-three/drei` when required.
+
+## Use Beams inside a slide
+
+For an inline panel or card, import the generated component and give it a sized wrapper:
+
+```mdx
+import Beams from './components/Beams'
+
+<div style={{ width: '1080px', height: '1080px', position: 'relative' }}>
+  <Beams
+    beamWidth={3}
+    beamHeight={30}
+    beamNumber={20}
+    lightColor="#ffffff"
+    speed={2}
+    noiseIntensity={1.75}
+    scale={0.2}
+    rotation={30}
+  />
+</div>
+```
+
+## Use Beams as a full-slide background
+
+For edge-to-edge backgrounds, prefer a custom layout. Honeydeck renders each slide at a logical canvas size, then scales the slide with CSS transforms to fit audience, presenter, preview, and export surfaces.
+
+Most HTML content does not need to know about that scale. Canvas and WebGL libraries often do, because they measure their container with `getBoundingClientRect()`. That measurement includes CSS transforms, so the effect can accidentally render at the transformed display size instead of the logical slide size.
+
+Use `useHoneydeck()` and `useSlideScale()` to give the background an inverse-sized wrapper:
+
+```tsx
+import { useHoneydeck, useSlideScale } from "@honeydeck/honeydeck"
+import type { LayoutProps } from "@honeydeck/honeydeck/types"
+import Beams from "../components/Beams"
+
+export default function BeamsBackground({ title, children }: LayoutProps) {
+  const { slideWidth, slideHeight } = useHoneydeck()
+  const slideScale = useSlideScale()
+
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-black text-white">
+      <div
+        className="absolute left-0 top-0"
+        style={{
+          width: slideWidth / slideScale,
+          height: slideHeight / slideScale,
+        }}
+      >
+        <Beams />
+      </div>
+
+      <div className="relative z-10 grid h-full place-items-center">
+        {title && <h1>{title}</h1>}
+        {children}
+      </div>
+    </div>
+  )
+}
+```
+
+Then register and use the layout:
+
+```ts
+import { DefaultLayout } from "@honeydeck/honeydeck/layouts"
+import type { LayoutMap } from "@honeydeck/honeydeck/types"
+import BeamsBackground from "./layouts/BeamsBackground"
+
+export default {
+  BeamsBackground,
+  Default: DefaultLayout,
+} satisfies LayoutMap
+```
+
+```mdx
+---
+layouts: "./layouts"
+layout: BeamsBackground
+---
+
+# Beams as a background
+```
+
+See [Runtime context](/docs/runtime-context#transform-aware-canvas-and-webgl-components) for more detail on transform-aware canvas and WebGL components.
+
+## Runnable example
+
+For a complete example, see `demos/react-bits-backgrounds` in the Honeydeck repository. It includes the minimal shadcn setup, the generated Beams component, and a custom full-slide background layout.
