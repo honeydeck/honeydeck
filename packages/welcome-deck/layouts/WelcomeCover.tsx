@@ -1,14 +1,15 @@
+import { useHoneydeck } from "@honeydeck/honeydeck";
 import type { LayoutDemo, LayoutProps } from "@honeydeck/honeydeck/types";
 import { useEffect, useState } from "react";
+import { parseAspectRatio } from "../../honeydeck/src/runtime/aspectRatio.ts";
 import { useSlideScale } from "../../honeydeck/src/runtime/SlideScaleContext.tsx";
 // @ts-expect-error no types for JSX component
 import Grainient from "../src/components/Grainient";
 
-const SLIDE_WIDTH = 1920;
-const SLIDE_HEIGHT = 1080;
-
 export default function WelcomeCover({ title, children }: LayoutProps) {
+	const { config } = useHoneydeck();
 	const slideScale = useSlideScale();
+	const slideDimensions = parseAspectRatio(config.aspectRatio);
 	const [primary, setPrimary] = useState<string>("");
 	const [accent, setAccent] = useState<string>("");
 	const [surface, setSurface] = useState<string>("");
@@ -29,8 +30,8 @@ export default function WelcomeCover({ title, children }: LayoutProps) {
 			<div
 				className="absolute left-0 top-0"
 				style={{
-					width: SLIDE_WIDTH / slideScale,
-					height: SLIDE_HEIGHT / slideScale,
+					width: slideDimensions.width / slideScale,
+					height: slideDimensions.height / slideScale,
 				}}
 			>
 				<Grainient
