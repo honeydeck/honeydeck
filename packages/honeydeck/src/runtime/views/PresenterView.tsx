@@ -51,12 +51,12 @@ import {
 	ColorModeCycleButton,
 } from "../components/ColorModeCycleButton.tsx";
 import { NotesContext } from "../components/Notes.tsx";
-import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
 import { readDocumentEffectiveColorMode } from "../EffectiveColorModeContext.tsx";
 import {
 	HoneydeckProvider,
 	resolveHoneydeckConfig,
 } from "../HoneydeckContext.tsx";
+import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
 import {
 	getSlideRouteFromRoute,
 	navigateTo,
