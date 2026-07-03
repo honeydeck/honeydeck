@@ -188,17 +188,10 @@ const Grainient = ({
 		ctxMap.set(container, { renderer, program, mesh });
 
 		const setSize = () => {
-			// Use layout size, not getBoundingClientRect(). Honeydeck scales the
-			// slide with CSS transforms; bounding rect already includes that scale.
-			// Passing scaled pixels to renderer.setSize() writes scaled px values back
-			// to the canvas style, which makes the canvas get scaled twice.
-			const w = Math.max(1, Math.floor(container.clientWidth));
-			const h = Math.max(1, Math.floor(container.clientHeight));
+			const rect = container.getBoundingClientRect();
+			const w = Math.max(1, Math.floor(rect.width));
+			const h = Math.max(1, Math.floor(rect.height));
 			renderer.setSize(w, h);
-			// OGL writes explicit px styles in setSize(). Keep CSS ownership at the
-			// container so transformed slides, previews, and exports all fill 100%.
-			canvas.style.width = "100%";
-			canvas.style.height = "100%";
 			const res = program.uniforms.iResolution.value;
 			res[0] = gl.drawingBufferWidth;
 			res[1] = gl.drawingBufferHeight;
