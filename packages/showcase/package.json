@@ -16,7 +16,7 @@
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
 		"tailwindcss": "^4.3.0",
-		"@honeydeck/honeydeck": "file:../honeydeck"
+		"@honeydeck/honeydeck": "workspace:*"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.15",

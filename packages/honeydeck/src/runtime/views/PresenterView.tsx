@@ -215,6 +215,8 @@ export function PresenterView({
 				layout: currentSlideData?.layoutName ?? "Default",
 				layoutProps: currentSlideData?.frontmatter ?? {},
 			},
+			slideWidth: BASE_WIDTH,
+			slideHeight: BASE_HEIGHT,
 			mode: effectiveMode,
 		}),
 		[slide, step, currentSlideData, effectiveMode],

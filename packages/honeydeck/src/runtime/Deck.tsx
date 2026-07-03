@@ -456,6 +456,8 @@ export function Deck() {
 				layout: currentSlideData?.layoutName ?? "Default",
 				layoutProps: currentSlideData?.frontmatter ?? {},
 			},
+			slideWidth: BASE_WIDTH,
+			slideHeight: BASE_HEIGHT,
 			mode: effectiveColorMode,
 		}),
 		[currentSlide, currentStep, currentSlideData, effectiveColorMode],

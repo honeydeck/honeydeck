@@ -17,7 +17,7 @@
 		"test": "node --test \"scripts/**/*.test.mjs\""
 	},
 	"dependencies": {
-		"@honeydeck/honeydeck": "file:../honeydeck",
+		"@honeydeck/honeydeck": "workspace:*",
 		"@orama/orama": "^3.1.17",
 		"fumadocs-core": "^16.10.5",
 		"fumadocs-mdx": "^15.0.12",

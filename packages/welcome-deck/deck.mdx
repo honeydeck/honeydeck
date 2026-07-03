@@ -1,11 +1,11 @@
 ---
 title: "Honeydeck"
 layouts: "./layouts"
-layout: BeeCover
+layout: WelcomeCover
 ---
 
 import './styles.css'
-import { Reveal, RevealGroup, Keyboard } from '@honeydeck/honeydeck'
+import { Reveal, RevealGroup, Keyboard, Notes } from '@honeydeck/honeydeck'
 
 # Honeydeck
 
@@ -21,10 +21,20 @@ layout: DiagonalSplit
 
 - **MDX-native** — Markdown + React, tech you know
 - **Static export** — Host anywhere, no runtime JS needed
-- **Open format** — Plain text forever, export to PDF anytime
 - **AI-ready** — Agent skills for writing and migration
+- **Batteries included** — Press <Keyboard>p</Keyboard> for presenter mode
 
 </RevealGroup>
+
+<Notes>
+
+# Why not follow along here for a slide or two?
+
+It's still <Keyboard>→</Keyboard> for next step and <Keyboard>↓</Keyboard> for next slide.
+
+Press <Keyboard>esc</Keyboard> to exit presenter mode.
+
+</Notes>
 
 ---
 layout: HexGrid
@@ -44,6 +54,12 @@ author: Jane
 # Second Slide
 ```
 
+<Notes>
+
+👆 you can already see what the next step will look like up here.
+
+</Notes>
+
 ---
 layout: Brutalist
 ---
@@ -60,9 +76,15 @@ Override CSS variables to brand any deck. The Bee theme brings deep purple and g
 
 <Reveal>
 
-<div className="absolute bottom-8 bg-foreground text-background px-2">👇 check live docs 📖</div>
+<div className="absolute bottom-22 bg-foreground text-background px-2">👇 check live docs 📖</div>
 
 </Reveal>
+
+<Notes>
+
+Exit presenter mode here to see the navigation bar in action 😉
+
+</Notes>
 
 ---
 layout: HexGrid
@@ -77,7 +99,7 @@ layout: HexGrid
     <div className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
     <span className="ml-3 font-mono text-xs text-surface-foreground/50">terminal</span>
   </div>
-  <div className="bg-surface/30 p-6 font-mono text-sm text-surface-foreground/80 space-y-2">
+  <div className="bg-[color-mix(in_srgb,var(--color-surface)_30%,var(--honeydeck-background))] p-6 font-mono text-sm text-surface-foreground/80 space-y-2">
     <p><span className="text-primary">$</span> npx @honeydeck/honeydeck init --name my-talk</p>
     <p><span className="text-primary">$</span> cd my-talk && npm run dev</p>
     <p className="text-accent mt-3">✓ Edit deck.mdx · Hot-reload · Present · Export PDF</p>

@@ -8,6 +8,13 @@ const baseCss = readFileSync(
 );
 
 describe("base theme CSS", () => {
+	it("makes slide canvases establish themed background and foreground colors", () => {
+		assert.match(
+			baseCss,
+			/\.honeydeck-slide-canvas\s*{[^}]*background:\s*var\(--honeydeck-background\);[^}]*color:\s*var\(--honeydeck-foreground\);/s,
+		);
+	});
+
 	it("restores slide list markers and indentation after Tailwind preflight", () => {
 		assert.match(
 			baseCss,

@@ -16,6 +16,7 @@
 - The package-local layout map exposes only layouts used by the deck plus the built-in `Default` layout for the runtime layouts reference page.
 - Every package-local custom layout exported by the layout map provides a static `demo` export so it appears with a live preview on the layouts reference page.
 - Custom layouts that render inline SVG definitions use per-instance IDs so repeated layout instances on different slides do not collide in the shared document.
+- `WelcomeCover` renders the Grainient WebGL background edge-to-edge inside the slide canvas, including when Honeydeck scales the slide with CSS transforms for audience, preview, or export views.
 
 ## Scripts
 

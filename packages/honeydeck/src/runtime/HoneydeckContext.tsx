@@ -35,6 +35,10 @@ export type HoneydeckContextValue = {
 	config: HoneydeckResolvedConfig;
 	/** Current slide/step/layout state. */
 	currentSlide: HoneydeckCurrentSlide;
+	/** Logical slide canvas width in pixels. */
+	slideWidth: number;
+	/** Logical slide canvas height in pixels. */
+	slideHeight: number;
 	/** Effective current color mode. */
 	mode: EffectiveColorMode;
 };
