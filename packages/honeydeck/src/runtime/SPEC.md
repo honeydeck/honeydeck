@@ -150,6 +150,8 @@ Reference page routes intentionally do not encode slide or step. During one brow
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview; in reference pages, return to slides; browser-native Escape handles fullscreen exit |
 
+Honeydeck keyboard shortcuts only run for unmodified key presses. If `Alt`, `Control`, `Meta`/`Command`, or `Shift` is held, Honeydeck ignores the event so browser and operating-system shortcuts (for example `⌘O`) remain native.
+
 ### Navigation UI Bar
 
 Shown in normal slide view only (not presenter/reference views).
@@ -177,6 +179,8 @@ When `showSlideNumbers: true`, normal slide view also renders the current slide 
 ### Input Ownership
 
 Navigation input is routed through a shared command abstraction used by audience, presenter, overview, reference pages, keyboard, touch, and button controls. Input handlers call semantic commands such as `nextStep`, `previousStep`, `nextSlide`, `previousSlide`, `openOverview`, `closeOverview`, `openReference`, `openPresenter`, `toggleNavBar`, and `resetZoom` instead of directly mutating route state.
+
+Keyboard shortcuts are registered through a central hotkey utility. Each hotkey definition includes a stable `id`, user-facing `name`, `description`, key list, and handler so Honeydeck can later expose shortcut help and override shortcuts from one place. The utility owns shared hotkey behavior, including ignoring modified key events and editable targets before handlers run.
 
 Wheel and trackpad scroll never navigate slides. Scrollable content owns scroll input. If a touch/pointer gesture starts inside an interactive element (`button`, `a`, `input`, `textarea`, `select`, etc.), an element marked `data-honeydeck-no-swipe`, or an auto-detected scrollable ancestor before the deck/slide root, Honeydeck does not claim swipe navigation for that gesture. A scrollable ancestor is an element whose scroll dimensions exceed client dimensions and whose computed overflow allows `auto` or `scroll` on either axis. Scroll-owned gestures never hand off to slide navigation at scroll boundaries.
 

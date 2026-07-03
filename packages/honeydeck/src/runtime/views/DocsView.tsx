@@ -9,7 +9,7 @@
 
 import { useEffect, useRef } from "react";
 import type { ColorMode } from "../components/ColorModeCycleButton.tsx";
-import { isEditableKeyboardTarget } from "../keyboardTarget.ts";
+import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
 import { getRememberedSlideRoute } from "../lastSlideRoute.ts";
 import type { KitTab } from "../router.ts";
 import { navigate } from "../router.ts";
@@ -37,16 +37,18 @@ export function DocsView({
 	}, [tab]);
 
 	useEffect(() => {
-		function handleKeyDown(event: KeyboardEvent) {
-			if (event.key !== "Escape") return;
-			if (isEditableKeyboardTarget(event.target)) return;
+		const hotkeys: HotkeyDefinition[] = [
+			{
+				id: "docs.close",
+				name: "Close reference pages",
+				description:
+					"Return from the runtime reference pages to the remembered slide.",
+				keys: ["Escape"],
+				handler: () => navigate(getRememberedSlideRoute()),
+			},
+		];
 
-			event.preventDefault();
-			navigate(getRememberedSlideRoute());
-		}
-
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
+		return registerHotkeys(window, hotkeys);
 	}, []);
 
 	return (
