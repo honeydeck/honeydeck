@@ -6,7 +6,8 @@
 		"packages/honeydeck",
 		"packages/docs",
 		"packages/showcase",
-		"packages/welcome-deck"
+		"packages/welcome-deck",
+		"demos/*"
 	],
 	"packageManager": "pnpm@10.34.4",
 	"engines": {

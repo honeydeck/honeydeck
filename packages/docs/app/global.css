@@ -204,3 +204,10 @@ body {
 	overflow-x: auto;
 	white-space: nowrap;
 }
+
+article img {
+	/* border: 2px solid var(--color-border); */
+	box-shadow: 0 0.2rem 0.3rem var(--docs-shadow);
+	width: 95%;
+	margin: 0 auto;
+}

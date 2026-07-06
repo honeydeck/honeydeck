@@ -2,19 +2,10 @@
 
 Standalone Honeydeck demo for using React Bits backgrounds through shadcn registry items, including Beams as an edge-to-edge slide background.
 
-## Run with npm
-
-```bash
-npm install
-npm run dev
-```
-
 ## Run with pnpm
 
-Because this repository has a root `pnpm-workspace.yaml`, use `--ignore-workspace` inside this demo:
-
 ```bash
-pnpm install --ignore-workspace
+pnpm install
 pnpm run dev
 ```
 

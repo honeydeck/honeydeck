@@ -1,0 +1,12 @@
+{
+	"title": "How To",
+	"defaultOpen": false,
+	"collapsible": true,
+	"pages": [
+		"skills",
+		"slidev-migration",
+		"mermaid",
+		"latex",
+		"react-bits-backgrounds"
+	]
+}

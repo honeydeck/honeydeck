@@ -1,12 +1,13 @@
 # Honeydeck Demos Specification
 
-Demos are standalone example projects under `demos/`. They are intentionally outside the root pnpm workspace, so root workspace scripts do not build, lint, or typecheck them by default.
+Demos are private example packages under `demos/`. They are part of the root pnpm workspace so `pnpm install` works normally from the repository root and from every demo directory.
 
 ## Demo model
 
-- Each demo is a self-contained Honeydeck project with its own `package.json`, deck entry, local assets/components/styles, and dependency declarations.
+- Each demo is a private workspace package with its own `package.json`, deck entry, local assets/components/styles, and dependency declarations.
 - Demo dependencies demonstrate normal user-space integration. Honeydeck core must not gain a dependency just because a demo uses a library.
-- Demo READMEs document how to run with npm and with pnpm using `pnpm install --ignore-workspace`.
+- Demo package dependencies on `@honeydeck/honeydeck` use the workspace package, while third-party feature dependencies remain declared by the demo that uses them.
+- Demo READMEs document normal `pnpm install` and `pnpm run dev` usage without `--ignore-workspace`.
 
 ## Available demos
 

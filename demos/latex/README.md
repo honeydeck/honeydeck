@@ -6,35 +6,15 @@ The local component accepts LaTeX source, renders it with `katex.renderToString`
 
 ## Run locally
 
-With npm:
-
 ```bash
 cd demos/latex
-npm install
-npm run dev
-```
-
-With pnpm:
-
-```bash
-cd demos/latex
-pnpm install --ignore-workspace
+pnpm install
 pnpm run dev
 ```
-
-The `--ignore-workspace` flag matters because this demo is intentionally not part of the repository's root pnpm workspace. Without it, pnpm will install the root workspace projects instead of this standalone demo.
 
 Open the local URL printed by the dev server.
 
 ## Build
-
-With npm:
-
-```bash
-npm run build
-```
-
-With pnpm:
 
 ```bash
 pnpm run build

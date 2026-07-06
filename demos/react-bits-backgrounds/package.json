@@ -7,7 +7,7 @@
 		"build": "honeydeck build"
 	},
 	"dependencies": {
-		"@honeydeck/honeydeck": "file:../../packages/honeydeck",
+		"@honeydeck/honeydeck": "workspace:*",
 		"@react-three/drei": "^10.7.7",
 		"@react-three/fiber": "^9.6.1",
 		"clsx": "^2.1.1",
