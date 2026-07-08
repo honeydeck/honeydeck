@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SlideNumberBadge } from "../../runtime/components/SlideNumberBadge.tsx";
+import { SlideNumberBadge } from "./SlideNumberBadge.tsx";
 
 describe("<SlideNumberBadge>", () => {
 	it("exposes the current slide number to screen readers and sighted users", () => {

@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Fade } from "../../runtime/components/Fade.tsx";
-import { FadeWith } from "../../runtime/components/FadeWith.tsx";
-import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
+import { Fade } from "./Fade.tsx";
+import { FadeWith } from "./FadeWith.tsx";
 
 function renderFade({
 	at = 1,

@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 
 export type TimelineStepsPhase = "before" | "active" | "after";
 

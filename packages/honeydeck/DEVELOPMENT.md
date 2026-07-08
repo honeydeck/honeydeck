@@ -508,7 +508,7 @@ Before publishing or enabling automation:
 honeydeck/
   src/
     cli/                    CLI commands, starter templates, and colocated CLI tests
-    runtime/                React app shell, router, slide runtime, views, components, and colocated runtime tests
+    runtime/                Feature folders for app shell, deck (including chrome), navigation, timeline, color mode, presentation, overview, reference, and shared public components, plus colocated runtime tests
     vite-plugin/            Deck loading, virtual modules, layout demo crawl, token manifest, and colocated plugin tests
     remark/                 MDX/remark transforms for metadata, steps, code blocks, and colocated remark tests
     layouts/                Built-in clean and bee layout maps/components and colocated layout tests

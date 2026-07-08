@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 import { CodeBlock } from "./CodeBlock.tsx";
 import { parseJsonProp, type StepGroup } from "./CodeBlockShared.ts";
 

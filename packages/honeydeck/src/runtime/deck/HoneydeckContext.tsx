@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext } from "react";
-import type { EffectiveColorMode } from "./EffectiveColorModeContext.tsx";
+import type { EffectiveColorMode } from "../color-mode/EffectiveColorModeContext.tsx";
 
 export type HoneydeckResolvedConfig = Record<string, unknown> & {
 	title: string;

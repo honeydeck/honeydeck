@@ -9,7 +9,7 @@
 
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parseHash, serializeRoute } from "../runtime/router.ts";
+import { parseHash, serializeRoute } from "./router.ts";
 
 // ---------------------------------------------------------------------------
 // parseHash — slide routes

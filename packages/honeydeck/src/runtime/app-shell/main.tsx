@@ -17,8 +17,8 @@ import {
 	applyHoneydeckColorMode,
 	readSystemPrefersDark,
 	resolveEffectiveColorMode,
-} from "../colorMode.ts";
-import { Deck } from "../Deck.tsx";
+} from "../color-mode/colorMode.ts";
+import { Deck } from "../deck/Deck.tsx";
 
 applyHoneydeckColorMode(
 	resolveEffectiveColorMode(

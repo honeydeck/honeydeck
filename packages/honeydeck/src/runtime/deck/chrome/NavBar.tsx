@@ -40,8 +40,8 @@ import {
 	openPresenter,
 	openReference,
 	previousStep,
-} from "../navigation.ts";
-import type { Route } from "../router.ts";
+} from "../../navigation/navigation.ts";
+import type { Route } from "../../navigation/router.ts";
 import { slideData } from "../slideData.ts";
 import type { ColorMode } from "./ColorModeCycleButton.tsx";
 import { ColorModeCycleButton } from "./ColorModeCycleButton.tsx";

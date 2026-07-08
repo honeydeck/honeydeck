@@ -8,15 +8,18 @@
  */
 
 import { useEffect, useRef } from "react";
-import type { ColorMode } from "../components/ColorModeCycleButton.tsx";
-import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
-import { getRememberedSlideRoute } from "../lastSlideRoute.ts";
-import type { KitTab } from "../router.ts";
-import { navigate } from "../router.ts";
-import { ComponentsTab } from "./docs/ComponentsTab.tsx";
-import { DocsHeader } from "./docs/DocsHeader.tsx";
-import { LayoutsTab } from "./docs/LayoutsTab.tsx";
-import { ThemeTab } from "./docs/ThemeTab.tsx";
+import type { ColorMode } from "../deck/chrome/ColorModeCycleButton.tsx";
+import {
+	type HotkeyDefinition,
+	registerHotkeys,
+} from "../navigation/hotkeys.ts";
+import { getRememberedSlideRoute } from "../navigation/lastSlideRoute.ts";
+import type { KitTab } from "../navigation/router.ts";
+import { navigate } from "../navigation/router.ts";
+import { ComponentsTab } from "./ComponentsTab.tsx";
+import { DocsHeader } from "./DocsHeader.tsx";
+import { LayoutsTab } from "./LayoutsTab.tsx";
+import { ThemeTab } from "./ThemeTab.tsx";
 
 export type DocsViewProps = {
 	tab?: KitTab;

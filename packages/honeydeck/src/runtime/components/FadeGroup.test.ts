@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FadeGroup } from "../../runtime/components/FadeGroup.tsx";
-import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
+import { FadeGroup } from "./FadeGroup.tsx";
 
 function renderFadeGroup(
 	stepIndex: number,

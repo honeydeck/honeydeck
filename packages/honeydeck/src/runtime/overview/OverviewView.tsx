@@ -5,10 +5,13 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { type HotkeyDefinition, handleHotkeyEvent } from "../hotkeys.ts";
-import { navigate } from "../router.ts";
-import { SlideCanvas } from "../SlideCanvas.tsx";
-import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
+import { SlideCanvas } from "../deck/SlideCanvas.tsx";
+import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../deck/slideData.ts";
+import {
+	type HotkeyDefinition,
+	handleHotkeyEvent,
+} from "../navigation/hotkeys.ts";
+import { navigate } from "../navigation/router.ts";
 import {
 	getOverviewGridColumnCount,
 	getOverviewGridSelectionMove,

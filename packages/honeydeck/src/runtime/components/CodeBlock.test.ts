@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { KeyedTokensInfo } from "@shikijs/magic-move/core";
-import { parseJsonProp } from "../../runtime/components/CodeBlockShared.ts";
+import { parseJsonProp } from "./CodeBlockShared.ts";
 import {
 	applyMagicCodeDimming,
 	getActiveCodeStateIndex,
 	getMagicCodeTransitionOptions,
 	isPdfExportRender,
-} from "../../runtime/components/MagicCodeBlock.tsx";
-import { applyCodeStepDimming } from "../../runtime/components/NormalCodeBlock.tsx";
+} from "./MagicCodeBlock.tsx";
+import { applyCodeStepDimming } from "./NormalCodeBlock.tsx";
 
 const html = [
 	"<pre><code>",

@@ -13,8 +13,8 @@ import { config } from "virtual:honeydeck/config";
 import { layoutMap } from "virtual:honeydeck/layouts";
 import * as slideModules from "virtual:honeydeck/slides";
 import type { ComponentType } from "react";
+import type { LayoutProps } from "../types.ts";
 import { parseAspectRatio } from "./aspectRatio.ts";
-import type { LayoutProps } from "./types.ts";
 
 // ---------------------------------------------------------------------------
 // Constants — derived from config.aspectRatio (default 16:9 → 1920×1080)

@@ -5,7 +5,7 @@ import { createElement, Fragment } from "react";
 import * as runtime from "react/jsx-runtime";
 import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
-import { PresenterNotesPanel } from "../../runtime/views/PresenterNotesPanel.tsx";
+import { PresenterNotesPanel } from "../presentation/PresenterNotesPanel.tsx";
 
 describe("speaker notes markdown", () => {
 	it("renders markdown inside <Notes> as speaker-note content", async () => {

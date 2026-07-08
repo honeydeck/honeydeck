@@ -39,27 +39,34 @@ import {
 import {
 	applyHoneydeckColorMode,
 	resolveEffectiveColorMode,
-} from "./colorMode.ts";
-import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
-import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
-import { NavBar } from "./components/NavBar.tsx";
-import { SlideNumberBadge } from "./components/SlideNumberBadge.tsx";
+} from "../color-mode/colorMode.ts";
 import {
 	type EffectiveColorMode,
 	EffectiveColorModeProvider,
-} from "./EffectiveColorModeContext.tsx";
+} from "../color-mode/EffectiveColorModeContext.tsx";
+import { ErrorBoundary } from "../components/ErrorBoundary.tsx";
+import { rememberSlideRoute } from "../navigation/lastSlideRoute.ts";
+import {
+	closeOverview,
+	toggleOverview as toggleOverviewRoute,
+} from "../navigation/navigation.ts";
+import { useRoute } from "../navigation/router.ts";
+import { useKeyboardNav } from "../navigation/useKeyboardNav.ts";
+import { useSwipeNav } from "../navigation/useSwipeNav.ts";
+import { OverviewView } from "../overview/OverviewView.tsx";
+import { PresenterView } from "../presentation/PresenterView.tsx";
+import { usePresentationReceiverSync } from "../presentation/presentationApi.ts";
+import { useSync } from "../presentation/sync.ts";
+import { DocsView } from "../reference/DocsView.tsx";
+import { startMagicTransition } from "../timeline/magicTransition.ts";
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
+import type { ColorMode } from "./chrome/ColorModeCycleButton.tsx";
+import { NavBar } from "./chrome/NavBar.tsx";
+import { SlideNumberBadge } from "./chrome/SlideNumberBadge.tsx";
 import {
 	HoneydeckProvider,
 	resolveHoneydeckConfig,
 } from "./HoneydeckContext.tsx";
-import { rememberSlideRoute } from "./lastSlideRoute.ts";
-import { startMagicTransition } from "./magicTransition.ts";
-import {
-	closeOverview,
-	toggleOverview as toggleOverviewRoute,
-} from "./navigation.ts";
-import { usePresentationReceiverSync } from "./presentationApi.ts";
-import { useRoute } from "./router.ts";
 import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
@@ -67,13 +74,6 @@ import {
 	resolveLayout,
 	slideData,
 } from "./slideData.ts";
-import { useSync } from "./sync.ts";
-import { TimelineProvider } from "./TimelineContext.tsx";
-import { useKeyboardNav } from "./useKeyboardNav.ts";
-import { useSwipeNav } from "./useSwipeNav.ts";
-import { DocsView } from "./views/DocsView.tsx";
-import { OverviewView } from "./views/OverviewView.tsx";
-import { PresenterView } from "./views/PresenterView.tsx";
 
 // ---------------------------------------------------------------------------
 // Scale calculation
