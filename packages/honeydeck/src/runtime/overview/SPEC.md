@@ -13,7 +13,7 @@ Toggled via `o` or the overview button. Overview is directly addressable as `/#/
 - Mobile overview is a responsive page with a fixed two-column grid; two columns are the minimum supported mobile overview density
 - Future reveal steps are visible at reduced opacity in thumbnails so authors can see what each slide will contain by the end
 - The current slide gets a `Current` badge; desktop keyboard selection gets the stronger accent-color outline. Mobile overview does not show a separate focused-slide indicator because compact padding makes that indicator visually noisy.
-- Click or tap a thumbnail to jump to that slide, reset to step 0, and exit overview by creating a new slide history entry. Clicking or tapping the already-current slide does nothing
+- Click or tap a thumbnail to jump to that slide, reset to step 0, and exit overview by creating a new slide history entry. Clicking or tapping the already-current slide exits overview and returns to the current slide and step
 - Browser Back from overview closes overview by returning to the previous route
 - Overview scroll is scroll-owned: wheel, trackpad, touch scroll, and swipe gestures that start in the overview grid scroll the grid and never navigate slides, even at scroll boundaries
 - Overview does not handle pinch gestures; pinch zoom is only supported on slides
@@ -29,7 +29,7 @@ Toggled via `o` or the overview button. Overview is directly addressable as `/#/
 - Pressing Down while the selected thumbnail is already in the bottommost rendered row keeps the current selection instead of jumping to the last slide
 - Overview gives a short visual boundary nudge when Up or Down cannot move because the selection is already at the top or bottom row
 - Keyboard navigation keeps the selected thumbnail smoothly scrolled into view, with margin so the selection is not flush against the viewport edge; if repeated key presses change the selection while a scroll animation is running, the new scroll target takes over instead of queueing behind the previous animation
-- Enter jumps to selected slide, resets to step 0, exits overview, and creates a new browser history entry. Pressing Enter while the current slide is already selected does nothing
+- Enter jumps to selected slide, resets to step 0, exits overview, and creates a new browser history entry. Pressing Enter while the current slide is already selected exits overview and returns to the current slide and step
 - `o` toggles (also exits) overview
 - Escape exits overview
 - Overview button in nav bar exits overview

@@ -119,6 +119,38 @@ describe("navigation route helpers", () => {
 		);
 	});
 
+	it("opens and closes presenter overview routes", () => {
+		assert.deepEqual(
+			getOverviewRoute({ view: "presenter", slide: 2, step: 1 }),
+			{ view: "presenterOverview", slide: 2, step: 1 },
+		);
+		assert.deepEqual(
+			getSlideRouteFromRoute({ view: "presenterOverview", slide: 2, step: 1 }),
+			{ view: "presenter", slide: 2, step: 1 },
+		);
+	});
+
+	it("toggles presenter overview route state", () => {
+		assert.deepEqual(
+			getToggleOverviewRoute({ view: "presenter", slide: 2, step: 1 }),
+			{ view: "presenterOverview", slide: 2, step: 1 },
+		);
+		assert.deepEqual(
+			getToggleOverviewRoute({ view: "presenterOverview", slide: 2, step: 1 }),
+			{ view: "presenter", slide: 2, step: 1 },
+		);
+	});
+
+	it("preserves presenterOverview view while navigating", () => {
+		assert.deepEqual(
+			getNextStepRoute(
+				{ view: "presenterOverview", slide: 2, step: 1 },
+				options,
+			),
+			{ view: "presenterOverview", slide: 2, step: 2 },
+		);
+	});
+
 	it("opens presenter mode by changing the current hash", () => {
 		const location = {
 			href: "https://example.com/deck/index.html",

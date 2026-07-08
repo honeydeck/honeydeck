@@ -59,7 +59,7 @@ Presenter mode supports the same slide overview as the audience view, rendered i
 - The overview uses the same `OverviewView` component as the audience view; only the surrounding container differs. Deck wraps the audience overview in a full-screen overlay, while presenter mode places it inside the current-slide cell.
 - Arrow keys move the selection within the grid; WASD timeline shortcuts are disabled while the overview is open.
 - `Enter` or clicking a thumbnail jumps to that slide at step 0 and returns to the plain presenter route (`/#/presenter/<slide>/0`).
-- Clicking or pressing `Enter` on the already-current slide does nothing.
+- Clicking or pressing `Enter` on the already-current slide exits the presenter overview and returns to the plain presenter route at the current slide and step.
 - `o` toggles the overview closed.
 - `Escape` closes the overview and returns to `/#/presenter/<slide>/<step>`; pressing `Escape` again exits presenter mode entirely.
 - `p` exits presenter mode entirely even if the overview is open.

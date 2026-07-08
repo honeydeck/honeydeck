@@ -170,6 +170,52 @@ describe("parseHash (presenter routes)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// parseHash — presenter overview routes
+// ---------------------------------------------------------------------------
+
+describe("parseHash (presenter overview routes)", () => {
+	it("parses #/presenter/overview/1/0 → presenterOverview view", () => {
+		assert.deepEqual(parseHash("#/presenter/overview/1/0"), {
+			view: "presenterOverview",
+			slide: 1,
+			step: 0,
+		});
+	});
+
+	it("parses #/presenter/overview/3/2 → presenterOverview view", () => {
+		assert.deepEqual(parseHash("#/presenter/overview/3/2"), {
+			view: "presenterOverview",
+			slide: 3,
+			step: 2,
+		});
+	});
+
+	it("#/presenter/overview/2 (missing step) → step 0", () => {
+		assert.deepEqual(parseHash("#/presenter/overview/2"), {
+			view: "presenterOverview",
+			slide: 2,
+			step: 0,
+		});
+	});
+
+	it("#/presenter/overview/0/-1 → clamps slide and step", () => {
+		assert.deepEqual(parseHash("#/presenter/overview/0/-1"), {
+			view: "presenterOverview",
+			slide: 1,
+			step: 0,
+		});
+	});
+
+	it("#/presenter/overview without numbers → defaults to slide 1, step 0", () => {
+		assert.deepEqual(parseHash("#/presenter/overview"), {
+			view: "presenterOverview",
+			slide: 1,
+			step: 0,
+		});
+	});
+});
+
+// ---------------------------------------------------------------------------
 // parseHash — reference routes
 // ---------------------------------------------------------------------------
 
@@ -240,6 +286,13 @@ describe("serializeRoute", () => {
 		);
 	});
 
+	it("presenterOverview view: slide 2, step 1 → #/presenter/overview/2/1", () => {
+		assert.equal(
+			serializeRoute({ view: "presenterOverview", slide: 2, step: 1 }),
+			"#/presenter/overview/2/1",
+		);
+	});
+
 	it("reference view: theme tab → #/theme", () => {
 		assert.equal(
 			serializeRoute({ view: "kit", slide: 1, step: 0, kitTab: "theme" }),
@@ -276,6 +329,7 @@ describe("round-trip", () => {
 		{ view: "slide" as const, slide: 2, step: 3 },
 		{ view: "overview" as const, slide: 3, step: 1 },
 		{ view: "presenter" as const, slide: 4, step: 2 },
+		{ view: "presenterOverview" as const, slide: 5, step: 1 },
 		{ view: "kit" as const, slide: 1, step: 0, kitTab: "theme" as const },
 	];
 

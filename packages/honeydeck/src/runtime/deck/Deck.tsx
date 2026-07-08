@@ -479,7 +479,7 @@ export function Deck() {
 	}
 
 	// ── Presenter mode: delegate to PresenterView ──────────────────────────
-	if (route.view === "presenter") {
+	if (route.view === "presenter" || route.view === "presenterOverview") {
 		return (
 			<PresenterView colorMode={colorMode} onSetColorMode={setColorMode} />
 		);
@@ -669,16 +669,19 @@ export function Deck() {
 
 					{/* ── Overview overlay ──────────────────────────────────────────── */}
 					{isOverview && (
-						<OverviewView
-							currentSlide={currentSlide}
-							currentStep={currentStep}
-							onClose={() =>
-								closeOverview(controlRoute, {
-									slideCount: slideData.length,
-									getStepCount,
-								})
-							}
-						/>
+						<div className="fixed inset-0 z-[100] overflow-hidden bg-background/50 backdrop-blur-xl">
+							<OverviewView
+								currentSlide={currentSlide}
+								currentStep={currentStep}
+								onClose={() =>
+									closeOverview(controlRoute, {
+										slideCount: slideData.length,
+										getStepCount,
+									})
+								}
+								targetView="slide"
+							/>
+						</div>
 					)}
 
 					{/* ── Black screen overlay (controlled by presenter) ────────── */}
