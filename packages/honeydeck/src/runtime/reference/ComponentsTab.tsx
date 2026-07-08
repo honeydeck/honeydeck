@@ -1,5 +1,5 @@
 import * as componentReference from "virtual:honeydeck/components";
-import type { ComponentDoc, ComponentPropDoc } from "../../types.ts";
+import type { ComponentDoc, ComponentPropDoc } from "../types.ts";
 import { Intro } from "./Intro.tsx";
 
 const { componentDocWarnings, componentDocs, componentMap, componentNames } =

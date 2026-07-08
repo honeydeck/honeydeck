@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "node:test";
 import {
 	getRememberedSlideRoute,
 	rememberSlideRoute,
-} from "../runtime/lastSlideRoute.ts";
+} from "./lastSlideRoute.ts";
 
 function installSessionStorage(
 	overrides: Partial<{

@@ -8,7 +8,7 @@ import {
 	type ReactElement,
 	type ReactNode,
 } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 import { Reveal } from "./Reveal.tsx";
 
 // ---------------------------------------------------------------------------

@@ -11,3 +11,4 @@ packages/docs/tsconfig.tsbuildinfo
 packages/docs/public/search-index.json
 packages/honeydeck/docs
 packages/honeydeck/.tmp-docs-tests
+agent-work

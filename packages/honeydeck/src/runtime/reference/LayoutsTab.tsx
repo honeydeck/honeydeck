@@ -1,9 +1,9 @@
 import * as layoutReference from "virtual:honeydeck/layouts";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { BASE_HEIGHT, BASE_WIDTH, resolveLayout } from "../../slideData.ts";
-import { TimelineProvider } from "../../TimelineContext.tsx";
-import type { CompiledLayoutDemo, LayoutPropDoc } from "../../types.ts";
+import { BASE_HEIGHT, BASE_WIDTH, resolveLayout } from "../deck/slideData.ts";
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
+import type { CompiledLayoutDemo, LayoutPropDoc } from "../types.ts";
 import { Intro } from "./Intro.tsx";
 
 const { layoutDemos, layoutDemoWarnings, layoutNames, layoutPropDocs } =

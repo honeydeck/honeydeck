@@ -46,35 +46,38 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { readDocumentEffectiveColorMode } from "../color-mode/EffectiveColorModeContext.tsx";
+import { NotesContext } from "../components/Notes.tsx";
 import {
 	type ColorMode,
 	ColorModeCycleButton,
-} from "../components/ColorModeCycleButton.tsx";
-import { NotesContext } from "../components/Notes.tsx";
-import { readDocumentEffectiveColorMode } from "../EffectiveColorModeContext.tsx";
+} from "../deck/chrome/ColorModeCycleButton.tsx";
 import {
 	HoneydeckProvider,
 	resolveHoneydeckConfig,
-} from "../HoneydeckContext.tsx";
-import { type HotkeyDefinition, registerHotkeys } from "../hotkeys.ts";
+} from "../deck/HoneydeckContext.tsx";
+import { SlideCanvas } from "../deck/SlideCanvas.tsx";
+import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../deck/slideData.ts";
+import {
+	type HotkeyDefinition,
+	registerHotkeys,
+} from "../navigation/hotkeys.ts";
 import {
 	getSlideRouteFromRoute,
 	navigateTo,
 	openUrlInNewTab,
-} from "../navigation.ts";
+} from "../navigation/navigation.ts";
+import { useRoute } from "../navigation/router.ts";
+import { useKeyboardNav } from "../navigation/useKeyboardNav.ts";
+import { PresenterCastButton } from "./PresenterCastButton.tsx";
+import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
 import {
 	getPresentationAudienceUrl,
 	usePresentationCast,
-} from "../presentationApi.ts";
-import { useRoute } from "../router.ts";
-import { SlideCanvas } from "../SlideCanvas.tsx";
-import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../slideData.ts";
-import { useSync } from "../sync.ts";
-import { useKeyboardNav } from "../useKeyboardNav.ts";
-import { PresenterCastButton } from "./PresenterCastButton.tsx";
-import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
+} from "./presentationApi.ts";
 import { getPresenterNextPreview } from "./presenterPreview.ts";
 import { formatPresenterElapsedTime } from "./presenterTime.ts";
+import { useSync } from "./sync.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers

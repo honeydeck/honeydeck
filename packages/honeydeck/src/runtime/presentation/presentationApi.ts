@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
-import { getRouteUrl } from "./navigation.ts";
-import { navigate, parseHash, type Route } from "./router.ts";
+import type { ColorMode } from "../deck/chrome/ColorModeCycleButton.tsx";
+import { getRouteUrl } from "../navigation/navigation.ts";
+import { navigate, parseHash, type Route } from "../navigation/router.ts";
 import {
 	createSyncColorModeMessage,
 	createSyncResponseMessage,

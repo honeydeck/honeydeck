@@ -4,7 +4,7 @@ import {
 	countGridColumnsFromChildren,
 	countGridTemplateColumns,
 	getOverviewGridSelectionMove,
-} from "../../runtime/views/overviewGrid.ts";
+} from "./overviewGrid.ts";
 
 function childrenWithTops(tops: number[]): HTMLCollection {
 	const children = tops.map((offsetTop) => ({ offsetTop }));

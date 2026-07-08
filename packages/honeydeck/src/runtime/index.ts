@@ -46,12 +46,12 @@ export type {
 	HoneydeckContextValue,
 	HoneydeckCurrentSlide,
 	HoneydeckResolvedConfig,
-} from "./HoneydeckContext.tsx";
-export { useHoneydeck } from "./HoneydeckContext.tsx";
-export { useSlideScale } from "./SlideScaleContext.tsx";
+} from "./deck/HoneydeckContext.tsx";
+export { useHoneydeck } from "./deck/HoneydeckContext.tsx";
+export { useSlideScale } from "./deck/SlideScaleContext.tsx";
 export type {
 	TimelineContextValue,
 	TimelineProviderProps,
-} from "./TimelineContext.tsx";
+} from "./timeline/TimelineContext.tsx";
 // TimelineProvider and useTimeline are exported for kit/layout authors.
-export { TimelineProvider, useTimeline } from "./TimelineContext.tsx";
+export { TimelineProvider, useTimeline } from "./timeline/TimelineContext.tsx";

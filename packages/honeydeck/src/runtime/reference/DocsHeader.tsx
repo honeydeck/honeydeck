@@ -2,10 +2,10 @@ import { ExternalLinkIcon } from "lucide-react";
 import {
 	type ColorMode,
 	ColorModeCycleButton,
-} from "../../components/ColorModeCycleButton.tsx";
-import { getRememberedSlideRoute } from "../../lastSlideRoute.ts";
-import type { KitTab } from "../../router.ts";
-import { navigate } from "../../router.ts";
+} from "../deck/chrome/ColorModeCycleButton.tsx";
+import { getRememberedSlideRoute } from "../navigation/lastSlideRoute.ts";
+import type { KitTab } from "../navigation/router.ts";
+import { navigate } from "../navigation/router.ts";
 
 export type DocsHeaderProps = {
 	tab: KitTab;

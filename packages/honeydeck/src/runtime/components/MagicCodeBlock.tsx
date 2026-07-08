@@ -1,9 +1,9 @@
 import type { KeyedTokensInfo } from "@shikijs/magic-move/core";
 import { ShikiMagicMovePrecompiled } from "@shikijs/magic-move/react";
 import { useEffect, useMemo, useState } from "react";
-import { useEffectiveColorMode } from "../EffectiveColorModeContext.tsx";
-import { useSlideScale } from "../SlideScaleContext.tsx";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useEffectiveColorMode } from "../color-mode/EffectiveColorModeContext.tsx";
+import { useSlideScale } from "../deck/SlideScaleContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 import { CodeBlock } from "./CodeBlock.tsx";
 import { parseJsonProp, type StepGroup } from "./CodeBlockShared.ts";
 

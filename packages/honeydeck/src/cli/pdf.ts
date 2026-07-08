@@ -61,7 +61,7 @@ import { remarkH1Extract } from "#remark/h1-extract.ts";
 import { remarkShikiCodeBlocks } from "#remark/shiki-code-blocks.ts";
 import { remarkStepNumbering } from "#remark/step-numbering.ts";
 import { loadDeck } from "#vite-plugin/deck-loader.ts";
-import { parseAspectRatio } from "../runtime/aspectRatio.ts";
+import { parseAspectRatio } from "../runtime/deck/aspectRatio.ts";
 import { hasHelpFlag } from "./args.ts";
 import { formatCommandBanner } from "./banner.ts";
 import { buildPresentation } from "./build.ts";

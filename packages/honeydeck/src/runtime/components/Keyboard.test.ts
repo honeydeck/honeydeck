@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Keyboard as BarrelKeyboard } from "../../runtime/components/index.ts";
-import { Keyboard } from "../../runtime/components/Keyboard.tsx";
+import { Keyboard as RootKeyboard } from "../index.ts";
 import {
 	type HotkeyDefinition,
 	handleHotkeyEvent,
-} from "../../runtime/hotkeys.ts";
-import { Keyboard as RootKeyboard } from "../../runtime/index.ts";
+} from "../navigation/hotkeys.ts";
 import {
 	hasKeyboardModifier,
 	isEditableKeyboardTarget,
-} from "../../runtime/keyboardTarget.ts";
+} from "../navigation/keyboardTarget.ts";
+import { Keyboard as BarrelKeyboard } from "./index.ts";
+import { Keyboard } from "./Keyboard.tsx";
 
 describe("<Keyboard>", () => {
 	it("renders children as one <kbd>", () => {

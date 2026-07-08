@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 
 export type TimelineRevealElement = "div" | "span";
 

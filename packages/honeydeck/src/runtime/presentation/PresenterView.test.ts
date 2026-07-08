@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { PresenterCastButton } from "../../runtime/views/PresenterCastButton.tsx";
-import { formatPresenterElapsedTime } from "../../runtime/views/presenterTime.ts";
+import { PresenterCastButton } from "./PresenterCastButton.tsx";
+import { formatPresenterElapsedTime } from "./presenterTime.ts";
 
 describe("<PresenterCastButton>", () => {
 	it("renders the supported idle state", () => {

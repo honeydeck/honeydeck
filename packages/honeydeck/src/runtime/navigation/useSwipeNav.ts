@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from "react";
+import { slideData } from "../deck/slideData.ts";
 import { shouldDeckOwnTouchGesture } from "./inputOwnership.ts";
 import {
 	nextSlide,
@@ -8,7 +9,6 @@ import {
 } from "./navigation.ts";
 import type { Route } from "./router.ts";
 import { parseHash } from "./router.ts";
-import { slideData } from "./slideData.ts";
 
 export type PanDelta = { dx: number; dy: number };
 

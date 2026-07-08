@@ -7,7 +7,7 @@ import {
 	type ReactElement,
 	type ReactNode,
 } from "react";
-import { useTimeline } from "../TimelineContext.tsx";
+import { useTimeline } from "../timeline/TimelineContext.tsx";
 import { Fade } from "./Fade.tsx";
 
 type ElementWithCommonProps = ReactElement<{

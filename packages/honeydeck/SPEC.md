@@ -57,9 +57,16 @@ The Honeydeck specification is distributed:
 | Agent skills | [`skills/SPEC.md`](skills/SPEC.md) | bundled installable skills and installer expectations |
 | Deck loading / frontmatter | [`src/vite-plugin/SPEC.md`](src/vite-plugin/SPEC.md) | deck entry, slide separators, MDX imports, assets, Markdown features, frontmatter |
 | Remark transforms | [`src/remark/SPEC.md`](src/remark/SPEC.md) | timeline annotation, code highlighting, step-through code metadata, and Magic Code syntax |
-| Runtime | [`src/runtime/SPEC.md`](src/runtime/SPEC.md) | timeline semantics, keyboard/touch navigation, SPA/build behavior, runtime errors |
-| Runtime components | [`src/runtime/components/SPEC.md`](src/runtime/components/SPEC.md) | `Reveal`, `RevealWith`, `RevealGroup`, `Fade`, `FadeWith`, `FadeGroup`, `TimelineSteps`, `ListStyle`, `Keyboard`, `BrowserFrame`, `Notes` |
-| Runtime views | [`src/runtime/views/SPEC.md`](src/runtime/views/SPEC.md) | presenter mode, overview mode, theme/layout/component reference pages |
+| App shell | [`src/runtime/app-shell/SPEC.md`](src/runtime/app-shell/SPEC.md) | Vite HTML entry, build/dev wiring, boot color mode |
+| Deck | [`src/runtime/deck/SPEC.md`](src/runtime/deck/SPEC.md) | deck orchestration, slide canvas, chrome, context, transitions, aspect ratio, runtime errors |
+| Navigation | [`src/runtime/navigation/SPEC.md`](src/runtime/navigation/SPEC.md) | hash routing, URL state, keyboard shortcuts, input ownership |
+| Timeline | [`src/runtime/timeline/SPEC.md`](src/runtime/timeline/SPEC.md) | per-slide timeline, steps, reveal/fade/code step semantics |
+| Color mode | [`src/runtime/color-mode/SPEC.md`](src/runtime/color-mode/SPEC.md) | effective color mode resolution and document attribute |
+| Presentation | [`src/runtime/presentation/SPEC.md`](src/runtime/presentation/SPEC.md) | presenter mode, sync, Presentation API casting |
+| Overview | [`src/runtime/overview/SPEC.md`](src/runtime/overview/SPEC.md) | overview mode and thumbnail grid |
+| Reference | [`src/runtime/reference/SPEC.md`](src/runtime/reference/SPEC.md) | built-in theme/layout/component reference pages |
+| Runtime components | [`src/runtime/components/SPEC.md`](src/runtime/components/SPEC.md) | public built-in slide components |
+| Runtime overview | [`src/runtime/SPEC.md`](src/runtime/SPEC.md) | runtime spec map and cross-cutting concerns |
 | Layouts and customization | [`src/layouts/SPEC.md`](src/layouts/SPEC.md) | custom theme/layout/component model, built-in layouts, layout props, demos, layout resolution |
 | Theme | [`src/theme/SPEC.md`](src/theme/SPEC.md) | design tokens, base theme CSS, Tailwind mapping, color mode behavior |
 | Public exports | [`src/SPEC.md`](src/SPEC.md) | import paths and public TypeScript types |

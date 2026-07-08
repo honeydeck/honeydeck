@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { getPresenterNextPreview } from "../../runtime/views/presenterPreview.ts";
+import { getPresenterNextPreview } from "./presenterPreview.ts";
 
 describe("getPresenterNextPreview", () => {
 	it("previews the next step on the current slide when steps remain", () => {

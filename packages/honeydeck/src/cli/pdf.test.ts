@@ -11,7 +11,7 @@ import {
 	resolvePdfSteps,
 	resolveStaticFilePath,
 } from "../cli/pdf.ts";
-import { parseAspectRatio } from "../runtime/aspectRatio.ts";
+import { parseAspectRatio } from "../runtime/deck/aspectRatio.ts";
 
 describe("resolvePdfSteps", () => {
 	it("defaults to final when no CLI flag or frontmatter is set", () => {

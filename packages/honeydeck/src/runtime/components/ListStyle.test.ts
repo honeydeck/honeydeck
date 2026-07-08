@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ListStyle } from "../../runtime/components/ListStyle.tsx";
+import { ListStyle } from "./ListStyle.tsx";
 
 function listWithNestedItem() {
 	return createElement(

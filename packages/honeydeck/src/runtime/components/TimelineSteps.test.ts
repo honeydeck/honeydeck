@@ -2,14 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import {
-	TimelineSteps,
-	useTimelineSteps,
-} from "../../runtime/components/TimelineSteps.tsx";
-import {
-	TimelineProvider,
-	useTimeline,
-} from "../../runtime/TimelineContext.tsx";
+import { TimelineProvider, useTimeline } from "../timeline/TimelineContext.tsx";
+import { TimelineSteps, useTimelineSteps } from "./TimelineSteps.tsx";
 
 function Probe() {
 	const state = useTimelineSteps();

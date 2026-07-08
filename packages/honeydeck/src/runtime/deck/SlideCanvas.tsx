@@ -10,6 +10,7 @@
  * so that surrounding layout can measure and position it correctly.
  */
 
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
 import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
@@ -17,7 +18,6 @@ import {
 	resolveLayout,
 	slideData,
 } from "./slideData.ts";
-import { TimelineProvider } from "./TimelineContext.tsx";
 
 // ---------------------------------------------------------------------------
 // Types

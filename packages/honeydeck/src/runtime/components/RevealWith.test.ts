@@ -2,11 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import {
-	RevealWith,
-	type RevealWithProps,
-} from "../../runtime/components/RevealWith.tsx";
-import { TimelineProvider } from "../../runtime/TimelineContext.tsx";
+import { TimelineProvider } from "../timeline/TimelineContext.tsx";
+import { RevealWith, type RevealWithProps } from "./RevealWith.tsx";
 
 function renderRevealWith({
 	at = 1,

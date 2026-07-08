@@ -31,8 +31,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ColorMode } from "./components/ColorModeCycleButton.tsx";
-import { navigate, parseHash, type Route } from "./router.ts";
+import type { ColorMode } from "../deck/chrome/ColorModeCycleButton.tsx";
+import { navigate, parseHash, type Route } from "../navigation/router.ts";
 
 // ---------------------------------------------------------------------------
 // Types

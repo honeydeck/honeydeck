@@ -8,6 +8,15 @@
  * ```
  */
 
+export type {
+	ColorMode,
+	ColorModeCycleButtonProps,
+} from "../deck/chrome/ColorModeCycleButton.tsx";
+export {
+	COLOR_MODES,
+	ColorModeCycleButton,
+	getNextColorMode,
+} from "../deck/chrome/ColorModeCycleButton.tsx";
 export type { BrowserFrameProps } from "./BrowserFrame.tsx";
 export { BrowserFrame } from "./BrowserFrame.tsx";
 export type { ButtonProps, ButtonVariant } from "./Button.tsx";
@@ -23,15 +32,6 @@ export {
 	surfaceControlClass,
 	transitionClass,
 } from "./Button.tsx";
-export type {
-	ColorMode,
-	ColorModeCycleButtonProps,
-} from "./ColorModeCycleButton.tsx";
-export {
-	COLOR_MODES,
-	ColorModeCycleButton,
-	getNextColorMode,
-} from "./ColorModeCycleButton.tsx";
 export type { FadeProps } from "./Fade.tsx";
 export { Fade } from "./Fade.tsx";
 export type { FadeGroupProps } from "./FadeGroup.tsx";
