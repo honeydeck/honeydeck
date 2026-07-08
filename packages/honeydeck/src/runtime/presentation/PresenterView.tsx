@@ -63,12 +63,14 @@ import {
 	registerHotkeys,
 } from "../navigation/hotkeys.ts";
 import {
+	closeOverview,
 	getSlideRouteFromRoute,
 	navigateTo,
 	openUrlInNewTab,
 } from "../navigation/navigation.ts";
 import { useRoute } from "../navigation/router.ts";
 import { useKeyboardNav } from "../navigation/useKeyboardNav.ts";
+import { OverviewView } from "../overview/OverviewView.tsx";
 import { PresenterCastButton } from "./PresenterCastButton.tsx";
 import { PresenterNotesPanel } from "./PresenterNotesPanel.tsx";
 import {
@@ -189,6 +191,7 @@ export function PresenterView({
 	const notesContextValue = useMemo(() => ({ setNotes }), []);
 
 	const currentIndex = slide - 1; // 0-based
+	const isOverview = route.view === "presenterOverview";
 	const currentStepCount = slideData[currentIndex]?.stepCount ?? 0;
 	const nextPreview = getPresenterNextPreview({
 		currentIndex,
@@ -251,7 +254,7 @@ export function PresenterView({
 	useKeyboardNav({
 		slideCount: totalSlides,
 		getStepCount,
-		onToggleOverview: () => {},
+		isOverview,
 	});
 
 	// ── Presenter exit + blank screen shortcuts ─────────────────────────────
@@ -270,13 +273,6 @@ export function PresenterView({
 	useEffect(() => {
 		const hotkeys: HotkeyDefinition[] = [
 			{
-				id: "presenter.close",
-				name: "Close presenter mode",
-				description: "Return from presenter mode to the audience slide view.",
-				keys: ["p", "Escape"],
-				handler: closePresenter,
-			},
-			{
 				id: "presenter.blank-screen.toggle",
 				name: "Toggle blank screen",
 				description: "Blank or restore the audience and cast screens.",
@@ -286,7 +282,7 @@ export function PresenterView({
 		];
 
 		return registerHotkeys(window, hotkeys);
-	}, [closePresenter, toggleBlankScreen]);
+	}, [toggleBlankScreen]);
 
 	// ── Timer controls ──────────────────────────────────────────────────────
 	function startTimer() {
@@ -353,14 +349,28 @@ export function PresenterView({
 
 					{/* ── Top section: current slide plus next/notes column ─────────── */}
 					<div className="grid grid-cols-[minmax(0,3fr)_minmax(280px,2fr)] gap-4 px-4 pt-4 pb-2 min-h-0 overflow-hidden">
-						{/* Current slide owns NotesContext. Next preview must not overwrite notes. */}
-						<NotesContext.Provider value={notesContextValue}>
-							<SlidePreview
-								slideIndex={currentIndex}
-								stepIndex={step}
-								label="Current"
+						{isOverview ? (
+							<OverviewView
+								currentSlide={slide}
+								currentStep={step}
+								onClose={() =>
+									closeOverview(route, {
+										slideCount: totalSlides,
+										getStepCount,
+									})
+								}
+								targetView="presenter"
 							/>
-						</NotesContext.Provider>
+						) : (
+							/* Current slide owns NotesContext. Next preview must not overwrite notes. */
+							<NotesContext.Provider value={notesContextValue}>
+								<SlidePreview
+									slideIndex={currentIndex}
+									stepIndex={step}
+									label="Current"
+								/>
+							</NotesContext.Provider>
+						)}
 
 						<div className="grid grid-rows-[minmax(0,1fr)_minmax(8rem,0.8fr)] gap-4 min-h-0 overflow-hidden">
 							<SlidePreview

@@ -3,7 +3,7 @@ import type { Route } from "./router.ts";
 import { navigate, serializeRoute } from "./router.ts";
 
 export type NavigationRoute = Route & {
-	view: "slide" | "presenter" | "overview";
+	view: "slide" | "presenter" | "presenterOverview" | "overview";
 };
 
 export type StepCountGetter = (slideIndex: number) => number;
@@ -31,6 +31,7 @@ function normalizeNavigableRoute(
 	if (
 		route.view !== "slide" &&
 		route.view !== "presenter" &&
+		route.view !== "presenterOverview" &&
 		route.view !== "overview"
 	) {
 		return null;
@@ -128,7 +129,16 @@ export function getOverviewRoute(
 ): Route | null {
 	const navigable = normalizeNavigableRoute(route, options);
 	if (!navigable) return null;
-	if (navigable.view === "overview") return navigable;
+	if (navigable.view === "overview" || navigable.view === "presenterOverview") {
+		return navigable;
+	}
+	if (navigable.view === "presenter") {
+		return {
+			view: "presenterOverview",
+			slide: navigable.slide,
+			step: navigable.step,
+		};
+	}
 	return { view: "overview", slide: navigable.slide, step: navigable.step };
 }
 
@@ -138,6 +148,12 @@ export function getSlideRouteFromRoute(
 ): Route | null {
 	const navigable = normalizeNavigableRoute(route, options);
 	if (!navigable) return null;
+	if (
+		navigable.view === "presenter" ||
+		navigable.view === "presenterOverview"
+	) {
+		return { view: "presenter", slide: navigable.slide, step: navigable.step };
+	}
 	return { view: "slide", slide: navigable.slide, step: navigable.step };
 }
 
@@ -145,7 +161,9 @@ export function getToggleOverviewRoute(
 	route: Route,
 	options?: NavigationOptions,
 ): Route | null {
-	if (route.view === "overview") return getSlideRouteFromRoute(route, options);
+	if (route.view === "overview" || route.view === "presenterOverview") {
+		return getSlideRouteFromRoute(route, options);
+	}
 	return getOverviewRoute(route, options);
 }
 

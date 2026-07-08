@@ -44,14 +44,22 @@ export type OverviewViewProps = {
 	currentStep: number;
 	/** Called when the overview should close. */
 	onClose: () => void;
+	/** Optional extra className applied to the root panel. */
+	className?: string;
+	/**
+	 * Route view to use when jumping to a selected slide.
+	 * @default "slide"
+	 */
+	targetView?: "slide" | "presenter";
 };
 
 export function OverviewView({
 	currentSlide,
 	currentStep,
 	onClose,
+	className = "",
+	targetView = "slide",
 }: OverviewViewProps) {
-	void currentStep;
 	const [selectionState, setSelectionState] = useState<SelectionState>({
 		selected: Math.max(0, currentSlide - 1),
 		boundaryFeedback: null,
@@ -133,9 +141,22 @@ export function OverviewView({
 		return () => cancelAnimationFrame(animationFrame);
 	}, [selected]);
 
-	const jumpTo = useCallback((index: number) => {
-		navigate({ view: "slide", slide: index + 1, step: 0 });
-	}, []);
+	const jumpTo = useCallback(
+		(index: number) => {
+			if (index === currentSlide - 1) {
+				// Selecting the already-current slide exits the overview and keeps
+				// the current slide and step instead of resetting to step 0.
+				navigate({
+					view: targetView,
+					slide: currentSlide,
+					step: currentStep,
+				});
+				return;
+			}
+			navigate({ view: targetView, slide: index + 1, step: 0 });
+		},
+		[currentSlide, currentStep, targetView],
+	);
 
 	const updateColumnCount = useCallback(() => {
 		colsRef.current = getOverviewGridColumnCount(gridRef.current);
@@ -259,12 +280,17 @@ export function OverviewView({
 			},
 		];
 
-		handleHotkeyEvent(e, hotkeys);
+		const handled = handleHotkeyEvent(e, hotkeys);
+		if (handled) {
+			// Stop the event from reaching window-level listeners (e.g. useKeyboardNav)
+			// so overview shortcuts like Escape and arrow keys are not handled twice.
+			e.stopPropagation();
+		}
 	}
 
 	return (
 		<div
-			className="fixed inset-0 z-[100] overflow-y-auto bg-background/50 text-foreground outline-none backdrop-blur-xl overscroll-contain"
+			className={`flex flex-col h-full w-full min-h-0 overflow-y-auto bg-background text-foreground outline-none overscroll-contain ${className}`}
 			tabIndex={-1}
 			ref={containerRef}
 			onKeyDown={handleKeyDown}

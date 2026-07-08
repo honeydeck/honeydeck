@@ -74,6 +74,30 @@ describe("<PresenterView>", () => {
 		assert.doesNotMatch(source, /usePresenterMobile/);
 		assert.doesNotMatch(source, /useSwipeNav/);
 	});
+
+	it("renders the embedded overview when in presenter overview route", () => {
+		const source = readFileSync(
+			new URL("./PresenterView.tsx", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(
+			source,
+			/import \{[^}]*OverviewView[^}]*\} from "\.\.\/overview\/OverviewView\.tsx"/,
+		);
+		assert.match(source, /targetView="presenter"/);
+		assert.match(source, /isOverview \? \(/);
+	});
+
+	it("does not bind presenter-close hotkeys locally; Escape and p are handled by useKeyboardNav", () => {
+		const source = readFileSync(
+			new URL("./PresenterView.tsx", import.meta.url),
+			"utf8",
+		);
+
+		assert.doesNotMatch(source, /id:\s*"presenter\.close"/);
+		assert.doesNotMatch(source, /keys:\s*\["Escape"\]/);
+	});
 });
 
 describe("formatPresenterElapsedTime", () => {
