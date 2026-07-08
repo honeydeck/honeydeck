@@ -14,10 +14,10 @@ slug: "navigation"
 | `←` / `a` | Previous step (crosses slide boundary) |
 | `↓` / `s` | Next slide |
 | `↑` / `w` | Previous slide |
-| `o` | Toggle overview mode |
-| `p` | Open presenter mode (same tab) |
+| `o` | Toggle overview mode; in presenter mode, toggle the presenter overview |
+| `p` | Open presenter mode (same tab); while in presenter mode, `p` exits presenter mode |
 | `f` | Toggle fullscreen |
-| `Escape` | Exit overview / exit fullscreen |
+| `Escape` | Exit overview; in presenter mode, first `Escape` closes the overview and a second `Escape` exits presenter mode; also exits fullscreen |
 
 Honeydeck only handles unmodified key presses. Browser and operating-system shortcuts with `Alt`, `Control`, `Meta`/`Command`, or `Shift` stay native, so shortcuts like `⌘O` still open the browser action instead of toggling overview.
 
@@ -73,25 +73,27 @@ Mobile uses touch-specific controls. See the full [Mobile and Touch](/docs/mobil
 A responsive grid of rendered slide thumbnails. Activated via `o` or the overview button.
 
 - Current slide is highlighted.
-- Click a thumbnail to jump to that slide.
+- Click a thumbnail to jump to that slide. Clicking the current slide does nothing.
 - Future reveal steps are shown at reduced opacity in thumbnails.
 - Arrow keys move selection using the rendered grid columns, including after resizes.
 - Up on the topmost row and Down on the bottommost row keep the current selection and show a short boundary nudge.
-- Enter jumps to selected slide.
+- Enter jumps to selected slide. Pressing Enter on the current slide does nothing.
 - Escape exits overview.
+- In presenter mode, the overview opens inside the current-slide cell at `/#/presenter/overview/<slide>/<step>` and shares the same keyboard behavior.
 
 ## URL State
 
 Honeydeck uses static-host friendly hash-based URLs:
 
 ```txt
-/#/1/0           → slide 1, step 0
-/#/1/1           → slide 1, step 1
-/#/2/0           → slide 2, step 0
-/#/presenter/1/0 → presenter mode
-/#/theme        → theme tokens tab
-/#/layouts      → layouts tab
-/#/components   → components reference tab
+/#/1/0                         → slide 1, step 0
+/#/1/1                         → slide 1, step 1
+/#/2/0                         → slide 2, step 0
+/#/presenter/1/0               → presenter mode
+/#/presenter/overview/1/0     → presenter overview at slide 1
+/#/theme                       → theme tokens tab
+/#/layouts                     → layouts tab
+/#/components                  → components reference tab
 ```
 
 - Slides are **1-based** (user-friendly).
