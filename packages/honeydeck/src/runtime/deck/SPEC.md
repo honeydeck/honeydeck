@@ -26,6 +26,10 @@ The context is available to slide content, custom layouts, overview thumbnails, 
 
 Build output is a single-page application. The app preserves client-side slide transitions, presenter sync, and step timeline state.
 
+### Audience overview overlay
+
+Audience overview mode (`/#/overview/<slideNumber>/<stepIndex>`) renders the shared `OverviewView` component as a contained panel inside a full-screen Deck overlay wrapper. The wrapper supplies the fixed positioning, z-index, translucent themed background (`bg-background`), and backdrop blur. The `OverviewView` component itself knows nothing about full-screen overlay layout, which lets the same component render inside the smaller current-slide cell in presenter mode.
+
 ## Slide Transitions
 
 Honeydeck uses a named slide transition system. Deck-level frontmatter sets defaults, and slide-level frontmatter overrides the transition **into that slide**:

@@ -9,7 +9,7 @@ import {
 	toggleOverview,
 } from "./navigation.ts";
 import type { Route } from "./router.ts";
-import { parseHash } from "./router.ts";
+import { navigate, parseHash } from "./router.ts";
 
 export type UseKeyboardNavOptions = {
 	/** Whether this hook should register keyboard navigation. */
@@ -131,7 +131,20 @@ export function useKeyboardNav({
 				keys: ["p"],
 				handler: () => {
 					const { route } = currentNavigationState();
-					if (route.view === "kit" || route.view === "presenter") return false;
+					if (route.view === "kit") return false;
+					if (
+						route.view === "presenter" ||
+						route.view === "presenterOverview"
+					) {
+						// Pressing p while already in presenter mode exits it entirely,
+						// even when the presenter overview is open.
+						navigate({
+							view: "slide",
+							slide: route.slide,
+							step: route.step,
+						});
+						return;
+					}
 					openPresenter(route);
 				},
 			},
@@ -159,8 +172,25 @@ export function useKeyboardNav({
 				keys: ["Escape"],
 				handler: () => {
 					const { inOverview, route } = currentNavigationState();
-					if (route.view === "kit" || !inOverview) return false;
-					toggleOverviewFrom(route);
+					if (route.view === "kit") return false;
+					if (inOverview) {
+						// First Escape closes the overview and keeps the current slide/step.
+						toggleOverviewFrom(route);
+						return;
+					}
+					if (
+						route.view === "presenter" ||
+						route.view === "presenterOverview"
+					) {
+						// In plain presenter view, Escape exits presenter mode entirely.
+						navigate({
+							view: "slide",
+							slide: route.slide,
+							step: route.step,
+						});
+						return;
+					}
+					return false;
 				},
 			},
 		];

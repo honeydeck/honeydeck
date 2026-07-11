@@ -51,6 +51,22 @@ Includes:
 - In the Next preview, reveal content from later timeline steps is visible at reduced opacity so the speaker can see what is still coming on that slide. Audience view and the Current preview keep future steps hidden.
 - When no next timeline state exists (final step of the final slide), the Next preview shows a placeholder (`No next step`) instead of trying to render a missing slide.
 
+## Presenter overview
+
+Presenter mode supports the same slide overview as the audience view, rendered inside the current-slide cell.
+
+- Pressing `o` while in presenter mode navigates to `/#/presenter/overview/<slideNumber>/<stepIndex>` and replaces the `Current` slide preview with a thumbnail grid.
+- The overview uses the same `OverviewView` component as the audience view; only the surrounding container differs. Deck wraps the audience overview in a full-screen overlay, while presenter mode places it inside the current-slide cell.
+- Arrow keys move the selection within the grid; WASD timeline shortcuts are disabled while the overview is open.
+- `Enter` or clicking a thumbnail jumps to that slide at step 0 and returns to the plain presenter route (`/#/presenter/<slide>/0`).
+- Clicking or pressing `Enter` on the already-current slide exits the presenter overview and returns to the plain presenter route at the current slide and step.
+- `o` toggles the overview closed.
+- `Escape` closes the overview and returns to `/#/presenter/<slide>/<step>`; pressing `Escape` again exits presenter mode entirely.
+- `p` exits presenter mode entirely even if the overview is open.
+- `b` (blank screen) remains active while the overview is open.
+- The overview panel is scroll-owned; scrolling inside it never navigates slides.
+- Jumping to a different slide from the overview broadcasts a `navigate` sync message to audience/cast views as usual.
+
 ## Presenter Responsiveness
 
 Presenter mode uses a two-column preview area (`Current` larger, `Next` smaller), a notes panel, and a bottom status/action bar on `md` and wider screens. Below Tailwind's `md` breakpoint, presenter mode is not supported: direct presenter URLs show a full-page hint that presenter mode is not supported on mobile and provide a button back to the same slide/step in audience view.
