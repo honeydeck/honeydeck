@@ -13,7 +13,7 @@ export default function HomePage() {
 					className="docs-home-copy max-w-3xl"
 					data-home-spotlight-pause-area
 				>
-					<p className="inline-flex items-center gap-2 rounded-full border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] px-3 py-1 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
+					<p className="hidden md:inline-flex items-center gap-2 rounded-full border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] px-3 py-1 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
 						<SparklesIcon size={16} aria-hidden="true" /> Deck experience for
 						MDX people
 					</p>
