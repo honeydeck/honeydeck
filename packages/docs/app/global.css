@@ -11,6 +11,9 @@
 	--color-surface: var(--honeydeck-color-surface);
 	--color-surface-foreground: var(--honeydeck-color-surface-foreground);
 	--color-border: var(--honeydeck-color-border);
+	--color-muted-foreground: var(--honeydeck-color-muted-foreground);
+	--color-docs-panel: var(--docs-panel);
+	--color-docs-panel-strong: var(--docs-panel-strong);
 	--color-accent: var(--honeydeck-color-primary);
 	--color-accent-foreground: var(--honeydeck-color-primary-foreground);
 	--radius-honeydeck: var(--honeydeck-border-radius);

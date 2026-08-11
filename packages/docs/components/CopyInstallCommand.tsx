@@ -16,7 +16,7 @@ export function CopyInstallCommand() {
 	return (
 		<button
 			aria-label="Copy Honeydeck init command"
-			className="inline-flex w-full md:w-auto max-w-full items-center justify-center gap-2 rounded-lg border border-(--honeydeck-color-border) bg-(--docs-panel) px-4 py-3 font-mono text-sm font-black shadow-sm transition-colors hover:border-[color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]"
+			className="inline-flex w-full md:w-auto max-w-full items-center justify-center gap-2 rounded-lg border border-border bg-docs-panel px-4 py-3 font-mono text-sm font-black shadow-sm transition-colors hover:border-[color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]"
 			onClick={copyCommand}
 			type="button"
 		>

@@ -27,19 +27,17 @@ function Playground({
 	code: string;
 }) {
 	return (
-		<section className="not-prose my-6 overflow-hidden rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] shadow-sm">
-			<div className="border-[color:var(--honeydeck-color-border)] border-b p-4 sm:p-5">
-				<p className="text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
-					Playground
-				</p>
+		<section className="not-prose my-6 overflow-hidden rounded-2xl border border-border bg-docs-panel shadow-sm">
+			<div className="border-border border-b p-4 sm:p-5">
+				<p className="text-sm font-black text-muted-foreground">Playground</p>
 				<h3 className="mt-1 text-xl font-black">{title}</h3>
-				<p className="mt-2 text-sm leading-6 text-[color:var(--honeydeck-color-muted-foreground)]">
+				<p className="mt-2 text-sm leading-6 text-muted-foreground">
 					{description}
 				</p>
 			</div>
 			<div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.85fr)]">
 				<div className="min-h-56 p-4 sm:p-5">{children}</div>
-				<pre className="m-0 overflow-auto border-[color:var(--honeydeck-color-border)] border-t bg-[color:color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-4 text-sm leading-6 lg:border-t-0 lg:border-l">
+				<pre className="m-0 overflow-auto border-border border-t bg-[color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-4 text-sm leading-6 lg:border-t-0 lg:border-l">
 					<code>{code}</code>
 				</pre>
 			</div>
@@ -63,7 +61,7 @@ export function KeyboardPlayground() {
 			description="Switch examples to see how Keyboard renders single keys and multi-key shortcuts inline."
 			code={`<Keyboard keys={${JSON.stringify(shortcut.keys)}} />`}
 		>
-			<div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
+			<div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-background p-5">
 				<PlaygroundTabs
 					ariaLabel="Shortcut examples"
 					onValueChange={setActive}
@@ -99,7 +97,7 @@ export function ListStylePlayground() {
 			description="Try marker styles for nested lists before using them in a deck."
 			code={`<ListStyle bullets={${mode.label === "Markerless" ? "false" : mode.label === "Arrows" ? '["→", "–", "·"]' : "[<CheckIcon />, <CircleIcon />]"}}>\n  <ul>...</ul>\n</ListStyle>`}
 		>
-			<div className="flex h-full flex-col gap-5 rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
+			<div className="flex h-full flex-col gap-5 rounded-2xl border border-border bg-background p-5">
 				<PlaygroundTabs
 					ariaLabel="List style examples"
 					onValueChange={setActive}
@@ -184,8 +182,8 @@ export function NotesPlayground() {
 			code={`# Launch plan\n\n- What changed\n- Why it matters\n\n<Notes>\n  # Demo cue\n  - Show the interactive component.\n  - Mention PDF export.\n</Notes>`}
 		>
 			<div className="grid h-full gap-4 md:grid-cols-2">
-				<div className="rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--honeydeck-color-background)] p-5">
-					<p className="flex items-center gap-2 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
+				<div className="rounded-2xl border border-border bg-background p-5">
+					<p className="flex items-center gap-2 text-sm font-black text-muted-foreground">
 						<MousePointerClickIcon size={16} aria-hidden="true" /> Audience view
 					</p>
 					<h4 className="mt-6 text-3xl font-black">Launch plan</h4>
@@ -194,8 +192,8 @@ export function NotesPlayground() {
 						<li>Why it matters</li>
 					</ul>
 				</div>
-				<div className="rounded-2xl border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel-strong)] p-5">
-					<p className="flex items-center gap-2 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
+				<div className="rounded-2xl border border-border bg-docs-panel-strong p-5">
+					<p className="flex items-center gap-2 text-sm font-black text-muted-foreground">
 						<MessageSquareTextIcon size={16} aria-hidden="true" /> Presenter
 						notes
 					</p>

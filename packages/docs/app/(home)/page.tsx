@@ -13,14 +13,14 @@ export default function HomePage() {
 					className="docs-home-copy max-w-3xl"
 					data-home-spotlight-pause-area
 				>
-					<p className="hidden md:inline-flex items-center gap-2 rounded-full border border-[color:var(--honeydeck-color-border)] bg-[color:var(--docs-panel)] px-3 py-1 text-sm font-black text-[color:var(--honeydeck-color-muted-foreground)]">
+					<p className="hidden md:inline-flex items-center gap-2 rounded-full border border-border bg-docs-panel px-3 py-1 text-sm font-black text-muted-foreground">
 						<SparklesIcon size={16} aria-hidden="true" /> Deck experience for
 						MDX people
 					</p>
 					<h1 className="mt-6 text-balance text-4xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
 						Build beautiful slide decks with MDX and React.
 					</h1>
-					<p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-[color:var(--honeydeck-color-muted-foreground)] sm:text-xl">
+					<p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
 						Honeydeck keeps presentations as plain text code, so teams and AI
 						agents can draft, review, present, and export decks with confidence.
 					</p>

@@ -67,7 +67,7 @@ export function PlaygroundTabs<TValue extends number | string>({
 		<div
 			aria-label={ariaLabel}
 			className={cn(
-				"inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-[color:var(--honeydeck-color-border)] bg-[color:color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-1 shadow-sm",
+				"inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-[color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-1 shadow-sm",
 				className,
 			)}
 			onKeyDown={onKeyDown}
@@ -79,10 +79,10 @@ export function PlaygroundTabs<TValue extends number | string>({
 					<button
 						aria-selected={selected}
 						className={cn(
-							"shrink-0 rounded-full px-3 py-1.5 text-sm font-black transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--honeydeck-color-primary)]",
+							"shrink-0 rounded-full px-3 py-1.5 text-sm font-black transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
 							selected
-								? "bg-[color:var(--honeydeck-color-primary)] text-[color:var(--honeydeck-color-primary-foreground)] shadow-sm"
-								: "text-[color:var(--honeydeck-color-muted-foreground)] hover:bg-[color:var(--honeydeck-color-background)] hover:text-[color:var(--honeydeck-color-foreground)]",
+								? "bg-primary text-primary-foreground shadow-sm"
+								: "text-muted-foreground hover:bg-background hover:text-foreground",
 						)}
 						key={String(option.value)}
 						onClick={() => onValueChange(option.value)}
