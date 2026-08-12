@@ -37,7 +37,7 @@ function Playground({
 			</div>
 			<div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.85fr)]">
 				<div className="min-h-56 p-4 sm:p-5">{children}</div>
-				<pre className="m-0 overflow-auto border-border border-t bg-[color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-4 text-sm leading-6 lg:border-t-0 lg:border-l">
+				<pre className="m-0 overflow-auto border-border border-t bg-foreground/5 p-4 text-sm leading-6 lg:border-t-0 lg:border-l">
 					<code>{code}</code>
 				</pre>
 			</div>

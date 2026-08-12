@@ -14,7 +14,7 @@ export function CodeBlock({ source, className, children }: CodeBlockProps) {
 	return (
 		<div
 			className={[
-				"honeydeck-code-block group relative mb-[0.75em] overflow-hidden rounded-honeydeck font-mono text-[length:var(--honeydeck-font-size-code)]",
+				"honeydeck-code-block group relative mb-[0.75em] overflow-hidden rounded-honeydeck font-mono text-code",
 				className,
 			]
 				.filter(Boolean)

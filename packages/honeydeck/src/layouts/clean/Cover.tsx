@@ -23,19 +23,19 @@ export default function CleanCoverLayout({
 	return (
 		<SlideFrame className="items-center justify-center text-center">
 			{hasTitle(title) && (
-				<h1 className="mb-10 font-heading text-[length:var(--honeydeck-font-size-h1)] font-semibold leading-tight text-foreground">
+				<h1 className="mb-10 font-heading text-h1 font-semibold leading-tight text-foreground">
 					{title}
 				</h1>
 			)}
 
 			{children && (
-				<div className="mb-12 max-w-4xl text-[length:var(--honeydeck-font-size-body)] leading-snug text-surface-foreground">
+				<div className="mb-12 max-w-4xl text-body leading-snug text-surface-foreground">
 					{children}
 				</div>
 			)}
 
 			{(author || date) && (
-				<div className="flex items-center gap-10 border-t border-border pt-5 text-[length:var(--honeydeck-font-size-small)] text-surface-foreground">
+				<div className="flex items-center gap-10 border-t border-border pt-5 text-small text-surface-foreground">
 					{author && <span>{author}</span>}
 					{author && date && <span aria-hidden="true">/</span>}
 					{date && <span>{date}</span>}

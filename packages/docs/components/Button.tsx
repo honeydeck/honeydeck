@@ -6,10 +6,10 @@ export type ButtonSize = "default" | "icon" | "sm";
 
 function getVariantClass(variant: ButtonVariant) {
 	if (variant === "primary") {
-		return "border border-[color-mix(in_oklab,#000_10%,var(--honeydeck-color-primary))] bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--honeydeck-color-primary)_26%,transparent)]";
+		return "border border-[color-mix(in_oklab,#000_10%,var(--color-primary))] bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--color-primary)_26%,transparent)]";
 	}
 
-	return "border border-transparent bg-transparent text-[color:inherit] shadow-none";
+	return "border border-transparent bg-transparent text-inherit shadow-none";
 }
 
 function getSizeClass(size: ButtonSize) {
@@ -30,7 +30,7 @@ export function buttonClassName({
 	return cn(
 		"inline-flex items-center justify-center gap-2.5 rounded-lg font-black no-underline",
 		"transition-[background-color,border-color,color,box-shadow] duration-150",
-		"hover:border-[color-mix(in_oklab,var(--honeydeck-color-primary)_48%,var(--honeydeck-color-border))]",
+		"hover:border-[color-mix(in_oklab,var(--color-primary)_48%,var(--color-border))]",
 		getVariantClass(variant),
 		getSizeClass(size),
 		className,

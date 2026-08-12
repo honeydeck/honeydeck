@@ -36,7 +36,7 @@ function PlaceholderBox() {
 					aria-hidden="true"
 				/>
 			</ImageFrame>
-			<p className="text-center text-[length:var(--honeydeck-font-size-small)] leading-snug text-surface-foreground opacity-60">
+			<p className="text-center text-small leading-snug text-surface-foreground opacity-60">
 				Add{" "}
 				<code className="rounded-honeydeck bg-background px-4 py-1 font-mono">
 					image: /path/to/image.png
@@ -80,7 +80,7 @@ export default function CleanImageLayout({
 				</div>
 
 				{hasCaption && (
-					<figcaption className="flex-shrink-0 pt-5 text-[length:var(--honeydeck-font-size-small)] leading-snug text-surface-foreground">
+					<figcaption className="flex-shrink-0 pt-5 text-small leading-snug text-surface-foreground">
 						{children}
 					</figcaption>
 				)}

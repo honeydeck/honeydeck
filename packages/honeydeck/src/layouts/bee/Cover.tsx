@@ -27,21 +27,21 @@ export default function CoverLayout({
 		<SlideFrame className="items-center justify-center text-center">
 			{/* Large centered title */}
 			{hasTitle(title) && (
-				<h1 className="font-heading font-bold text-[length:var(--honeydeck-font-size-h1)] leading-tight text-primary mb-14">
+				<h1 className="font-heading font-bold text-h1 leading-tight text-primary mb-14">
 					{title}
 				</h1>
 			)}
 
 			{/* Slide body (MDX content after title) */}
 			{children && (
-				<div className="text-[length:var(--honeydeck-font-size-body)] text-surface-foreground font-light mb-18 max-w-4xl">
+				<div className="text-body text-surface-foreground font-light mb-18 max-w-4xl">
 					{children}
 				</div>
 			)}
 
 			{/* Author / date metadata */}
 			{(author || date) && (
-				<div className="flex items-center gap-14 text-[length:var(--honeydeck-font-size-small)] text-surface-foreground mt-9">
+				<div className="flex items-center gap-14 text-small text-surface-foreground mt-9">
 					{author && <span>{author}</span>}
 					{author && date && <span className="text-border">·</span>}
 					{date && <span>{date}</span>}

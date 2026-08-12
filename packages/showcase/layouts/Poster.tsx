@@ -11,23 +11,23 @@ export default function PosterLayout({
 	frontmatter,
 }: LayoutProps<PosterFrontmatter>) {
 	return (
-		<div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-primary p-[var(--honeydeck-slide-padding)] text-center font-body text-primary-foreground">
+		<div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-primary p-slide-padding text-center font-body text-primary-foreground">
 			<div
 				className="absolute inset-x-0 top-0 h-8 bg-primary-foreground/20"
 				aria-hidden="true"
 			/>
 			{frontmatter.kicker && (
-				<p className="mb-8 text-[length:var(--honeydeck-font-size-small)] font-semibold uppercase tracking-[0.35em] text-primary-foreground/70">
+				<p className="mb-8 text-small font-semibold uppercase tracking-[0.35em] text-primary-foreground/70">
 					{frontmatter.kicker}
 				</p>
 			)}
 			{title && (
-				<h1 className="max-w-5xl font-heading text-[length:var(--honeydeck-font-size-display)] font-black leading-none tracking-tight">
+				<h1 className="max-w-5xl font-heading text-display font-black leading-none tracking-tight">
 					{title}
 				</h1>
 			)}
 			{children && (
-				<div className="mt-10 max-w-3xl text-[length:var(--honeydeck-font-size-body)] text-primary-foreground/75">
+				<div className="mt-10 max-w-3xl text-body text-primary-foreground/75">
 					{children}
 				</div>
 			)}

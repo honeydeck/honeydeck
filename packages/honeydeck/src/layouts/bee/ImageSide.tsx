@@ -58,7 +58,7 @@ function DefaultSideContent({
 		<div className="flex min-h-0 flex-col overflow-hidden">
 			{hasTitle(title) && (
 				<header className="mb-8 flex-shrink-0">
-					<h1 className="font-heading font-bold text-[length:var(--honeydeck-font-size-h2)] leading-tight text-primary">
+					<h1 className="font-heading font-bold text-h2 leading-tight text-primary">
 						{title}
 					</h1>
 					<div

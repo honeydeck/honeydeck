@@ -73,7 +73,7 @@ function PlaceholderBox() {
 				/>
 			</ImageFrame>
 			{/* Hint text below the frame */}
-			<p className="text-[length:var(--honeydeck-font-size-small)] text-surface-foreground text-center opacity-50 leading-snug">
+			<p className="text-small text-surface-foreground text-center opacity-50 leading-snug">
 				Add{" "}
 				<code className="font-mono bg-background px-5 py-1 rounded-honeydeck">
 					image: /path/to/image.png
@@ -128,7 +128,7 @@ export default function ImageLayout({
 
 				{/* ── Caption ─────────────────────────────────────────────────── */}
 				{hasCaption && (
-					<figcaption className="flex-shrink-0 border-l-4 border-accent pl-11 text-[length:var(--honeydeck-font-size-small)] text-surface-foreground italic leading-snug">
+					<figcaption className="flex-shrink-0 border-l-4 border-accent pl-11 text-small text-surface-foreground italic leading-snug">
 						{children}
 					</figcaption>
 				)}

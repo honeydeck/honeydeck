@@ -67,7 +67,7 @@ export function PlaygroundTabs<TValue extends number | string>({
 		<div
 			aria-label={ariaLabel}
 			className={cn(
-				"inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-[color-mix(in_oklab,var(--honeydeck-color-foreground)_5%,var(--honeydeck-color-background))] p-1 shadow-sm",
+				"inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-foreground/5 p-1 shadow-sm",
 				className,
 			)}
 			onKeyDown={onKeyDown}

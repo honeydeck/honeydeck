@@ -11,7 +11,7 @@ export default function CleanDefaultLayout({ title, children }: LayoutProps) {
 		<SlideFrame>
 			{hasTitle(title) && (
 				<header className="mb-8 flex-shrink-0">
-					<h1 className="font-heading text-[length:var(--honeydeck-font-size-h2)] font-semibold leading-tight text-foreground">
+					<h1 className="font-heading text-h2 font-semibold leading-tight text-foreground">
 						{title}
 					</h1>
 				</header>

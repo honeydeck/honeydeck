@@ -10,13 +10,13 @@ export default function CleanSectionLayout({ title, children }: LayoutProps) {
 	return (
 		<SlideFrame className="items-center justify-center text-center">
 			{hasTitle(title) && (
-				<h1 className="mb-7 max-w-5xl font-heading text-[length:var(--honeydeck-font-size-display)] font-semibold leading-none text-foreground">
+				<h1 className="mb-7 max-w-5xl font-heading text-display font-semibold leading-none text-foreground">
 					{title}
 				</h1>
 			)}
 
 			{children && (
-				<div className="max-w-3xl text-[length:var(--honeydeck-font-size-body)] leading-snug text-surface-foreground">
+				<div className="max-w-3xl text-body leading-snug text-surface-foreground">
 					{children}
 				</div>
 			)}
