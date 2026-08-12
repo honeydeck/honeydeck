@@ -8,7 +8,7 @@ export const surfaceControlClass = `border border-border bg-surface/86 text-fore
 
 const buttonBaseClass = `inline-flex items-center justify-center gap-2.5 rounded-lg px-4 py-3 font-black no-underline ${transitionClass}`;
 
-export const buttonPrimaryClass = `${buttonBaseClass} border border-[color-mix(in_oklab,#000_10%,var(--color-primary))] bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--color-primary)_26%,transparent)] ${hoverBorderClass}`;
+export const buttonPrimaryClass = `${buttonBaseClass} border border-black/10 bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--color-primary)_26%,transparent)] ${hoverBorderClass}`;
 export const buttonSecondaryClass = `${buttonBaseClass} ${surfaceControlClass}`;
 export const iconButtonClass = `inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center gap-1.5 rounded-lg px-3 py-2 no-underline ${surfaceControlClass} ${transitionClass}`;
 export const smallButtonClass = `inline-flex min-h-[2.35rem] flex-1 basis-48 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 no-underline md:flex-none ${surfaceControlClass} ${transitionClass}`;

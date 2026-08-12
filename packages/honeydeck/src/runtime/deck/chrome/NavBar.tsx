@@ -128,7 +128,7 @@ export function NavBar({
 			data-honeydeck-no-swipe="true"
 		>
 			{/* Actual bar */}
-			<div className="honeydeck-nav-bar pointer-events-auto mx-2 mb-2 flex max-w-[calc(100vw-1rem)] flex-wrap items-center justify-center gap-1 rounded-lg border border-white/10 bg-black/70 px-1.5 py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur sm:mx-0 sm:ml-6 sm:mb-6 sm:max-w-none sm:flex-nowrap sm:justify-start sm:gap-1 sm:px-2">
+			<div className="honeydeck-nav-bar pointer-events-auto mx-2 mb-2 flex max-w-[calc(100vw-1rem)] flex-wrap items-center justify-center gap-1 rounded-lg border border-white/10 bg-black/70 px-1.5 py-1.5 shadow-[0_4px_24px] shadow-black/40 backdrop-blur sm:mx-0 sm:ml-6 sm:mb-6 sm:max-w-none sm:flex-nowrap sm:justify-start sm:gap-1 sm:px-2">
 				<div className={groupClass}>
 					{/* Prev step */}
 					<NavBarButton

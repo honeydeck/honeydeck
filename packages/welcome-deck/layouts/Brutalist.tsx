@@ -4,10 +4,10 @@ export default function Brutalist({ title, children }: LayoutProps) {
 	return (
 		<div className="h-full overflow-hidden bg-accent p-16">
 			{/* Thick border frame */}
-			<div className="absolute inset-4 border-[6px] border-[#111111]" />
+			<div className="absolute inset-4 border-[6px] border-foreground" />
 
 			{/* Rotated background text */}
-			<div className="absolute -right-16 top-1/2 -translate-y-1/2 -rotate-90 font-mono text-[8rem] font-black text-[#111111]/10 whitespace-nowrap">
+			<div className="absolute -right-16 top-1/2 -translate-y-1/2 -rotate-90 font-mono text-[8rem] font-black text-foreground/10 whitespace-nowrap">
 				HONEY
 			</div>
 

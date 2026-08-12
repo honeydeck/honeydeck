@@ -6,7 +6,7 @@ export type ButtonSize = "default" | "icon" | "sm";
 
 function getVariantClass(variant: ButtonVariant) {
 	if (variant === "primary") {
-		return "border border-[color-mix(in_oklab,#000_10%,var(--color-primary))] bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--color-primary)_26%,transparent)]";
+		return "border border-black/10 bg-primary text-primary-foreground shadow-[0_14px_30px_color-mix(in_oklab,var(--color-primary)_26%,transparent)]";
 	}
 
 	return "border border-transparent bg-transparent text-inherit shadow-none";
