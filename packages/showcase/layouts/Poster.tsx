@@ -17,17 +17,17 @@ export default function PosterLayout({
 				aria-hidden="true"
 			/>
 			{frontmatter.kicker && (
-				<p className="mb-8 text-[length:var(--honeydeck-font-size-small)] font-semibold uppercase tracking-[0.35em] text-primary-foreground/70">
+				<p className="mb-8 text-small font-semibold uppercase tracking-[0.35em] text-primary-foreground/70">
 					{frontmatter.kicker}
 				</p>
 			)}
 			{title && (
-				<h1 className="max-w-5xl font-heading text-[length:var(--honeydeck-font-size-display)] font-black leading-none tracking-tight">
+				<h1 className="max-w-5xl font-heading text-display font-black leading-none tracking-tight">
 					{title}
 				</h1>
 			)}
 			{children && (
-				<div className="mt-10 max-w-3xl text-[length:var(--honeydeck-font-size-body)] text-primary-foreground/75">
+				<div className="mt-10 max-w-3xl text-body text-primary-foreground/75">
 					{children}
 				</div>
 			)}

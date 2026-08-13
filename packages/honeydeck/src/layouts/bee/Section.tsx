@@ -14,14 +14,14 @@ export default function SectionLayout({ title, children }: LayoutProps) {
 		<SlideFrame className="items-center justify-center bg-primary dark:bg-primary/75 text-primary-foreground text-center">
 			{/* Big centered section title */}
 			{hasTitle(title) && (
-				<h1 className="font-heading font-black text-[length:var(--honeydeck-font-size-display)] leading-none mb-6 tracking-tight">
+				<h1 className="font-heading font-black text-display leading-none mb-6 tracking-tight">
 					{title}
 				</h1>
 			)}
 
 			{/* Optional subtitle / body */}
 			{children && (
-				<div className="text-[length:var(--honeydeck-font-size-body)] text-primary-foreground/70 max-w-3xl font-light">
+				<div className="text-body text-primary-foreground/70 max-w-3xl font-light">
 					{children}
 				</div>
 			)}

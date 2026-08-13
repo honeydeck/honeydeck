@@ -37,7 +37,7 @@ export function FadeWith({
 	return (
 		<Component
 			className={[
-				"honeydeck-fade honeydeck-fade-with mb-[0.75em] text-[length:var(--honeydeck-font-size-body)] leading-[1.6] [&>:last-child]:mb-0",
+				"honeydeck-fade honeydeck-fade-with mb-[0.75em] text-body leading-[1.6] [&>:last-child]:mb-0",
 				className,
 			]
 				.filter(Boolean)
