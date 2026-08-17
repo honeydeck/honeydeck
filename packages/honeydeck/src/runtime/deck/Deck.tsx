@@ -17,8 +17,16 @@
  * - Manual color mode override (system / light / dark) via NavBar
  *
  * ### Viewport scaling
- * The base canvas is 1920 × 1080 px; `transform: scale()` shrinks it
- * uniformly to fit any screen size without distorting content.
+ * The base canvas is 1920 × 1080 px; CSS `zoom` shrinks it uniformly to fit
+ * any screen size without distorting content. `zoom` (instead of
+ * `transform: scale()`) makes the browser lay slide content out at its
+ * rendered size, so text and OS emoji glyphs rasterize at the size they are
+ * displayed at. Gecko rasterizes glyphs inside a scaled transform at the
+ * unscaled font size and then clips them to the correctly sized glyph box,
+ * which crops bitmap color emoji; `zoom` avoids that entirely.
+ *
+ * Honeydeck-controlled slide zoom and pan stay a `transform` on the slide
+ * canvas so magnifying a slide does not re-run slide layout.
  *
  * ### Architecture note
  * Slide data (metadata, components, layout resolution) is now imported from
@@ -503,7 +511,8 @@ export function Deck() {
 			: route;
 	const activeSlideScale = scale * slideZoom;
 	const viewportScale = scale || 1;
-	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${activeSlideScale})`;
+	// Pan is measured in viewport pixels. Inside the zoomed canvas one CSS pixel
+	// covers `scale` viewport pixels, so the pan offset is divided by the scale.
 	const zoomedSlideTransform = `translate(${slidePan.x / viewportScale}px, ${slidePan.y / viewportScale}px) scale(${slideZoom})`;
 	const showSlideNumbers = config.showSlideNumbers === true;
 	const disableSlideTextSelection =
@@ -533,8 +542,7 @@ export function Deck() {
 								style={{
 									width: BASE_WIDTH,
 									height: BASE_HEIGHT,
-									transform: `scale(${scale})`,
-									transformOrigin: "center center",
+									zoom: scale,
 								}}
 							/>
 						</div>
@@ -601,8 +609,7 @@ export function Deck() {
 										style={{
 											width: BASE_WIDTH,
 											height: BASE_HEIGHT,
-											transform: `scale(${scale})`,
-											transformOrigin: "center center",
+											zoom: scale,
 										}}
 									>
 										<div
@@ -657,7 +664,8 @@ export function Deck() {
 									style={{
 										width: BASE_WIDTH,
 										height: BASE_HEIGHT,
-										transform: slideTransform,
+										zoom: scale,
+										transform: zoomedSlideTransform,
 										transformOrigin: "center center",
 									}}
 								>

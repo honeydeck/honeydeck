@@ -109,9 +109,9 @@ import Beams from './components/Beams'
 
 ## Use Beams as a full-slide background
 
-For edge-to-edge backgrounds, prefer a custom layout. Honeydeck renders each slide at a logical canvas size, then scales the slide with CSS transforms to fit audience, presenter, preview, and export surfaces.
+For edge-to-edge backgrounds, prefer a custom layout. Honeydeck renders each slide at a logical canvas size, then scales the slide with CSS `zoom` to fit audience, presenter, preview, and export surfaces.
 
-Most HTML content does not need to know about that scale. Canvas and WebGL libraries often do, because they measure their container with `getBoundingClientRect()`. That measurement includes CSS transforms, so the effect can accidentally render at the transformed display size instead of the logical slide size.
+Most HTML content does not need to know about that scale. Canvas and WebGL libraries often do, because they measure their container with `getBoundingClientRect()`. That measurement reports scaled pixels, so the effect can accidentally render at the displayed size instead of the logical slide size.
 
 Use `useHoneydeck()` and `useSlideScale()` to give the background an inverse-sized wrapper:
 

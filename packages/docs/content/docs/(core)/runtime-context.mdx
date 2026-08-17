@@ -49,13 +49,13 @@ honeydeck.mode
 
 ## Slide scale
 
-Honeydeck renders each slide at logical canvas dimensions, then scales the full slide with CSS transforms to fit the current viewport or preview surface. Normal HTML and CSS content does not need to account for this scale.
+Honeydeck renders each slide at logical canvas dimensions, then scales the full slide with CSS `zoom` to fit the current viewport or preview surface. Scaling with `zoom` lays the slide out at its rendered size, so text and operating system emoji glyphs stay crisp and uncropped in every browser. Normal HTML and CSS content does not need to account for this scale.
 
-Use `useSlideScale()` only when a component or layout needs the current CSS scale applied to the logical slide canvas.
+Use `useSlideScale()` only when a component or layout needs the current scale factor applied to the logical slide canvas.
 
-## Transform-aware canvas and WebGL components
+## Scale-aware canvas and WebGL components
 
-Some canvas and WebGL libraries measure their container with `getBoundingClientRect()` and write that measured size back into the canvas style. Because `getBoundingClientRect()` includes CSS transforms, those libraries can accidentally apply Honeydeck's slide scale twice and render smaller than their wrapper.
+Some canvas and WebGL libraries measure their container with `getBoundingClientRect()` and write that measured size back into the canvas style. Because `getBoundingClientRect()` reports scaled pixels, those libraries can accidentally apply Honeydeck's slide scale twice and render smaller than their wrapper.
 
 Wrap those components with an inverse-sized frame using `slideWidth`, `slideHeight`, and `useSlideScale()`:
 
