@@ -28,6 +28,11 @@
  * Honeydeck-controlled slide zoom and pan stay a `transform` on the slide
  * canvas so magnifying a slide does not re-run slide layout.
  *
+ * Because `zoom` participates in layout, only slides that can be seen keep
+ * rendering: the current slide, transition participants, and direct
+ * neighbours. Every other slide gets `content-visibility: hidden`, so resizing
+ * the window re-runs layout for a couple of slides instead of the whole deck.
+ *
  * ### Architecture note
  * Slide data (metadata, components, layout resolution) is now imported from
  * `./slideData.ts` which is also used by PresenterView and OverviewView.
@@ -559,6 +564,11 @@ export function Deck() {
 										? "exit"
 										: null;
 							const isVisible = isCurrent || transitionRole !== null;
+							// Off-screen slides skip layout and paint entirely. Direct
+							// neighbours keep rendering so navigating into them does not pay
+							// a first-layout cost during the transition.
+							const skipsRendering =
+								!isVisible && Math.abs(slideNumber - currentSlide) > 1;
 							const slideStepIndex =
 								transitionRole === "exit" && activeTransition
 									? activeTransition.fromStep
@@ -610,6 +620,7 @@ export function Deck() {
 											width: BASE_WIDTH,
 											height: BASE_HEIGHT,
 											zoom: scale,
+											contentVisibility: skipsRendering ? "hidden" : "visible",
 										}}
 									>
 										<div

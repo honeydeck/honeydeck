@@ -64,6 +64,8 @@ Scaling with `zoom` lays slide content out at its rendered size, so glyphs raste
 
 Honeydeck-controlled slide zoom and pan apply a `transform` on top of the scaled canvas, so magnifying a slide does not re-run slide layout.
 
+The audience deck keeps every slide mounted, and only slides that can be seen keep rendering: the current slide, both participants of a running transition, and the direct neighbours of the current slide. Remaining slides skip layout and paint through `content-visibility: hidden`, so resizing the window stays responsive regardless of deck length. Slide content therefore has no layout while its slide is off screen, and components that measure themselves measure once their slide renders.
+
 PDF pages use the same 1920px-wide dimensions derived from deck-level `aspectRatio`, so exported pages match the deck ratio without stretching or letterbox/pillarbox space. During crossfades, Honeydeck paints a themed `bg-background` backdrop at the scaled slide size behind the slides to avoid flicker.
 
 No per-slide ratio.
