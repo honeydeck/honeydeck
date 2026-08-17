@@ -1,18 +1,26 @@
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import {
 	type KeyboardEvent,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
 import { SlideCanvas } from "../deck/SlideCanvas.tsx";
-import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../deck/slideData.ts";
+import {
+	BASE_HEIGHT,
+	BASE_WIDTH,
+	isSlideHidden,
+	slideData,
+} from "../deck/slideData.ts";
 import {
 	type HotkeyDefinition,
 	handleHotkeyEvent,
 } from "../navigation/hotkeys.ts";
 import { navigate } from "../navigation/router.ts";
 import {
+	findNearestListedPosition,
 	getOverviewGridColumnCount,
 	getOverviewGridSelectionMove,
 } from "./overviewGrid.ts";
@@ -27,10 +35,12 @@ const MOBILE_GAP = 12;
 type BoundaryFeedback = {
 	direction: "up" | "down";
 	key: number;
+	/** 0-based slide index the feedback belongs to. */
 	selected: number;
 };
 
 type SelectionState = {
+	/** 0-based slide index of the selected thumbnail. */
 	selected: number;
 	boundaryFeedback: BoundaryFeedback | null;
 };
@@ -64,7 +74,12 @@ export function OverviewView({
 		selected: Math.max(0, currentSlide - 1),
 		boundaryFeedback: null,
 	});
-	const { selected, boundaryFeedback } = selectionState;
+	const { boundaryFeedback } = selectionState;
+	// Opening overview on a hidden slide lists hidden slides right away so the
+	// `Current` badge stays visible.
+	const [showHiddenSlides, setShowHiddenSlides] = useState(() =>
+		isSlideHidden(currentSlide - 1),
+	);
 	const [viewportWidth, setViewportWidth] = useState(() =>
 		typeof window === "undefined" ? 1024 : window.innerWidth,
 	);
@@ -74,7 +89,27 @@ export function OverviewView({
 	const gridRef = useRef<HTMLDivElement>(null);
 	const selectedRef = useRef<HTMLDivElement | null>(null);
 	const colsRef = useRef(1);
-	const total = slideData.length;
+
+	const listedSlides = useMemo(
+		() =>
+			slideData
+				.map((slide, index) => ({ slide, index }))
+				.filter((entry) => showHiddenSlides || !entry.slide.hidden),
+		[showHiddenSlides],
+	);
+	const listedSlideIndexes = useMemo(
+		() => listedSlides.map((entry) => entry.index),
+		[listedSlides],
+	);
+	const listedCount = listedSlides.length;
+	const hiddenCount = slideData.filter((slide) => slide.hidden).length;
+	const selectedPosition = findNearestListedPosition(
+		listedSlideIndexes,
+		selectionState.selected,
+	);
+	// Selection follows the listed thumbnails, so hiding hidden slides again
+	// moves the selection to the nearest listed thumbnail.
+	const selected = listedSlideIndexes[selectedPosition] ?? -1;
 
 	const gap = isMobile ? MOBILE_GAP : 48;
 	const thumbW = isMobile
@@ -96,6 +131,7 @@ export function OverviewView({
 		const routeSelected = Math.max(0, currentSlide - 1);
 		selectionSourceRef.current = "direct";
 		setSelectionState({ selected: routeSelected, boundaryFeedback: null });
+		if (isSlideHidden(routeSelected)) setShowHiddenSlides(true);
 	}, [currentSlide]);
 
 	useEffect(() => {
@@ -191,36 +227,41 @@ export function OverviewView({
 		selectionSourceRef.current = "keyboard";
 
 		setSelectionState((state) => {
-			const move = getOverviewGridSelectionMove(
+			const position = findNearestListedPosition(
+				listedSlideIndexes,
 				state.selected,
-				total,
+			);
+			const move = getOverviewGridSelectionMove(
+				position,
+				listedCount,
 				columns,
 				direction,
 			);
+			const nextSelected = listedSlideIndexes[move.selected] ?? state.selected;
 
 			if (!move.didMove && direction === "ArrowUp") {
 				return {
-					selected: move.selected,
+					selected: nextSelected,
 					boundaryFeedback: {
 						direction: "up",
 						key: (state.boundaryFeedback?.key ?? 0) + 1,
-						selected: state.selected,
+						selected: nextSelected,
 					},
 				};
 			}
 
 			if (!move.didMove && direction === "ArrowDown") {
 				return {
-					selected: move.selected,
+					selected: nextSelected,
 					boundaryFeedback: {
 						direction: "down",
 						key: (state.boundaryFeedback?.key ?? 0) + 1,
-						selected: state.selected,
+						selected: nextSelected,
 					},
 				};
 			}
 
-			return { selected: move.selected, boundaryFeedback: null };
+			return { selected: nextSelected, boundaryFeedback: null };
 		});
 	}
 
@@ -268,8 +309,16 @@ export function OverviewView({
 				keys: ["Enter"],
 				handler: () => {
 					if (e.target !== e.currentTarget) return false;
+					if (selected < 0) return false;
 					jumpTo(selected);
 				},
+			},
+			{
+				id: "overview.hidden-slides.toggle",
+				name: "Toggle hidden slides",
+				description: "Show or hide slides marked hidden in the overview grid.",
+				keys: ["h"],
+				handler: () => setShowHiddenSlides((value) => !value),
 			},
 			{
 				id: "overview.close",
@@ -300,10 +349,26 @@ export function OverviewView({
 		>
 			<div className="sticky top-0 z-20 flex justify-between items-center bg-background/75 px-4 py-3 backdrop-blur-xl border-b border-border/50">
 				<span className="text-foreground/60 text-base font-sans">
-					{total} slide{total !== 1 ? "s" : ""}
+					{listedCount} slide{listedCount !== 1 ? "s" : ""}
+					{hiddenCount > 0 && ` — ${hiddenCount} hidden`}
 					{!isMobile && " — click or press Enter to jump"}
 				</span>
 				<div className="flex items-center gap-2">
+					{hiddenCount > 0 && (
+						<button
+							type="button"
+							onClick={() => setShowHiddenSlides((value) => !value)}
+							aria-pressed={showHiddenSlides}
+							className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface px-3 text-sm text-surface-foreground"
+						>
+							{showHiddenSlides ? (
+								<EyeOffIcon aria-hidden="true" size={14} />
+							) : (
+								<EyeIcon aria-hidden="true" size={14} />
+							)}
+							{showHiddenSlides ? "Hide hidden" : "Show hidden"} (h)
+						</button>
+					)}
 					<button
 						type="button"
 						onClick={onClose}
@@ -330,7 +395,7 @@ export function OverviewView({
 							: `repeat(auto-fill, ${DESKTOP_THUMB_W}px)`,
 					}}
 				>
-					{slideData.map((slide, i) => {
+					{listedSlides.map(({ slide, index: i }) => {
 						const isActive = i + 1 === currentSlide;
 						const isSelected = i === selected;
 						const showSelection = !isMobile && isSelected;
@@ -350,7 +415,10 @@ export function OverviewView({
 										? boundaryFeedback.direction
 										: undefined
 								}
-								className={`honeydeck-overview-thumbnail block rounded-md overflow-hidden relative bg-background transition-all duration-100 ease-out outline-solid hover:outline-2 ${
+								data-slide-hidden={slide.hidden ? "true" : undefined}
+								className={`honeydeck-overview-thumbnail block rounded-md overflow-hidden relative bg-background transition-all duration-100 ease-out hover:outline-2 ${
+									slide.hidden ? "outline-dashed" : "outline-solid"
+								} ${
 									showSelection
 										? "outline-4 outline-foreground shadow-lg scale-[1.01]"
 										: "outline-1 outline-foreground/40"
@@ -377,10 +445,21 @@ export function OverviewView({
 										Current
 									</div>
 								)}
+
+								{slide.hidden && (
+									<div className="absolute top-1.5 right-2 inline-flex items-center gap-1 bg-surface text-surface-foreground text-2xs font-bold px-2 py-0.5 rounded-xs tracking-wider uppercase shadow">
+										<EyeOffIcon aria-hidden="true" size={11} />
+										Hidden
+									</div>
+								)}
 								<button
 									type="button"
 									aria-current={isActive ? "true" : undefined}
-									aria-label={`Go to slide ${i + 1}`}
+									aria-label={
+										slide.hidden
+											? `Go to hidden slide ${i + 1}`
+											: `Go to slide ${i + 1}`
+									}
 									className="absolute inset-0 z-10"
 									onClick={() => jumpTo(i)}
 									onFocus={() => setSelectedFrom("direct", i)}

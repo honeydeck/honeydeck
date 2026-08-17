@@ -39,6 +39,32 @@ describe("getPresenterNextPreview", () => {
 		);
 	});
 
+	it("skips hidden slides when previewing the next slide", () => {
+		assert.deepEqual(
+			getPresenterNextPreview({
+				currentIndex: 0,
+				step: 0,
+				stepCount: 0,
+				totalSlides: 4,
+				isSlideHidden: (index) => index === 1 || index === 2,
+			}),
+			{ slideIndex: 3, stepIndex: 0 },
+		);
+	});
+
+	it("returns no preview when only hidden slides follow", () => {
+		assert.equal(
+			getPresenterNextPreview({
+				currentIndex: 0,
+				step: 0,
+				stepCount: 0,
+				totalSlides: 3,
+				isSlideHidden: (index) => index > 0,
+			}),
+			null,
+		);
+	});
+
 	it("returns no preview on the final slide when there is no next slide", () => {
 		assert.equal(
 			getPresenterNextPreview({

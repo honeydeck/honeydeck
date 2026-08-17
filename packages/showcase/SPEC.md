@@ -21,6 +21,7 @@
 - `deck.mdx` includes a `RevealWith` slide that syncs supporting content with both a named reveal target and an existing numeric timeline step.
 - `deck.mdx` includes a Magic Code slide using `md magic-code` with inner TypeScript fences, line-highlight states, and an explicit duration override.
 - `deck.mdx` demonstrates `<RevealGroup listRevealMode="nested">` with nested Markdown list items so the opt-in nested-list reveal mode is covered by the showcase deck.
+- `deck.mdx` demonstrates hidden slides: an explainer slide followed by a `hidden: true` backup slide that timeline navigation skips, the overview lists behind `h`, and PDF export omits.
 - `deck.mdx` demonstrates named slide transitions, including built-in `slide-left`, runtime `magic` transitions for explicit `data-magic-id` move/fade behavior, and a custom CSS transition named `honey-spin` defined in `styles.css`.
 
 ## Scripts

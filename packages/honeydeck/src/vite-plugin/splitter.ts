@@ -31,6 +31,8 @@ export type SlideSegment = {
 	index: number;
 	/** Complete MDX source for this slide, with shared imports prepended */
 	rawMdx: string;
+	/** Parsed slide-level frontmatter of this slide, empty when the slide has none */
+	frontmatter: Record<string, unknown>;
 };
 
 export type SplitResult = {
@@ -135,6 +137,20 @@ function firstSlideFrontmatterFromDeckYaml(yamlLines: string[]): string[] {
 // ---------------------------------------------------------------------------
 // Frontmatter-only block detection
 // ---------------------------------------------------------------------------
+
+/**
+ * Parse the leading YAML frontmatter block of a single slide's MDX source.
+ * Returns an empty object when the slide has no frontmatter block.
+ */
+function readSlideFrontmatter(content: string): Record<string, unknown> {
+	if (!content.startsWith("---")) return {};
+
+	const lines = content.split("\n");
+	const closingIndex = lines.indexOf("---", 1);
+	if (closingIndex === -1) return {};
+
+	return parseFrontmatter(lines.slice(1, closingIndex).join("\n"));
+}
 
 /**
  * Returns true if every non-empty line in `lines` looks like a YAML key-value
@@ -314,7 +330,11 @@ export function splitSlides(
 			rawMdx = sharedImports ? `${sharedImports}\n\n${trimmed}` : trimmed;
 		}
 
-		slides.push({ index: slides.length, rawMdx });
+		slides.push({
+			index: slides.length,
+			rawMdx,
+			frontmatter: readSlideFrontmatter(trimmed),
+		});
 	}
 
 	addSlide(firstSlideContentBody);

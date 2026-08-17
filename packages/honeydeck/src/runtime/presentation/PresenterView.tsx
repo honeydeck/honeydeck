@@ -57,7 +57,13 @@ import {
 	resolveHoneydeckConfig,
 } from "../deck/HoneydeckContext.tsx";
 import { SlideCanvas } from "../deck/SlideCanvas.tsx";
-import { BASE_HEIGHT, BASE_WIDTH, slideData } from "../deck/slideData.ts";
+import {
+	BASE_HEIGHT,
+	BASE_WIDTH,
+	getSlideStepCount,
+	isSlideHidden,
+	slideData,
+} from "../deck/slideData.ts";
 import {
 	type HotkeyDefinition,
 	registerHotkeys,
@@ -193,11 +199,13 @@ export function PresenterView({
 	const currentIndex = slide - 1; // 0-based
 	const isOverview = route.view === "presenterOverview";
 	const currentStepCount = slideData[currentIndex]?.stepCount ?? 0;
+	const isCurrentSlideHidden = isSlideHidden(currentIndex);
 	const nextPreview = getPresenterNextPreview({
 		currentIndex,
 		step,
 		stepCount: currentStepCount,
 		totalSlides,
+		isSlideHidden,
 	});
 	const presentationCast = usePresentationCast({
 		audienceUrl: getPresentationAudienceUrl({ view: "slide", slide, step }),
@@ -247,13 +255,11 @@ export function PresenterView({
 	});
 
 	// ── Keyboard navigation ─────────────────────────────────────────────────
-	const getStepCount = useCallback(
-		(i: number) => slideData[i]?.stepCount ?? 0,
-		[],
-	);
+	const getStepCount = getSlideStepCount;
 	useKeyboardNav({
 		slideCount: totalSlides,
 		getStepCount,
+		isSlideHidden,
 		isOverview,
 	});
 
@@ -390,6 +396,7 @@ export function PresenterView({
 							<span className="truncate">
 								Slide {slide}/{totalSlides}
 								{currentStepCount > 0 && ` · Step ${step}/${currentStepCount}`}
+								{isCurrentSlideHidden && " · Hidden"}
 							</span>
 							{timerState === "idle" && (
 								<button

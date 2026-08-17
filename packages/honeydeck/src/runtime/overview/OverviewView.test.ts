@@ -36,7 +36,7 @@ describe("<OverviewView>", () => {
 	it("renders a close button and a slide count header", () => {
 		assert.match(source, /onClick=\{onClose\}/);
 		assert.match(source, />\s*Close\s*</);
-		assert.match(source, /\{total\}\s+slide/);
+		assert.match(source, /\{listedCount\}\s+slide/);
 	});
 
 	it("marks the current slide with a badge", () => {
@@ -48,6 +48,41 @@ describe("<OverviewView>", () => {
 	});
 
 	it("labels each thumbnail with its slide number", () => {
-		assert.match(source, /aria-label=\{`Go to slide \$\{i \+ 1\}`\}/);
+		assert.match(source, /`Go to slide \$\{i \+ 1\}`/);
+		assert.match(source, /`Go to hidden slide \$\{i \+ 1\}`/);
+	});
+
+	it("lists hidden slides only while hidden slides are shown", () => {
+		assert.match(
+			source,
+			/filter\(\(entry\) => showHiddenSlides \|\| !entry\.slide\.hidden\)/,
+		);
+	});
+
+	it("shows hidden slides when the overview opens on a hidden slide", () => {
+		assert.match(
+			source,
+			/useState\(\(\) =>\s*isSlideHidden\(currentSlide - 1\),\s*\)/,
+		);
+		assert.match(
+			source,
+			/if \(isSlideHidden\(routeSelected\)\) setShowHiddenSlides\(true\)/,
+		);
+	});
+
+	it("toggles hidden slides with the h hotkey and a header button", () => {
+		assert.match(source, /id: "overview\.hidden-slides\.toggle"/);
+		assert.match(source, /keys: \["h"\]/);
+		assert.match(source, /aria-pressed=\{showHiddenSlides\}/);
+		assert.match(source, /"Hide hidden" : "Show hidden"\} \(h\)/);
+	});
+
+	it("marks hidden thumbnails with a badge and a dashed outline", () => {
+		assert.match(
+			source,
+			/data-slide-hidden=\{slide\.hidden \? "true" : undefined\}/,
+		);
+		assert.match(source, /slide\.hidden \? "outline-dashed" : "outline-solid"/);
+		assert.match(source, /Hidden\s*<\/div>/);
 	});
 });

@@ -1,5 +1,5 @@
 import { type RefObject, useEffect, useRef } from "react";
-import { slideData } from "../deck/slideData.ts";
+import { getDeckNavigationOptions } from "./deckNavigationOptions.ts";
 import { shouldDeckOwnTouchGesture } from "./inputOwnership.ts";
 import {
 	nextSlide,
@@ -184,11 +184,7 @@ export function useSwipeNav({
 			const route = parseCurrentRoute();
 			if (route.view !== "slide" && route.view !== "presenter") return;
 
-			const options = {
-				slideCount: slideData.length,
-				getStepCount: (slideIndex: number) =>
-					slideData[slideIndex]?.stepCount ?? 0,
-			};
+			const options = getDeckNavigationOptions();
 
 			if (adx >= ady) {
 				if (dx < 0) nextStep(route, options);
@@ -217,11 +213,7 @@ export function useSwipeNav({
 
 			const route = parseCurrentRoute();
 			if (route.view !== "slide" && route.view !== "presenter") return;
-			const options = {
-				slideCount: slideData.length,
-				getStepCount: (slideIndex: number) =>
-					slideData[slideIndex]?.stepCount ?? 0,
-			};
+			const options = getDeckNavigationOptions();
 
 			if (yRatio < 0.25) previousSlide(route, options);
 			else if (yRatio > 0.75) nextSlide(route, options);

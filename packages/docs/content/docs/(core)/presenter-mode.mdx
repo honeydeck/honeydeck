@@ -92,6 +92,8 @@ Reveal content from later timeline steps is also shown in the `Next` preview at 
 
 When no next timeline state exists, the `Next` preview shows an end-of-deck placeholder instead of trying to render a missing slide.
 
+The `Next` preview follows timeline navigation, so it skips slides marked `hidden: true`. While the current slide is hidden, the slide counter appends `Hidden`. The counter uses deck slide numbering, so both the current number and the total count hidden slides.
+
 ## Slide overview
 
 Press `o` in presenter mode to open a slide overview inside the **Current** slide cell.
@@ -100,6 +102,7 @@ Press `o` in presenter mode to open a slide overview inside the **Current** slid
 - Use the arrow keys to move the selection. Timeline shortcuts (`d`/`a`/`s`/`w`) are disabled while the overview is open.
 - Press `Enter` or click a thumbnail to jump to that slide at step 0. The audience and cast views follow the jump through sync.
 - Selecting the slide you are already on exits the overview and returns to the current slide and step.
+- Press `h` to list hidden slides in the grid, then jump to one — this is how you reach a backup slide during a talk.
 - Press `o` or `Escape` to close the overview and return to the plain presenter view.
 - Press `p` to exit presenter mode entirely, even if the overview is open.
 - `b` (blank screen) remains active while the overview is open.

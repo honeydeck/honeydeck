@@ -362,6 +362,24 @@ describe("splitSlides — with-slide-frontmatter.mdx", () => {
 	it("deck frontmatter is extracted correctly", () => {
 		assert.equal(result.deckFrontmatter.title, "Demo Deck");
 	});
+
+	it("exposes parsed slide frontmatter per slide", () => {
+		assert.deepEqual(result.slides[1]?.frontmatter, {
+			layout: "Cover",
+			author: "Honeydeck Team",
+		});
+		assert.deepEqual(result.slides[2]?.frontmatter, { layout: "Section" });
+		assert.deepEqual(result.slides[3]?.frontmatter, {});
+	});
+
+	it("exposes the hidden flag from slide frontmatter", () => {
+		const hiddenResult = splitSlides(
+			"# Visible\n\n---\nhidden: true\n---\n\n# Backup\n",
+		);
+
+		assert.equal(hiddenResult.slides[0]?.frontmatter.hidden, undefined);
+		assert.equal(hiddenResult.slides[1]?.frontmatter.hidden, true);
+	});
 });
 
 describe("splitSlides — shared imports + slide frontmatter ordering", () => {

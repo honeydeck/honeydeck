@@ -84,6 +84,7 @@ import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
 	BASE_HEIGHT,
 	BASE_WIDTH,
+	isSlideHidden,
 	resolveLayout,
 	slideData,
 } from "./slideData.ts";
@@ -338,6 +339,7 @@ export function Deck() {
 		enabled: route.view === "slide",
 		slideCount: slideData.length,
 		getStepCount,
+		isSlideHidden,
 		onToggleOverview: toggleOverview,
 		isOverview,
 	});

@@ -14,6 +14,7 @@ slug: "navigation"
 | `←` / `a` | Previous step (crosses slide boundary) |
 | `↓` / `s` | Next slide |
 | `↑` / `w` | Previous slide |
+| `h` | In overview mode, show or hide hidden slides in the grid |
 | `o` | Toggle overview mode; in presenter mode, toggle the presenter overview |
 | `p` | Open presenter mode (same tab); while in presenter mode, `p` exits presenter mode |
 | `f` | Toggle fullscreen |
@@ -30,6 +31,8 @@ Boundary behavior:
 - Right at last step → next slide at step 0.
 - Left at step 0 → previous slide at its final step.
 
+Slides with `hidden: true` are skipped in both directions, so navigation lands on the nearest non-hidden slide. See [Hidden Slides](/docs/slides#hidden-slides).
+
 ## Navigation UI
 
 - Hidden by default for clean presentation.
@@ -39,6 +42,8 @@ Boundary behavior:
 - Built-in controls use `lucide-react` icons, imported from the suffixed `...Icon` exports (for example `ChevronLeftIcon`), not inline SVG paths or unsuffixed aliases.
 
 When `showSlideNumbers: true`, the current slide number is also shown as a single viewer overlay aligned to the bottom-right corner of the slide canvas. It is not part of individual slide content, so it does not animate during slide transitions. It renders as themed foreground text without a background container.
+
+Slide numbering counts every slide, including slides marked `hidden: true`. Displayed numbers therefore stay in sync with the URL even when a deck contains hidden slides, and a hidden slide shows its own deck number while it is current.
 
 ```txt
 ┌──────────────────────────────────────┐
@@ -78,6 +83,8 @@ A responsive grid of rendered slide thumbnails. Activated via `o` or the overvie
 - Arrow keys move selection using the rendered grid columns, including after resizes.
 - Up on the topmost row and Down on the bottommost row keep the current selection and show a short boundary nudge.
 - Enter jumps to selected slide. Pressing Enter on the current slide does nothing.
+- Hidden slides are left out of the grid; press `h` or use the `Show hidden` header button to list them, then click or press Enter to jump to one. Listed hidden thumbnails carry a `Hidden` badge.
+- Opening overview while the current slide is hidden lists hidden slides right away.
 - Escape exits overview.
 - In presenter mode, the overview opens inside the current-slide cell at `/#/presenter/overview/<slide>/<step>` and shares the same keyboard behavior.
 
@@ -98,6 +105,7 @@ Honeydeck uses static-host friendly hash-based URLs:
 
 - Slides are **1-based** (user-friendly).
 - Steps are **0-based** (step 0 is the initial state).
+- Slides marked `hidden: true` count as slides and keep their number, so URLs stay stable no matter how many slides are hidden.
 - Reloading or sharing the URL restores both slide and step.
 
 Hash routing means no server-side routing config needed — works on any static host.

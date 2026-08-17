@@ -22,6 +22,19 @@ Toggled via `o` or the overview button. Overview is directly addressable as `/#/
 - The presenter overview uses the same keyboard rules as the audience overview: arrow keys move selection, Enter jumps, `o` toggles, and Escape closes the overview and returns to the plain presenter route
 - **Timeline navigation is disabled** — arrow keys are repurposed for overview grid selection; WASD are no-ops
 
+## Hidden Slides in Overview
+
+Overview mode is where hidden slides (slide-level frontmatter `hidden: true`) become reachable again.
+
+- Hidden slides are left out of the thumbnail grid by default
+- The header shows the number of listed slides plus a `— <n> hidden` note whenever the deck contains hidden slides
+- When the deck contains hidden slides, the header shows a toggle button labelled `Show hidden (h)` or `Hide hidden (h)` with an eye icon; the button reports its state through `aria-pressed`
+- The `h` key toggles hidden slides in the grid, in both audience and presenter overview
+- Revealed hidden thumbnails render like normal thumbnails plus a `Hidden` badge and a dashed outline, and selecting one jumps to that slide exactly like selecting a normal thumbnail
+- Opening overview while the current slide is hidden shows hidden slides right away, so the `Current` badge stays visible
+- Keyboard selection and arrow movement only walk the thumbnails currently listed in the grid
+- Hiding hidden slides again while a hidden thumbnail is selected moves the selection to the nearest listed thumbnail
+
 ## Keyboard in Overview
 
 - Arrow keys move selection within the rendered grid; vertical movement uses the actual measured column count so it stays correct after initial layout and window resizes while overview is open
@@ -31,5 +44,6 @@ Toggled via `o` or the overview button. Overview is directly addressable as `/#/
 - Keyboard navigation keeps the selected thumbnail smoothly scrolled into view, with margin so the selection is not flush against the viewport edge; if repeated key presses change the selection while a scroll animation is running, the new scroll target takes over instead of queueing behind the previous animation
 - Enter jumps to selected slide, resets to step 0, exits overview, and creates a new browser history entry. Pressing Enter while the current slide is already selected exits overview and returns to the current slide and step
 - `o` toggles (also exits) overview
+- `h` shows or hides hidden slides in the grid
 - Escape exits overview
 - Overview button in nav bar exits overview

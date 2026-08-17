@@ -48,12 +48,25 @@ Reference page routes intentionally do not encode slide or step. During one brow
 | `←` / `a` | Previous step (crosses slide boundary); in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `↓` / `s` | Next slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
 | `↑` / `w` | Previous slide; in overview, timeline navigation is disabled: arrow keys move overview selection and WASD are no-ops |
+| `h` | In overview mode, show or hide hidden slides in the thumbnail grid; outside overview mode, `h` is unassigned |
 | `o` | Toggle overview mode in audience view; toggle presenter overview in presenter mode |
 | `p` | Open presenter mode (same tab); presenter mode is unsupported below Tailwind's `md` breakpoint and shows a mobile hint with a button back to the same audience slide/step. While in presenter mode, `p` exits presenter mode even if the overview is open |
 | `f` | Toggle fullscreen |
 | `Escape` | Exit overview; in presenter mode, first `Escape` closes the presenter overview and a second `Escape` exits presenter mode; in reference pages, return to slides; browser-native Escape handles fullscreen exit |
 
 Honeydeck keyboard shortcuts only run for unmodified key presses. If `Alt`, `Control`, `Meta`/`Command`, or `Shift` is held, Honeydeck ignores the event so browser and operating-system shortcuts (for example `⌘O`) remain native.
+
+## Hidden Slides
+
+A slide with slide-level frontmatter `hidden: true` stays part of the deck and keeps its own slide number, and timeline navigation skips it.
+
+- Hidden slides keep their position in slide numbering, so `/#/<slideNumber>/<stepIndex>` addresses the same slide whether or not earlier slides are hidden
+- Next/previous step navigation that crosses a slide boundary lands on the nearest non-hidden slide in that direction, skipping any number of consecutive hidden slides
+- Next/previous slide navigation lands on the nearest non-hidden slide in that direction
+- When only hidden slides remain in the requested direction, navigation does nothing, exactly like reaching the first or last slide
+- Explicit navigation always reaches hidden slides: a hash URL, a reload, an overview thumbnail click, and Enter on an overview thumbnail
+- While the current slide is hidden, step navigation inside that slide works normally, and leaving it in either direction resumes at the nearest non-hidden slide
+- Keyboard, touch, navigation-bar, and presenter navigation share this skipping behavior
 
 ## Input Ownership
 

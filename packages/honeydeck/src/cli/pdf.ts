@@ -430,12 +430,16 @@ export function buildPdfCaptureTargets(
 	slideCount: number,
 	stepCounts: number[],
 	steps: "final" | "all",
+	hiddenSlides: readonly boolean[] = [],
 ): PdfCaptureTarget[] {
 	const targets: PdfCaptureTarget[] = [];
 
 	for (let slideIndex = 0; slideIndex < slideCount; slideIndex++) {
 		const slide = slideIndex + 1;
 		const slideStepCount = stepCounts[slideIndex] ?? 0;
+
+		// Hidden slides are backup material for live navigation, never PDF pages.
+		if (hiddenSlides[slideIndex] === true) continue;
 
 		if (steps === "all") {
 			for (let step = 0; step <= slideStepCount; step++) {
@@ -720,11 +724,13 @@ export async function runPdf(args: string[]): Promise<void> {
 	// ── Read deck entry ──────────────────────────────────────────────────────
 	let deckFrontmatter: Record<string, unknown> = {};
 	let slideCount = 0;
+	let hiddenSlides: boolean[] = [];
 
 	try {
 		const { slides, deckFrontmatter: fm } = loadDeck(deck);
 		deckFrontmatter = fm;
 		slideCount = slides.length;
+		hiddenSlides = slides.map((slide) => slide.frontmatter.hidden === true);
 	} catch (err) {
 		console.error(`\n  ❌  Cannot read ${deck}`);
 		console.error(err);
@@ -733,6 +739,13 @@ export async function runPdf(args: string[]): Promise<void> {
 
 	if (slideCount === 0) {
 		console.error(`\n  ❌  No slides found in ${deck}`);
+		process.exit(1);
+	}
+
+	if (hiddenSlides.every((hidden) => hidden)) {
+		console.error(
+			`\n  ❌  No slides found for export in ${deck} — every slide is hidden`,
+		);
 		process.exit(1);
 	}
 
@@ -801,7 +814,12 @@ export async function runPdf(args: string[]): Promise<void> {
             })();
 				`;
 
-				const targets = buildPdfCaptureTargets(slideCount, stepCounts, steps);
+				const targets = buildPdfCaptureTargets(
+					slideCount,
+					stepCounts,
+					steps,
+					hiddenSlides,
+				);
 				const captureConcurrency = resolvePdfCaptureConcurrency(
 					parallel,
 					targets.length,

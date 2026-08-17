@@ -77,6 +77,94 @@ describe("navigation route helpers", () => {
 		);
 	});
 
+	it("skips hidden slides when crossing slide boundaries with steps", () => {
+		const hiddenOptions = {
+			slideCount: 5,
+			getStepCount: (index: number) => [0, 1, 0, 0, 2][index] ?? 0,
+			isSlideHidden: (index: number) => index === 1 || index === 2,
+		};
+
+		assert.deepEqual(
+			getNextStepRoute({ view: "slide", slide: 1, step: 0 }, hiddenOptions),
+			{ view: "slide", slide: 4, step: 0 },
+		);
+		assert.deepEqual(
+			getPreviousStepRoute({ view: "slide", slide: 4, step: 0 }, hiddenOptions),
+			{ view: "slide", slide: 1, step: 0 },
+		);
+	});
+
+	it("skips hidden slides during slide navigation", () => {
+		const hiddenOptions = {
+			slideCount: 4,
+			getStepCount: () => 0,
+			isSlideHidden: (index: number) => index === 1,
+		};
+
+		assert.deepEqual(
+			getNextSlideRoute({ view: "slide", slide: 1, step: 0 }, hiddenOptions),
+			{ view: "slide", slide: 3, step: 0 },
+		);
+		assert.deepEqual(
+			getPreviousSlideRoute(
+				{ view: "slide", slide: 3, step: 0 },
+				hiddenOptions,
+			),
+			{ view: "slide", slide: 1, step: 0 },
+		);
+	});
+
+	it("navigates within a hidden slide and leaves it to non-hidden slides", () => {
+		const hiddenOptions = {
+			slideCount: 3,
+			getStepCount: (index: number) => [0, 2, 0][index] ?? 0,
+			isSlideHidden: (index: number) => index === 1,
+		};
+
+		assert.deepEqual(
+			getNextStepRoute({ view: "slide", slide: 2, step: 0 }, hiddenOptions),
+			{ view: "slide", slide: 2, step: 1 },
+		);
+		assert.deepEqual(
+			getNextStepRoute({ view: "slide", slide: 2, step: 2 }, hiddenOptions),
+			{ view: "slide", slide: 3, step: 0 },
+		);
+		assert.deepEqual(
+			getPreviousSlideRoute(
+				{ view: "slide", slide: 2, step: 0 },
+				hiddenOptions,
+			),
+			{ view: "slide", slide: 1, step: 0 },
+		);
+	});
+
+	it("stops navigating when only hidden slides remain", () => {
+		const hiddenOptions = {
+			slideCount: 3,
+			getStepCount: () => 0,
+			isSlideHidden: (index: number) => index > 0,
+		};
+
+		assert.equal(
+			getNextSlideRoute({ view: "slide", slide: 1, step: 0 }, hiddenOptions),
+			null,
+		);
+		assert.equal(
+			getNextStepRoute({ view: "slide", slide: 1, step: 0 }, hiddenOptions),
+			null,
+		);
+		assert.equal(
+			getPreviousSlideRoute(
+				{ view: "slide", slide: 2, step: 0 },
+				{
+					...hiddenOptions,
+					isSlideHidden: (index: number) => index === 0,
+				},
+			),
+			null,
+		);
+	});
+
 	it("preserves presenter view while navigating", () => {
 		assert.deepEqual(
 			getNextStepRoute({ view: "presenter", slide: 2, step: 2 }, options),

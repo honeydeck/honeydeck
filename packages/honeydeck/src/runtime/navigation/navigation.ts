@@ -8,9 +8,17 @@ export type NavigationRoute = Route & {
 
 export type StepCountGetter = (slideIndex: number) => number;
 
+export type SlideHiddenGetter = (slideIndex: number) => boolean;
+
 export type NavigationOptions = {
 	slideCount?: number;
 	getStepCount?: StepCountGetter;
+	/**
+	 * Returns whether the 0-based slide index is hidden from the normal timeline.
+	 * Hidden slides keep their slide number and stay reachable through explicit
+	 * navigation, but step/slide navigation skips them.
+	 */
+	isSlideHidden?: SlideHiddenGetter;
 };
 
 function getSlideCount(options?: NavigationOptions): number {
@@ -39,6 +47,33 @@ function normalizeNavigableRoute(
 	const totalSlides = getSlideCount(options);
 	const slide = Math.max(1, Math.min(route.slide, totalSlides));
 	return { ...route, slide } as NavigationRoute;
+}
+
+/**
+ * Find the nearest slide in `direction` that timeline navigation may land on.
+ * Returns `null` when only hidden slides or no slides remain in that direction.
+ */
+function findNavigableSlide(
+	fromSlide: number,
+	direction: 1 | -1,
+	options?: NavigationOptions,
+): number | null {
+	const totalSlides = getSlideCount(options);
+	const firstCandidate = fromSlide + direction;
+
+	if (!Number.isFinite(totalSlides)) {
+		return firstCandidate >= 1 ? firstCandidate : null;
+	}
+
+	for (
+		let slide = firstCandidate;
+		slide >= 1 && slide <= totalSlides;
+		slide += direction
+	) {
+		if (options?.isSlideHidden?.(slide - 1) !== true) return slide;
+	}
+
+	return null;
 }
 
 function withRoutePosition(
@@ -73,8 +108,8 @@ export function getPreviousStepRoute(
 		return withRoutePosition(navigable, navigable.slide, navigable.step - 1);
 	}
 
-	if (navigable.slide > 1) {
-		const prevSlide = navigable.slide - 1;
+	const prevSlide = findNavigableSlide(navigable.slide, -1, options);
+	if (prevSlide !== null) {
 		const prevSteps = getStepCountForSlide(prevSlide - 1, options);
 		return withRoutePosition(navigable, prevSlide, prevSteps);
 	}
@@ -89,15 +124,15 @@ export function getNextStepRoute(
 	const navigable = normalizeNavigableRoute(route, options);
 	if (!navigable) return null;
 
-	const totalSlides = getSlideCount(options);
 	const stepCount = getStepCountForSlide(navigable.slide - 1, options);
 
 	if (navigable.step < stepCount) {
 		return withRoutePosition(navigable, navigable.slide, navigable.step + 1);
 	}
 
-	if (navigable.slide < totalSlides) {
-		return withRoutePosition(navigable, navigable.slide + 1, 0);
+	const nextSlide = findNavigableSlide(navigable.slide, 1, options);
+	if (nextSlide !== null) {
+		return withRoutePosition(navigable, nextSlide, 0);
 	}
 
 	return null;
@@ -108,8 +143,10 @@ export function getPreviousSlideRoute(
 	options?: NavigationOptions,
 ): Route | null {
 	const navigable = normalizeNavigableRoute(route, options);
-	if (!navigable || navigable.slide <= 1) return null;
-	return withRoutePosition(navigable, navigable.slide - 1, 0);
+	if (!navigable) return null;
+	const prevSlide = findNavigableSlide(navigable.slide, -1, options);
+	if (prevSlide === null) return null;
+	return withRoutePosition(navigable, prevSlide, 0);
 }
 
 export function getNextSlideRoute(
@@ -118,9 +155,9 @@ export function getNextSlideRoute(
 ): Route | null {
 	const navigable = normalizeNavigableRoute(route, options);
 	if (!navigable) return null;
-	const totalSlides = getSlideCount(options);
-	if (navigable.slide >= totalSlides) return null;
-	return withRoutePosition(navigable, navigable.slide + 1, 0);
+	const nextSlide = findNavigableSlide(navigable.slide, 1, options);
+	if (nextSlide === null) return null;
+	return withRoutePosition(navigable, nextSlide, 0);
 }
 
 export function getOverviewRoute(
