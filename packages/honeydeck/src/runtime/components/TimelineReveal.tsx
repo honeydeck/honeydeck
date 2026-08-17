@@ -65,11 +65,7 @@ export function TimelineReveal({
 	if (ephemeral && !visible && !previewFuture) return null;
 
 	return (
-		<Component
-			className={className}
-			style={style}
-			{...dataAttributes}
-		>
+		<Component className={className} style={style} {...dataAttributes}>
 			{children}
 		</Component>
 	);
