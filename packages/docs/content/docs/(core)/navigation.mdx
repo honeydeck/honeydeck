@@ -43,6 +43,8 @@ Slides with `hidden: true` are skipped in both directions, so navigation lands o
 
 When `showSlideNumbers: true`, the current slide number is also shown as a single viewer overlay aligned to the bottom-right corner of the slide canvas. It is not part of individual slide content, so it does not animate during slide transitions. It renders as themed foreground text without a background container.
 
+Slide numbering counts every slide, including slides marked `hidden: true`. Displayed numbers therefore stay in sync with the URL even when a deck contains hidden slides, and a hidden slide shows its own deck number while it is current.
+
 ```txt
 ┌──────────────────────────────────────┐
 │                                      │
@@ -103,6 +105,7 @@ Honeydeck uses static-host friendly hash-based URLs:
 
 - Slides are **1-based** (user-friendly).
 - Steps are **0-based** (step 0 is the initial state).
+- Slides marked `hidden: true` count as slides and keep their number, so URLs stay stable no matter how many slides are hidden.
 - Reloading or sharing the URL restores both slide and step.
 
 Hash routing means no server-side routing config needed — works on any static host.

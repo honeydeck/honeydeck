@@ -35,6 +35,7 @@ Audience overview mode (`/#/overview/<slideNumber>/<stepIndex>`) renders the sha
 Slide-level frontmatter `hidden: true` keeps a slide in the deck and its numbering while timeline navigation skips it. Skipping rules live in [`../navigation/SPEC.md`](../navigation/SPEC.md).
 
 - A hidden slide renders exactly like any other slide once it is the current slide, including layouts, timeline steps, transitions, and the slide number overlay
+- Slide numbering counts hidden slides, so the navigation bar slide number and the `showSlideNumbers` overlay show the deck slide number of the current slide whether or not it or any earlier slide is hidden
 - `useHoneydeck().currentSlide.layoutProps` exposes `hidden` like any other slide frontmatter field
 - The deck chrome shows a hidden-slide indicator in the navigation bar while a hidden slide is current
 

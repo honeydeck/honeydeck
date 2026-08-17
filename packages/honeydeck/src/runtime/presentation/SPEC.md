@@ -52,6 +52,7 @@ Includes:
 - When no next timeline state exists (final step of the final slide), the Next preview shows a placeholder (`No next step`) instead of trying to render a missing slide.
 - The Next preview follows timeline navigation and therefore skips hidden slides: after the final step of a slide it previews the nearest non-hidden following slide, and it shows the `No next step` placeholder when only hidden slides follow.
 - While the current slide is hidden, the slide/step counter in the bottom bar appends a `Hidden` marker.
+- The slide counter uses deck slide numbering, so both the current number and the total count hidden slides.
 
 ## Presenter overview
 

@@ -39,11 +39,11 @@ honeydeck.mode
 ```
 
 - `config` is the resolved [deck configuration](/docs/configuration) with Honeydeck defaults applied.
-- `currentSlide.index` is 1-based and matches the slide number in the URL.
+- `currentSlide.index` is 1-based and matches the slide number in the URL. Slides marked `hidden: true` count in this numbering.
 - `currentSlide.step` is 0-based and matches the step number in the URL.
 - `currentSlide.maxSteps` is the number of steps on the current slide.
 - `currentSlide.layout` is the current slide layout name.
-- `currentSlide.layoutProps` is the parsed slide frontmatter passed to the layout as `frontmatter`.
+- `currentSlide.layoutProps` is the parsed slide frontmatter passed to the layout as `frontmatter`, including `hidden` when the slide sets it.
 - `slideWidth` and `slideHeight` are the logical slide canvas dimensions after resolving `aspectRatio`.
 - `mode` is the effective color mode: `"light"` or `"dark"`.
 

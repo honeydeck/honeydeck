@@ -39,7 +39,7 @@ Only shown when somebody asks.
 ```
 
 - Step and slide navigation (keyboard, touch, navigation bar, presenter) jump over hidden slides in both directions.
-- Hidden slides keep their number, so `/#/7/0` always points at the same slide.
+- Hidden slides count as slides and keep their number, so `/#/7/0` always points at the same slide. The navigation bar number, the `showSlideNumbers` overlay, and the presenter counter (current number and total) all use that numbering.
 - Reach a hidden slide from overview mode: press `o`, then `h` to list hidden slides, then click or press Enter on one. A direct URL works too.
 - While a hidden slide is current, its own steps work normally, and leaving it in either direction continues with the nearest non-hidden slide.
 - The navigation bar shows a `Hidden slide` marker and presenter mode appends `Hidden` to the slide counter while a hidden slide is current.
