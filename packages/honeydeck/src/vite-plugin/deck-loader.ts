@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { stripHtmlComments } from "./html-comments.ts";
 import { findImportStatementEnd } from "./import-statements.ts";
 import { type SplitResult, splitSlides } from "./splitter.ts";
 
@@ -56,7 +57,7 @@ function expandMdxFile(filePath: string, context: ExpandContext): string {
 
 	context.watchedFiles.add(absolutePath);
 
-	const rawSource = readFileSync(absolutePath, "utf-8");
+	const rawSource = stripHtmlComments(readFileSync(absolutePath, "utf-8"));
 	const baseDir = dirname(absolutePath);
 	const imports = new Map<string, MdxImport>();
 	const nextContext = {

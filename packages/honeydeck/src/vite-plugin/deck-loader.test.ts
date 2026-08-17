@@ -104,6 +104,52 @@ describe("loadDeck", () => {
 		}
 	});
 
+	it("strips HTML comments from root and imported MDX files", () => {
+		const tempDir = mkdtempSync(resolve(tmpdir(), "deck-loader-"));
+		try {
+			const entry = resolve(tempDir, "entry.mdx");
+			const nested = resolve(tempDir, "nested.mdx");
+
+			writeFileSync(
+				entry,
+				[
+					"---",
+					"title: Commented Deck",
+					"---",
+					"",
+					"import Nested from './nested.mdx'",
+					"",
+					"<!-- a root note -->",
+					"# Root Slide <!-- inline note -->",
+					"",
+					"<Nested />",
+					"",
+					"---",
+					"",
+					"<!--",
+					"multi-line note with a --- separator inside",
+					"-->",
+					"# Last Slide",
+					"",
+				].join("\n"),
+			);
+			writeFileSync(nested, "<!-- nested note -->\n# Nested Slide\n");
+
+			const commentedResult = loadDeck(entry);
+
+			assert.equal(commentedResult.slides.length, 3);
+			for (const slide of commentedResult.slides) {
+				assert.ok(!slide.rawMdx.includes("<!--"));
+				assert.ok(!slide.rawMdx.includes("-->"));
+			}
+			assert.ok(commentedResult.slides[0]?.rawMdx.includes("# Root Slide"));
+			assert.ok(commentedResult.slides[1]?.rawMdx.includes("# Nested Slide"));
+			assert.ok(commentedResult.slides[2]?.rawMdx.includes("# Last Slide"));
+		} finally {
+			rmSync(tempDir, { recursive: true, force: true });
+		}
+	});
+
 	it("fails on circular MDX imports", () => {
 		const tempDir = mkdtempSync(resolve(tmpdir(), "deck-loader-"));
 		try {

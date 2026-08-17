@@ -30,6 +30,19 @@ Content here.
 More content.
 ```
 
+### Comments
+
+HTML comments (`<!-- ... -->`) are valid deck syntax in the deck entry file and in imported MDX files. They are removed from the raw source before slide splitting and MDX compilation, so they never affect slide boundaries, frontmatter, imports, or rendered output.
+
+Rules:
+
+- Single-line, inline, and multi-line comments are removed
+- A line whose content is only a comment is dropped entirely, so a comment between two paragraph lines does not split the paragraph
+- Text before and after a comment on the same line is preserved
+- `---` lines inside a comment are comment text and never create a slide boundary
+- Comments inside fenced code blocks stay literal code text
+- An unterminated comment removes the rest of that file
+
 ### Multiple MDX Files
 
 Additional MDX files can be imported explicitly as slide groups:
