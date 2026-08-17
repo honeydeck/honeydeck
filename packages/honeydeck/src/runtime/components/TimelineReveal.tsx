@@ -65,16 +65,7 @@ export function TimelineReveal({
 	if (ephemeral && !visible && !previewFuture) return null;
 
 	return (
-		<Component
-			className={[
-				"honeydeck-reveal mb-[0.75em] text-body leading-[1.6] [&>:last-child]:mb-0",
-				className,
-			]
-				.filter(Boolean)
-				.join(" ")}
-			style={style}
-			{...dataAttributes}
-		>
+		<Component className={className} style={style} {...dataAttributes}>
 			{children}
 		</Component>
 	);

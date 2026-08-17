@@ -60,7 +60,7 @@ describe("<Reveal>", () => {
 	it("keeps author classes and renders block reveals by default", () => {
 		const html = renderReveal({ className: "custom-fade" });
 
-		assert.match(html, /class="[^"]*\bhoneydeck-reveal\b[^"]*\bcustom-fade\b/);
+		assert.match(html, /class="custom-fade"/);
 		assert.ok(html.includes("display:block"));
 	});
 
@@ -103,7 +103,6 @@ describe("<Reveal>", () => {
 		const html = renderReveal({ as: "span", children: "Inline content" });
 
 		assert.match(html, /^<span\b/);
-		assert.ok(html.includes("honeydeck-reveal"));
 		assert.ok(html.includes("display:inline"));
 		assert.ok(html.includes("visibility:visible"));
 		assert.ok(html.includes("opacity:1"));
