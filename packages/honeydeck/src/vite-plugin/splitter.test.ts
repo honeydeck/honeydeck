@@ -201,6 +201,56 @@ describe("splitSlides — with-imports.mdx", () => {
 });
 
 // ---------------------------------------------------------------------------
+// with-multiline-imports.mdx — multi-line import statements stay intact
+// ---------------------------------------------------------------------------
+describe("splitSlides — with-multiline-imports.mdx", () => {
+	const result = splitSlides(fixture("with-multiline-imports.mdx"));
+	const multilineImport = [
+		"import {",
+		"\tMapIcon,",
+		"\tRouteIcon,",
+		"} from './components/icons'",
+	].join("\n");
+
+	it("produces exactly 2 slides", () => {
+		assert.equal(result.slides.length, 2);
+	});
+
+	it("captures the whole multi-line statement as a shared import", () => {
+		assert.ok(result.sharedImports.includes(multilineImport));
+		assert.ok(
+			result.sharedImports.includes(
+				"import { Reveal } from '@honeydeck/honeydeck'",
+			),
+		);
+		assert.ok(
+			result.sharedImports.includes(
+				"import SparkleButton from './components/SparkleButton'",
+			),
+		);
+	});
+
+	it("prepends the complete statement to every slide", () => {
+		for (const slide of result.slides) {
+			assert.ok(
+				slide.rawMdx.includes(multilineImport),
+				`slide ${slide.index} should contain the complete multi-line import`,
+			);
+		}
+	});
+
+	it("does not leak import fragments into slide body content", () => {
+		const firstSlide = result.slides[0]?.rawMdx ?? "";
+		assert.equal(firstSlide.split("MapIcon,").length - 1, 1);
+		assert.equal(firstSlide.split("} from './components/icons'").length - 1, 1);
+		assert.ok(firstSlide.includes("# First Slide"));
+		assert.ok(
+			firstSlide.indexOf(multilineImport) < firstSlide.indexOf("# First Slide"),
+		);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Edge cases
 // ---------------------------------------------------------------------------
 describe("splitSlides — edge cases", () => {

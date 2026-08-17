@@ -47,6 +47,19 @@ import DemoSlides from './demo.mdx'   // slide group
 import Chart from './Chart'            // normal inline component
 ```
 
+### Import Formatting
+
+Imports at the top of the deck are shared with every slide. They may be written on one line or spread across several lines:
+
+```mdx
+import {
+  MapIcon,
+  RouteIcon,
+} from './components/icons'
+```
+
+Import statements written inside fenced code blocks stay literal code text.
+
 ### Slide Expansion
 
 If an imported `.mdx` file contains `---` separators, those slides are expanded at the location where the component is rendered. Rendering an imported MDX component always creates slide boundaries around it.

@@ -228,4 +228,103 @@ export const demo = {
 			rmSync(root, { recursive: true, force: true });
 		}
 	});
+
+	it("compiles every slide when the deck preamble uses a multi-line import", async () => {
+		const root = mkdtempSync(join(tmpdir(), "honeydeck-multiline-import-"));
+
+		try {
+			writeFileSync(
+				join(root, "icons.tsx"),
+				`
+export function MapIcon() { return null }
+export function RouteIcon() { return null }
+`,
+			);
+			writeFileSync(
+				join(root, "deck.mdx"),
+				[
+					"import {",
+					"  MapIcon,",
+					"  RouteIcon,",
+					'} from "./icons"',
+					"",
+					"# First",
+					"",
+					"<MapIcon />",
+					"",
+					"---",
+					"",
+					"# Second",
+					"",
+					"<RouteIcon />",
+					"",
+				].join("\n"),
+			);
+
+			const plugin = virtualModulesPlugin({
+				entryPath: join(root, "deck.mdx"),
+			});
+			const context = {
+				addWatchFile() {},
+				error(message: string): never {
+					throw new Error(message);
+				},
+			};
+			const load = plugin.load as unknown as (
+				this: typeof context,
+				id: string,
+			) => Promise<string> | string | null;
+
+			for (const index of [0, 1]) {
+				const module = String(
+					await load.call(context, `\0virtual:honeydeck/slide/${index}.mdx`),
+				);
+				assert.match(module, /from "\.\/icons"/);
+				assert.match(module, /export const stepCount = 0;/);
+			}
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it("reports the slide index and generated source when a slide fails to compile", async () => {
+		const root = mkdtempSync(join(tmpdir(), "honeydeck-compile-error-"));
+
+		try {
+			writeFileSync(
+				join(root, "deck.mdx"),
+				["# First", "", "---", "", "export const = 5", ""].join("\n"),
+			);
+
+			const plugin = virtualModulesPlugin({
+				entryPath: join(root, "deck.mdx"),
+			});
+			const context = {
+				addWatchFile() {},
+				error(message: string): never {
+					throw new Error(message);
+				},
+			};
+			const load = plugin.load as unknown as (
+				this: typeof context,
+				id: string,
+			) => Promise<string> | string | null;
+
+			await assert.rejects(
+				async () => {
+					await load.call(context, "\0virtual:honeydeck/slide/1.mdx");
+				},
+				(error: unknown) => {
+					const message =
+						error instanceof Error ? error.message : String(error);
+					assert.match(message, /failed to compile slide 1 of deck\.mdx/);
+					assert.match(message, /Generated MDX source:/);
+					assert.match(message, /1 \| export const = 5/);
+					return true;
+				},
+			);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
 });

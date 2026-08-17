@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { findImportStatementEnd } from "./import-statements.ts";
 import { type SplitResult, splitSlides } from "./splitter.ts";
 
 export type LoadedDeck = SplitResult & {
@@ -19,8 +20,16 @@ type MdxImport = {
 const DEFAULT_MDX_IMPORT_RE =
 	/^import\s+([A-Za-z_$][\w$]*)\s+from\s+(['"])([^'"]+\.mdx)\2\s*;?\s*$/;
 
+/**
+ * Matches a complete relative import statement. `[\s\S]` keeps the clause part
+ * multi-line friendly so statements such as
+ * `import {\n  Foo,\n} from './icons'` are rewritten too.
+ */
+/** Import statement start, tolerating leading whitespace. */
+const INDENTED_IMPORT_START_RE = /^\s*import\b/;
+
 const RELATIVE_IMPORT_RE =
-	/^(?<prefix>\s*import\s+(?:(?:[^'"]+?)\s+from\s+)?)(?<quote>['"])(?<specifier>\.{1,2}\/[^'"]+)(?<suffix>\k<quote>\s*;?\s*)$/;
+	/^(?<prefix>\s*import\s+(?:(?:[^'"]|\n)+?\s+from\s+)?)(?<quote>['"])(?<specifier>\.{1,2}\/[^'"]+)(?<suffix>\k<quote>\s*;?\s*)$/;
 
 export function loadDeck(entryPath: string): LoadedDeck {
 	const watchedFiles = new Set<string>();
@@ -108,16 +117,59 @@ function isStandaloneMdxUsage(line: string, localName: string): boolean {
 }
 
 function rewriteRelativeImports(source: string, baseDir: string): string {
-	return mapMdxLines(source, (line) => {
-		const match = line.match(RELATIVE_IMPORT_RE);
+	return mapMdxImportStatements(source, (statement) => {
+		const match = statement.match(RELATIVE_IMPORT_RE);
 		const groups = match?.groups;
-		if (!groups) return line;
+		if (!groups) return statement;
 
 		const specifier = groups.specifier;
-		if (!specifier || specifier.endsWith(".mdx")) return line;
+		if (!specifier || specifier.endsWith(".mdx")) return statement;
 
 		return `${groups.prefix}${groups.quote}${toFsImportSpecifier(resolve(baseDir, specifier))}${groups.suffix}`;
 	});
+}
+
+/**
+ * Map every complete `import` statement outside fenced code blocks.
+ *
+ * The mapper receives the whole statement text, so multi-line imports are
+ * transformed as one unit instead of line by line.
+ */
+function mapMdxImportStatements(
+	source: string,
+	mapStatement: (statement: string) => string,
+): string {
+	const lines = source.split("\n");
+	const output: string[] = [];
+	let inFence = false;
+
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		if (line === undefined) continue;
+
+		if (/^\s*```/.test(line)) {
+			inFence = !inFence;
+			output.push(line);
+			continue;
+		}
+
+		if (inFence || !INDENTED_IMPORT_START_RE.test(line)) {
+			output.push(line);
+			continue;
+		}
+
+		const endIndex = findImportStatementEnd(lines, i);
+		if (endIndex === null) {
+			output.push(line);
+			continue;
+		}
+
+		const statement = lines.slice(i, endIndex + 1).join("\n");
+		output.push(mapStatement(statement));
+		i = endIndex;
+	}
+
+	return output.join("\n");
 }
 
 function mapMdxLines(
