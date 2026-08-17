@@ -24,6 +24,26 @@ Layout names are PascalCase. If no `layout:` is specified, `Default` is used.
 
 Layouts receive a `title` prop extracted from the first `# heading` in the slide, plus any additional frontmatter fields as props.
 
+## Comments
+
+HTML comments are supported anywhere in deck MDX and are removed before compilation, so they never render:
+
+```mdx
+<!-- reminder: shorten this slide -->
+
+# Roadmap
+
+Shipping next quarter. <!-- confirm the date -->
+
+<!--
+Multi-line comments work too.
+-->
+```
+
+A line that contains only a comment disappears completely, so comments between paragraph lines do not break the paragraph. Comments inside fenced code blocks stay literal and are rendered as code. An unterminated comment hides everything after it in that file.
+
+MDX expression comments (`{/* ... */}`) keep working as well.
+
 ## Multiple MDX Files
 
 The deck entry file defaults to `deck.mdx`, and `--deck <file.mdx>` can select another root document. Additional MDX files are included via standard ESM imports:
