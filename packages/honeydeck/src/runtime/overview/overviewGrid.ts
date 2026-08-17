@@ -58,6 +58,31 @@ export function getOverviewGridColumnCount(grid: HTMLElement | null): number {
 	return Math.max(1, computedColumns);
 }
 
+/**
+ * Map a selected slide index onto a position in the listed thumbnails.
+ *
+ * Hidden slides can leave the grid while they are still selected, so the
+ * selection falls back to the nearest preceding listed slide, or the first
+ * listed slide when every listed slide comes later in the deck.
+ */
+export function findNearestListedPosition(
+	listedSlideIndexes: readonly number[],
+	selectedSlideIndex: number,
+): number {
+	if (listedSlideIndexes.length === 0) return -1;
+
+	const exactPosition = listedSlideIndexes.indexOf(selectedSlideIndex);
+	if (exactPosition !== -1) return exactPosition;
+
+	let position = 0;
+	for (let index = 0; index < listedSlideIndexes.length; index++) {
+		if ((listedSlideIndexes[index] ?? 0) > selectedSlideIndex) break;
+		position = index;
+	}
+
+	return position;
+}
+
 export type OverviewGridSelectionDirection =
 	| "ArrowRight"
 	| "ArrowLeft"

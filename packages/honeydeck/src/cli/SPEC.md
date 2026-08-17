@@ -191,6 +191,7 @@ PDF export preserves browser rendering fidelity by exporting rasterized slide pa
 
 - Does not require a pre-existing production build and does not write to the normal `dist/` output
 - One rendered slide/state per PDF page
+- Slides with slide-level frontmatter `hidden: true` are excluded from the capture plan and therefore from the exported PDF, in both `--steps final` and `--steps all`; page counts and progress output report the exported pages only
 - PDF page dimensions follow deck-level `aspectRatio`: width is fixed at 1920 and height is derived from the ratio (`16:9` → 1920×1080, `4:3` → 1920×1440, etc.). Invalid or missing ratios fall back to 1920×1080.
 - Default output: `deck.pdf` in the current working directory
 - Default steps: final state only
@@ -232,3 +233,7 @@ Interactive components (like `SparkleButton`) render their current timeline-driv
 ### Notes in PDF
 
 `<Notes>` content is excluded from normal PDF output.
+
+### Hidden Slides in PDF
+
+Hidden slides are backup material for live navigation, so PDF export skips them. A deck whose slides are all hidden exports no pages and reports that no slides were found for export.

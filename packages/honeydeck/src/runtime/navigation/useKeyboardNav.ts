@@ -18,6 +18,8 @@ export type UseKeyboardNavOptions = {
 	slideCount: number;
 	/** Returns the total step count for a given 0-based slide index. */
 	getStepCount: (slideIndex: number) => number;
+	/** Returns whether the given 0-based slide index is hidden from the timeline. */
+	isSlideHidden?: (slideIndex: number) => boolean;
 	/** Called when the user presses `o` or `Escape` while in overview. */
 	onToggleOverview?: () => void;
 	/** Whether overview mode is currently active. */
@@ -28,6 +30,7 @@ export function useKeyboardNav({
 	enabled = true,
 	slideCount,
 	getStepCount,
+	isSlideHidden,
 	onToggleOverview,
 	isOverview,
 }: UseKeyboardNavOptions): void {
@@ -36,6 +39,9 @@ export function useKeyboardNav({
 
 	const getStepCountRef = useRef(getStepCount);
 	getStepCountRef.current = getStepCount;
+
+	const isSlideHiddenRef = useRef(isSlideHidden);
+	isSlideHiddenRef.current = isSlideHidden;
 
 	const onToggleOverviewRef = useRef(onToggleOverview);
 	onToggleOverviewRef.current = onToggleOverview;
@@ -54,6 +60,7 @@ export function useKeyboardNav({
 				options: {
 					slideCount,
 					getStepCount: getStepCountRef.current,
+					isSlideHidden: isSlideHiddenRef.current,
 				},
 				route,
 				slideCount,
@@ -97,9 +104,9 @@ export function useKeyboardNav({
 				description: "Jump to the next slide.",
 				keys: ["ArrowDown", "s"],
 				handler: () => {
-					const { inOverview, route, slideCount } = currentNavigationState();
+					const { inOverview, options, route } = currentNavigationState();
 					if (route.view === "kit" || inOverview) return false;
-					nextSlide(route, { slideCount });
+					nextSlide(route, options);
 				},
 			},
 			{
@@ -108,9 +115,9 @@ export function useKeyboardNav({
 				description: "Jump to the previous slide.",
 				keys: ["ArrowUp", "w"],
 				handler: () => {
-					const { inOverview, route } = currentNavigationState();
+					const { inOverview, options, route } = currentNavigationState();
 					if (route.view === "kit" || inOverview) return false;
-					previousSlide(route);
+					previousSlide(route, options);
 				},
 			},
 			{

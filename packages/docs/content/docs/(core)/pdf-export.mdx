@@ -73,6 +73,10 @@ When `pdfSteps: final` (default):
 In `pdfSteps: all`, `isPdfFinalRender` stays false because each step is captured
 with the same timeline state the browser presentation would use.
 
+## Hidden Slides in PDF
+
+Slides with `hidden: true` are backup material for live navigation, so PDF export skips them in both `--steps final` and `--steps all`. Page counts and progress output cover the exported pages only. Exporting a deck whose slides are all hidden fails with a message that no slides were found for export.
+
 ## Aspect Ratio
 
 PDF pages follow the deck's `aspectRatio`. Width stays fixed at 1920 and height is derived from the ratio:

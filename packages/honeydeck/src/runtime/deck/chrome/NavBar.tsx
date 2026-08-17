@@ -9,6 +9,7 @@
  * ### Controls
  * - Previous step (←)
  * - Current slide number
+ * - Hidden-slide indicator while the current slide has `hidden: true`
  * - Next step (→)
  * - Overview grid toggle
  * - Layouts reference
@@ -24,6 +25,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	ExternalLinkIcon,
+	EyeOffIcon,
 	LayoutGridIcon,
 	MaximizeIcon,
 	MinimizeIcon,
@@ -32,6 +34,7 @@ import {
 	TextSelectIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getDeckNavigationOptions } from "../../navigation/deckNavigationOptions.ts";
 import {
 	getNextStepRoute,
 	getPreviousStepRoute,
@@ -42,7 +45,7 @@ import {
 	previousStep,
 } from "../../navigation/navigation.ts";
 import type { Route } from "../../navigation/router.ts";
-import { slideData } from "../slideData.ts";
+import { isSlideHidden } from "../slideData.ts";
 import type { ColorMode } from "./ColorModeCycleButton.tsx";
 import { ColorModeCycleButton } from "./ColorModeCycleButton.tsx";
 import { NavBarButton, navBarButtonClass } from "./NavBarButton.tsx";
@@ -81,10 +84,8 @@ export function NavBar({
 	isTextSelectionEnabled = false,
 	onToggleTextSelection,
 }: NavBarProps) {
-	const navigationOptions = {
-		slideCount: slideData.length,
-		getStepCount: (slideIndex: number) => slideData[slideIndex]?.stepCount ?? 0,
-	};
+	const navigationOptions = getDeckNavigationOptions();
+	const isCurrentSlideHidden = isSlideHidden(route.slide - 1);
 
 	// ISSUE-02: track fullscreen reactively via event listener
 	const [isFullscreen, setIsFullscreen] = useState(
@@ -143,6 +144,17 @@ export function NavBar({
 					<span className="min-w-6 px-1 text-center font-sans text-sm tabular-nums text-white/60">
 						{route.slide}
 					</span>
+
+					{/* Hidden slide indicator */}
+					{isCurrentSlideHidden && (
+						<span
+							title="Hidden slide"
+							className="inline-flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5 font-sans text-2xs tracking-wider text-white/70 uppercase"
+						>
+							<EyeOffIcon aria-hidden="true" size={12} />
+							Hidden slide
+						</span>
+					)}
 
 					{/* Next step */}
 					<NavBarButton

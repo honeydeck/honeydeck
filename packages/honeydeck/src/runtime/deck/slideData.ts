@@ -41,6 +41,8 @@ export type SlideData = {
 	frontmatter: Record<string, unknown>;
 	/** Layout name from frontmatter.layout, or 'Default' when absent. */
 	layoutName: string;
+	/** True when frontmatter.hidden is true: timeline navigation skips this slide. */
+	hidden: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -60,15 +62,17 @@ function buildSlideData(): SlideData[] {
 					`This is a bug in the virtual module plugin.`,
 			);
 		}
+		const frontmatter =
+			(_allExports[`slideFrontmatter${i}`] as
+				| Record<string, unknown>
+				| undefined) ?? {};
 		return {
 			id: `Slide${i}`,
 			Component,
 			stepCount: (_allExports[`stepCount${i}`] as number | undefined) ?? 0,
 			title: (_allExports[`slideTitle${i}`] as string | undefined) ?? "",
-			frontmatter:
-				(_allExports[`slideFrontmatter${i}`] as
-					| Record<string, unknown>
-					| undefined) ?? {},
+			frontmatter,
+			hidden: frontmatter.hidden === true,
 			layoutName:
 				(_allExports[`slideLayout${i}`] as string | undefined) ||
 				(config.defaultLayout as string | undefined) ||
@@ -79,6 +83,29 @@ function buildSlideData(): SlideData[] {
 
 /** All slide data in deck order. Singleton — assembled once at import time. */
 export const slideData: SlideData[] = buildSlideData();
+
+// ---------------------------------------------------------------------------
+// Slide metadata helpers
+// ---------------------------------------------------------------------------
+
+/** Number of timeline steps on the 0-based slide index. */
+export function getSlideStepCount(slideIndex: number): number {
+	return slideData[slideIndex]?.stepCount ?? 0;
+}
+
+/**
+ * Whether the 0-based slide index is hidden from the normal timeline.
+ * Hidden slides keep their slide number and stay reachable through explicit
+ * navigation, but step/slide navigation skips them.
+ */
+export function isSlideHidden(slideIndex: number): boolean {
+	return slideData[slideIndex]?.hidden === true;
+}
+
+/** Number of slides that timeline navigation walks through. */
+export function getVisibleSlideCount(): number {
+	return slideData.filter((slide) => !slide.hidden).length;
+}
 
 // ---------------------------------------------------------------------------
 // Layout resolution

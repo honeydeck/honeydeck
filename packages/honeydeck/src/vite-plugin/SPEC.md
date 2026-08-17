@@ -110,6 +110,8 @@ Honeydeck does not include Mermaid as a built-in Markdown feature. Fenced `merma
 
 All settings use **camelCase**. No separate config file exists. Frontmatter parsing is a limited flat YAML subset: `key: value` pairs with strings, booleans, numbers, and quoted strings. Nested objects, arrays, and multiline YAML are not supported.
 
+Deck loading exposes each split slide's parsed slide-level frontmatter next to that slide's MDX source, so CLI commands read slide-level settings such as `hidden` without compiling slides.
+
 ### Deck-Level (deck entry file, first block only)
 
 | Property | Type | Default | Description |
@@ -133,6 +135,7 @@ All settings use **camelCase**. No separate config file exists. Frontmatter pars
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `layout` | `string` | (uses `defaultLayout`) | Layout map key to use (PascalCase by convention, not validated) |
+| `hidden` | `boolean` | `false` | Keep the slide in the deck at its own slide number while timeline navigation skips it |
 | `transition` | `string \| boolean` | deck default | Named transition into this slide; legacy booleans map to `fade`/`none` |
 | `transitionDuration` | `number` | deck default | Transition duration into this slide in milliseconds |
 | `transitionEasing` | `string` | deck default | Transition easing into this slide |

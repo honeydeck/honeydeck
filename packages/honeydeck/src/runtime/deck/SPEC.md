@@ -30,6 +30,14 @@ Build output is a single-page application. The app preserves client-side slide t
 
 Audience overview mode (`/#/overview/<slideNumber>/<stepIndex>`) renders the shared `OverviewView` component as a contained panel inside a full-screen Deck overlay wrapper. The wrapper supplies the fixed positioning, z-index, translucent themed background (`bg-background`), and backdrop blur. The `OverviewView` component itself knows nothing about full-screen overlay layout, which lets the same component render inside the smaller current-slide cell in presenter mode.
 
+## Hidden Slides
+
+Slide-level frontmatter `hidden: true` keeps a slide in the deck and its numbering while timeline navigation skips it. Skipping rules live in [`../navigation/SPEC.md`](../navigation/SPEC.md).
+
+- A hidden slide renders exactly like any other slide once it is the current slide, including layouts, timeline steps, transitions, and the slide number overlay
+- `useHoneydeck().currentSlide.layoutProps` exposes `hidden` like any other slide frontmatter field
+- The deck chrome shows a hidden-slide indicator in the navigation bar while a hidden slide is current
+
 ## Slide Transitions
 
 Honeydeck uses a named slide transition system. Deck-level frontmatter sets defaults, and slide-level frontmatter overrides the transition **into that slide**:
@@ -118,6 +126,7 @@ Shown in normal slide view only (not presenter/reference views).
   - Docs website button (opens `https://honeydeck.dev` in a new tab)
   - Presenter mode button on `md` and wider screens
   - Fullscreen button
+  - Hidden-slide indicator: a non-interactive `Hidden slide` marker with an eye-off icon, shown only while the current slide has `hidden: true`
   - Mobile text selection toggle (off by default, enables selecting slide content when needed)
   - Color mode switch (system → light → dark → system)
   - All icon-only controls expose explicit accessible names via `aria-label` and matching hover titles

@@ -912,7 +912,34 @@ Press <Keyboard>o</Keyboard>.
 - Future timeline steps appear at reduced opacity.
 - Arrow keys move selection.
 - Enter jumps to selected slide.
+- Press <Keyboard>h</Keyboard> to list hidden slides and jump to one.
 - Escape exits overview.
+
+---
+
+# Hidden Slides 🙈
+
+The next slide uses `hidden: true`:
+
+```yaml
+---
+hidden: true
+---
+```
+
+- Step and slide navigation skip it.
+- Press <Keyboard>o</Keyboard> then <Keyboard>h</Keyboard> to reach it.
+- PDF export leaves it out.
+
+---
+hidden: true
+---
+
+# Hidden Backup Slide 🗄️
+
+You reached this slide on purpose — through the overview grid or a direct URL.
+
+Step navigation from here continues with the next non-hidden slide.
 
 ---
 

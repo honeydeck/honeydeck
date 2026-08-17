@@ -50,6 +50,8 @@ Includes:
 - Presenter previews render code highlight states statically without line-enter animations, so timer ticks and preview rerenders do not flicker highlighted code lines.
 - In the Next preview, reveal content from later timeline steps is visible at reduced opacity so the speaker can see what is still coming on that slide. Audience view and the Current preview keep future steps hidden.
 - When no next timeline state exists (final step of the final slide), the Next preview shows a placeholder (`No next step`) instead of trying to render a missing slide.
+- The Next preview follows timeline navigation and therefore skips hidden slides: after the final step of a slide it previews the nearest non-hidden following slide, and it shows the `No next step` placeholder when only hidden slides follow.
+- While the current slide is hidden, the slide/step counter in the bottom bar appends a `Hidden` marker.
 
 ## Presenter overview
 
@@ -58,6 +60,7 @@ Presenter mode supports the same slide overview as the audience view, rendered i
 - Pressing `o` while in presenter mode navigates to `/#/presenter/overview/<slideNumber>/<stepIndex>` and replaces the `Current` slide preview with a thumbnail grid.
 - The overview uses the same `OverviewView` component as the audience view; only the surrounding container differs. Deck wraps the audience overview in a full-screen overlay, while presenter mode places it inside the current-slide cell.
 - Arrow keys move the selection within the grid; WASD timeline shortcuts are disabled while the overview is open.
+- `h` shows or hides hidden slides in the presenter overview grid, which is how a speaker jumps to a hidden slide during a talk.
 - `Enter` or clicking a thumbnail jumps to that slide at step 0 and returns to the plain presenter route (`/#/presenter/<slide>/0`).
 - Clicking or pressing `Enter` on the already-current slide exits the presenter overview and returns to the plain presenter route at the current slide and step.
 - `o` toggles the overview closed.

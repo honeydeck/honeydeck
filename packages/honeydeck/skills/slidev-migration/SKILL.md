@@ -68,6 +68,7 @@ Create a working Honeydeck presentation that preserves the talk's structure, con
 
 - Both frameworks use `---` slide separators. Preserve exact standalone separators.
 - Convert Slidev layout names to Honeydeck names where possible.
+- Map slide frontmatter `hide: true` to Honeydeck `hidden: true`, which keeps the slide reachable from overview mode while timeline navigation skips it.
 
 ### Notes
 

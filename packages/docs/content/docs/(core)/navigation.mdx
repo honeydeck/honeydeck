@@ -14,6 +14,7 @@ slug: "navigation"
 | `←` / `a` | Previous step (crosses slide boundary) |
 | `↓` / `s` | Next slide |
 | `↑` / `w` | Previous slide |
+| `h` | In overview mode, show or hide hidden slides in the grid |
 | `o` | Toggle overview mode; in presenter mode, toggle the presenter overview |
 | `p` | Open presenter mode (same tab); while in presenter mode, `p` exits presenter mode |
 | `f` | Toggle fullscreen |
@@ -29,6 +30,8 @@ Honeydeck only handles unmodified key presses. Browser and operating-system shor
 Boundary behavior:
 - Right at last step → next slide at step 0.
 - Left at step 0 → previous slide at its final step.
+
+Slides with `hidden: true` are skipped in both directions, so navigation lands on the nearest non-hidden slide. See [Hidden Slides](/docs/slides#hidden-slides).
 
 ## Navigation UI
 
@@ -78,6 +81,8 @@ A responsive grid of rendered slide thumbnails. Activated via `o` or the overvie
 - Arrow keys move selection using the rendered grid columns, including after resizes.
 - Up on the topmost row and Down on the bottommost row keep the current selection and show a short boundary nudge.
 - Enter jumps to selected slide. Pressing Enter on the current slide does nothing.
+- Hidden slides are left out of the grid; press `h` or use the `Show hidden` header button to list them, then click or press Enter to jump to one. Listed hidden thumbnails carry a `Hidden` badge.
+- Opening overview while the current slide is hidden lists hidden slides right away.
 - Escape exits overview.
 - In presenter mode, the overview opens inside the current-slide cell at `/#/presenter/overview/<slide>/<step>` and shares the same keyboard behavior.
 

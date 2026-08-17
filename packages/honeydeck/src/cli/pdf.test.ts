@@ -156,6 +156,40 @@ describe("buildPdfCaptureTargets", () => {
 			},
 		]);
 	});
+
+	it("excludes hidden slides from final-state targets", () => {
+		const targets = buildPdfCaptureTargets(4, [0, 1, 0, 0], "final", [
+			false,
+			true,
+			true,
+			false,
+		]);
+
+		assert.deepEqual(
+			targets.map(({ pageIndex, slide }) => ({ pageIndex, slide })),
+			[
+				{ pageIndex: 0, slide: 1 },
+				{ pageIndex: 1, slide: 4 },
+			],
+		);
+	});
+
+	it("excludes hidden slides from all-step targets", () => {
+		const targets = buildPdfCaptureTargets(3, [1, 1, 0], "all", [
+			false,
+			true,
+			false,
+		]);
+
+		assert.deepEqual(
+			targets.map(({ pageIndex, slide, step }) => ({ pageIndex, slide, step })),
+			[
+				{ pageIndex: 0, slide: 1, step: 0 },
+				{ pageIndex: 1, slide: 1, step: 1 },
+				{ pageIndex: 2, slide: 3, step: 0 },
+			],
+		);
+	});
 });
 
 describe("resolvePdfCaptureConcurrency", () => {

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
 	countGridColumnsFromChildren,
 	countGridTemplateColumns,
+	findNearestListedPosition,
 	getOverviewGridSelectionMove,
 } from "./overviewGrid.ts";
 
@@ -85,5 +86,23 @@ describe("overview grid selection movement", () => {
 			selected: 8,
 			didMove: true,
 		});
+	});
+});
+
+describe("overview listed selection mapping", () => {
+	it("maps a listed slide index to its grid position", () => {
+		assert.equal(findNearestListedPosition([0, 2, 3, 5], 3), 2);
+	});
+
+	it("falls back to the nearest preceding listed slide", () => {
+		assert.equal(findNearestListedPosition([0, 2, 5], 4), 1);
+	});
+
+	it("falls back to the first listed slide when every listed slide comes later", () => {
+		assert.equal(findNearestListedPosition([3, 4, 5], 1), 0);
+	});
+
+	it("reports no position for an empty grid", () => {
+		assert.equal(findNearestListedPosition([], 2), -1);
 	});
 });
