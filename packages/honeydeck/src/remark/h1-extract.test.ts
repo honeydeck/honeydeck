@@ -214,7 +214,7 @@ describe("remarkH1Extract — rich title preservation", () => {
 
 		assert.equal(
 			data.titleMdx,
-			"<span>**Bold** and *italic*</span>",
+			'<span className="flex items-center gap-4">**Bold** and *italic*</span>',
 			"titleMdx preserves inline Markdown emphasis",
 		);
 	});
@@ -235,7 +235,7 @@ describe("remarkH1Extract — rich title preservation", () => {
 
 		assert.equal(
 			data.titleMdx,
-			"<span>Hello <SparkleButton /> world</span>",
+			'<span className="flex items-center gap-4">Hello <SparkleButton /> world</span>',
 			"titleMdx preserves custom JSX components",
 		);
 		assert.deepEqual(data.titleImports, [
