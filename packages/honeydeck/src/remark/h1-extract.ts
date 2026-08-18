@@ -140,7 +140,7 @@ export const remarkH1Extract: Plugin<[], Root> = () => (tree, vfile) => {
 			{ extensions: [mdxToMarkdown(), gfmToMarkdown()] },
 		).trim();
 		if (titleMdx) {
-			vfile.data.titleMdx = `<span>${titleMdx}</span>`;
+			vfile.data.titleMdx = `<span className="flex items-center gap-4">${titleMdx}</span>`;
 		}
 
 		// Collect the slide's ESM import declarations so the generated title
