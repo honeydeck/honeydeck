@@ -38,7 +38,7 @@ export function SlideFrame({
 		<div
 			className={cn(
 				"relative size-full flex flex-col overflow-hidden bg-background text-foreground font-body",
-				padded && "p-[var(--honeydeck-slide-padding)]",
+				padded && "p-slide-padding",
 				className,
 			)}
 		>

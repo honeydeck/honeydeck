@@ -41,7 +41,7 @@ export default function CoverLayout({
 
 			{/* Author / date metadata */}
 			{(author || date) && (
-				<div className="flex items-center gap-14 text--small text-surface-foreground mt-9">
+				<div className="flex items-center gap-14 text-small text-surface-foreground mt-9">
 					{author && <span>{author}</span>}
 					{author && date && <span className="text-border">·</span>}
 					{date && <span>{date}</span>}

@@ -11,7 +11,7 @@ export default function PosterLayout({
 	frontmatter,
 }: LayoutProps<PosterFrontmatter>) {
 	return (
-		<div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-primary p-[var(--honeydeck-slide-padding)] text-center font-body text-primary-foreground">
+		<div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-primary p-slide-padding text-center font-body text-primary-foreground">
 			<div
 				className="absolute inset-x-0 top-0 h-8 bg-primary-foreground/20"
 				aria-hidden="true"

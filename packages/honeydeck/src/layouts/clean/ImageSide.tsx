@@ -60,8 +60,8 @@ function CleanSideContent({
 		<div
 			className={`flex min-h-0 flex-col overflow-hidden ${
 				side === "left"
-					? "py-[var(--honeydeck-slide-padding)] pr-[var(--honeydeck-slide-padding)]"
-					: "py-[var(--honeydeck-slide-padding)] pl-[var(--honeydeck-slide-padding)]"
+					? "py-slide-padding pr-slide-padding"
+					: "py-slide-padding pl-slide-padding"
 			}`}
 		>
 			{hasTitle(title) && (

@@ -39,7 +39,7 @@ export default function HomePage() {
 				<figure className="relative mx-auto w-full max-w-lg overflow-visible">
 					<div
 						aria-hidden="true"
-						className="absolute inset-10 rounded-full bg-[color-mix(in_oklab,var(--honeydeck-color-primary)_16%,transparent)] blur-3xl"
+						className="absolute inset-10 rounded-full bg-primary/16 blur-3xl"
 					/>
 					<Image
 						alt="Dex, the Honeydeck bee mascot, presenting a slide deck workflow."

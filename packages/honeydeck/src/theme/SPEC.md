@@ -150,9 +150,22 @@ Honeydeck uses Tailwind v4 `@theme` in `base.css` to map tokens to utilities:
   --color-link: var(--honeydeck-link-color);
 
   --radius-honeydeck: var(--honeydeck-border-radius);
+  --radius-2honeydeck: calc(var(--honeydeck-border-radius) * 2);
   --font-heading: var(--honeydeck-font-heading);
   --font-body: var(--honeydeck-font-body);
   --font-mono: var(--honeydeck-font-mono);
+
+  --text-display: var(--honeydeck-font-size-display);
+  --text-h1: var(--honeydeck-font-size-h1);
+  --text-h2: var(--honeydeck-font-size-h2);
+  --text-h3: var(--honeydeck-font-size-h3);
+  --text-h4: var(--honeydeck-font-size-h4);
+  --text-body: var(--honeydeck-font-size-body);
+  --text-small: var(--honeydeck-font-size-small);
+  --text-code: var(--honeydeck-font-size-code);
+
+  --spacing-slide-padding: var(--honeydeck-slide-padding);
+  --aspect-browser: var(--honeydeck-browser-frame-aspect-ratio);
 }
 ```
 

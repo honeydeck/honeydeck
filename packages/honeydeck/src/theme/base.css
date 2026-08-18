@@ -161,6 +161,7 @@
 @theme {
 	/* Spacing — pixel-based (decoupled from root font-size which is 36px for slides) */
 	--spacing: 4px;
+	--spacing-slide-padding: var(--honeydeck-slide-padding);
 
 	/* Text sizes — pixel-based for predictable sizing across contexts */
 	--text-2xs: 10px;
@@ -175,6 +176,16 @@
 	--text-4xl: 22px;
 	--text-5xl: 28px;
 	--text-6xl: 40px;
+
+	/* Text sizes — Honeydeck dynamic type scale */
+	--text-display: var(--honeydeck-font-size-display);
+	--text-h1: var(--honeydeck-font-size-h1);
+	--text-h2: var(--honeydeck-font-size-h2);
+	--text-h3: var(--honeydeck-font-size-h3);
+	--text-h4: var(--honeydeck-font-size-h4);
+	--text-body: var(--honeydeck-font-size-body);
+	--text-small: var(--honeydeck-font-size-small);
+	--text-code: var(--honeydeck-font-size-code);
 
 	/* Colors — slide theme */
 	--color-primary: var(--honeydeck-primary);
@@ -201,11 +212,15 @@
 	--radius-lg: 10px;
 	--radius-xl: 12px;
 	--radius-honeydeck: var(--honeydeck-border-radius);
+	--radius-2honeydeck: calc(var(--honeydeck-border-radius) * 2);
 
 	/* Fonts */
 	--font-heading: var(--honeydeck-font-heading);
 	--font-body: var(--honeydeck-font-body);
 	--font-mono: var(--honeydeck-font-mono);
+
+	/* Aspect ratios */
+	--aspect-browser: var(--honeydeck-browser-frame-aspect-ratio);
 }
 
 /* ── Base element styles ────────────────────────────────────────────────────

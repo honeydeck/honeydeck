@@ -135,7 +135,7 @@ export function BrowserFrame({
 		<div className="grid h-full min-h-0 w-full place-items-center [container-type:size]">
 			<div
 				className={cn(
-					"group mx-auto flex aspect-[var(--honeydeck-browser-frame-aspect-ratio)] w-[min(100cqw,calc(100cqh*var(--honeydeck-browser-frame-aspect-ratio)))] max-w-full flex-col self-center overflow-hidden rounded-[calc(var(--honeydeck-border-radius)*2)] border border-border bg-surface font-body text-surface-foreground shadow-[0_2px_6px_color-mix(in_srgb,var(--honeydeck-foreground)_10%,transparent)]",
+					"group mx-auto flex aspect-browser w-[min(100cqw,calc(100cqh*var(--aspect-browser)))] max-w-full flex-col self-center overflow-hidden rounded-2honeydeck border border-border bg-surface font-body text-surface-foreground shadow-[0_2px_6px] shadow-foreground/10",
 					className,
 				)}
 				data-honeydeck-browser-frame=""
@@ -143,26 +143,26 @@ export function BrowserFrame({
 				style={frameStyle(aspectRatio)}
 			>
 				<div
-					className="flex items-center gap-[0.55em] border-border border-b bg-[color-mix(in_srgb,var(--honeydeck-surface)_88%,var(--honeydeck-background))] px-[0.55em] py-[0.42em]"
+					className="flex items-center gap-[0.55em] border-border border-b bg-surface/88 px-[0.55em] py-[0.42em]"
 					data-honeydeck-browser-frame-chrome=""
 				>
 					<div className="flex items-center gap-[0.22em]">
 						<span
-							className="h-[0.36em] w-[0.36em] rounded-full border border-[color-mix(in_srgb,var(--honeydeck-foreground)_18%,transparent)] bg-[#ff5f57]"
+							className="h-[0.36em] w-[0.36em] rounded-full border border-foreground/18 bg-[#ff5f57]"
 							aria-hidden="true"
 						/>
 						<span
-							className="h-[0.36em] w-[0.36em] rounded-full border border-[color-mix(in_srgb,var(--honeydeck-foreground)_18%,transparent)] bg-[#febc2e]"
+							className="h-[0.36em] w-[0.36em] rounded-full border border-foreground/18 bg-[#febc2e]"
 							aria-hidden="true"
 						/>
 						<span
-							className="h-[0.36em] w-[0.36em] rounded-full border border-[color-mix(in_srgb,var(--honeydeck-foreground)_18%,transparent)] bg-[#28c840]"
+							className="h-[0.36em] w-[0.36em] rounded-full border border-foreground/18 bg-[#28c840]"
 							aria-hidden="true"
 						/>
 						{hasFallback && (
 							<button
 								type="button"
-								className="h-[0.36em] w-[0.36em] cursor-pointer appearance-none rounded-full border border-[color-mix(in_srgb,var(--honeydeck-foreground)_18%,transparent)] bg-accent p-0 opacity-0 transition-opacity duration-150 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+								className="h-[0.36em] w-[0.36em] cursor-pointer appearance-none rounded-full border border-foreground/18 bg-accent p-0 opacity-0 transition-opacity duration-150 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
 								data-honeydeck-browser-frame-toggle=""
 								aria-label={
 									fallbackActive
