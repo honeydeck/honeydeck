@@ -32,6 +32,7 @@ Decks are plain MDX files separated into slides with `---`; see the first deck e
 - [Local development](https://honeydeck.dev/docs/local-development) - running Honeydeck from this repository
 - [Skills](https://honeydeck.dev/docs/skills) - optional agent skills for authoring, writing, and migration help
 - [Slidev migration](https://honeydeck.dev/docs/slidev-migration) - moving from Slidev with the bundled agent skill
+- [Troubleshooting](https://honeydeck.dev/docs/troubleshooting) - dev server and dependency cache fixes
 
 ## Common commands
 
@@ -39,6 +40,7 @@ Decks are plain MDX files separated into slides with `---`; see the first deck e
 honeydeck dev                 # start dev server on port 4200
 honeydeck dev --open          # start and open the browser
 honeydeck dev --deck talk.mdx # use a custom deck entry file
+honeydeck dev --force         # clear the Vite cache and re-bundle dependencies
 
 honeydeck build               # build a static SPA into dist/
 honeydeck pdf                 # export deck.pdf

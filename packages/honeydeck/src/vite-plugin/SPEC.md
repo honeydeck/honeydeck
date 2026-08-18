@@ -107,6 +107,18 @@ Honeydeck treats React and React DOM as project-owned peer dependencies. The Vit
 
 Honeydeck package subpaths are resolved through the package `exports` map. The Vite plugin must not alias public `@honeydeck/honeydeck/*` imports to private source paths unless a virtual-module feature cannot be represented by package metadata. Runtime/component Honeydeck package entries are excluded from Vite dependency pre-bundling so context-backed components stay in the same source module graph as the app shell.
 
+### Dependency Pre-Bundling Cache
+
+Vite pre-bundles bare dependencies into its cache directory and reuses that cache until its own cache key changes. Honeydeck keeps that cache consistent with the installed Honeydeck version and the deck's dependency set:
+
+- The dependency policy plugin name carries the installed Honeydeck version (`honeydeck:dependency-policy@<version>`). Vite includes plugin names in the dependency optimizer cache key, so installing a different Honeydeck version always re-optimizes dependencies, even when the package manager lockfile is unchanged (linked, `file:`, or republished-same-version installs).
+- The React runtime dependencies Honeydeck itself imports (`react`, `react/jsx-runtime`, `react/jsx-dev-runtime`, `react-dom/client`, `lucide-react`) are always pre-bundled.
+- Bare package specifiers imported by the deck entry file and its imported MDX files are pre-bundled up front, so packages used only from MDX do not trigger a mid-session re-optimization that invalidates already-loaded dependency chunks.
+- Relative and absolute specifiers, `node:`/`http(s):` specifiers, non-JavaScript specifiers (for example `.css`, `.svg`, `.png` subpaths), and `@honeydeck/honeydeck*` entries are never added to the pre-bundle include list.
+- An unreadable or unparsable deck entry never breaks server start-up: pre-bundling falls back to the React runtime dependencies alone.
+
+Deck import scanning affects the optimizer cache key too, so adding a package import to a deck also re-optimizes dependencies on the next server start.
+
 ### Markdown Features
 
 Slide MDX supports GitHub-flavored Markdown pipe tables. Pipe tables render as real HTML tables in slides. The base theme styles slide tables with compact, full-width, token-based horizontal rules, bold headers, and light horizontal cell spacing so table Markdown is presentation-ready without custom CSS.

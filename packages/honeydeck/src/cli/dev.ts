@@ -36,6 +36,7 @@ import {
 	resolveDeckPath,
 	validateDeckPath,
 } from "./deck-path.ts";
+import { clearViteCacheDir } from "./vite-cache.ts";
 
 // ---------------------------------------------------------------------------
 // Paths (all resolved at module load time, before any async work)
@@ -57,19 +58,6 @@ const INDEX_HTML_PATH = resolve(APP_SHELL_DIR, "index.html");
  */
 const PACKAGE_ROOT = resolve(__dirname, "../..");
 
-/**
- * Bare dependencies imported by the Honeydeck app shell/runtime before any
- * user-authored HTML entry exists. Keep the CommonJS/large ESM deps
- * pre-bundled explicitly.
- */
-const DEV_OPTIMIZE_DEPS = [
-	"react",
-	"react/jsx-runtime",
-	"react/jsx-dev-runtime",
-	"react-dom/client",
-	"lucide-react",
-] as const;
-
 // ---------------------------------------------------------------------------
 // Arg parsing
 // ---------------------------------------------------------------------------
@@ -77,6 +65,7 @@ const DEV_OPTIMIZE_DEPS = [
 export type DevOptions = {
 	port: number;
 	open: boolean;
+	force: boolean;
 } & DeckPathOptions;
 
 export function createDevServerConfig(port: number, open: boolean) {
@@ -101,11 +90,13 @@ export function printDevHelp(): void {
     --deck <file.mdx>  Deck entry file          (default: ./deck.mdx)
     -p, --port <n>     Dev server port          (default: 4200)
     -o, --open         Open browser on start
+    -f, --force        Clear the Vite cache and re-bundle dependencies
     -h, --help         Show this help page
 
   Examples:
     honeydeck dev
     honeydeck dev --open
+    honeydeck dev --force
     honeydeck dev --deck talk.mdx --port 8080
 `);
 }
@@ -126,6 +117,7 @@ function readOptionValue(
 export function parseDevArgs(args: string[]): DevOptions {
 	let port = 4200;
 	let open = false;
+	let force = false;
 	let deckPath: string | null = null;
 
 	for (let i = 0; i < args.length; i++) {
@@ -140,6 +132,8 @@ export function parseDevArgs(args: string[]): DevOptions {
 			}
 		} else if (arg === "--open" || arg === "-o") {
 			open = true;
+		} else if (arg === "--force" || arg === "-f") {
+			force = true;
 		} else if (arg === "--deck") {
 			const value = readOptionValue(args, i, arg);
 			validateDeckPath(value, arg);
@@ -150,7 +144,7 @@ export function parseDevArgs(args: string[]): DevOptions {
 		}
 	}
 
-	return { port, open, ...resolveDeckPath(deckPath ?? undefined) };
+	return { port, open, force, ...resolveDeckPath(deckPath ?? undefined) };
 }
 
 // ---------------------------------------------------------------------------
@@ -207,6 +201,9 @@ function appShellPlugin(projectRoot: string): Plugin {
 					const transformed = await server.transformIndexHtml(url, html);
 
 					res.setHeader("Content-Type", "text/html; charset=utf-8");
+					// Match Vite's own HTML handling: never let a browser replay a
+					// cached app shell that points at outdated module URLs.
+					res.setHeader("Cache-Control", "no-cache");
 					res.end(transformed);
 				} catch (err) {
 					next(err);
@@ -226,12 +223,19 @@ export async function runDev(args: string[]): Promise<void> {
 		return;
 	}
 
-	const { port, open, root, entry, deck } = parseDevArgs(args);
+	const { port, open, force, root, entry, deck } = parseDevArgs(args);
 
 	console.log("\n  ✨ Honeydeck dev starting...\n");
 	console.log(`  Root   → ${root}`);
 	console.log(`  Deck   → ${deck}`);
 	console.log(`  Port   → ${port}`);
+
+	if (force) {
+		const cleared = clearViteCacheDir(root);
+		console.log(
+			cleared ? `  Cache  → cleared ${cleared}` : "  Cache  → nothing to clear",
+		);
+	}
 
 	const server = await createServer({
 		// Set root to the deck dir so local CSS/assets resolve naturally.
@@ -243,8 +247,10 @@ export async function runDev(args: string[]): Promise<void> {
 
 		server: createDevServerConfig(port, open),
 
+		// Dependency pre-bundling policy (include/exclude lists and the
+		// version-scoped optimizer cache key) lives in honeydeckPlugin().
 		optimizeDeps: {
-			include: [...DEV_OPTIMIZE_DEPS],
+			force,
 		},
 
 		plugins: [

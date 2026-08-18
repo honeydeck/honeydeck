@@ -32,6 +32,10 @@ import { DEFAULT_DECK_ENTRY } from "../defaults.ts";
 import { remarkH1Extract } from "../remark/h1-extract.ts";
 import { remarkShikiCodeBlocks } from "../remark/shiki-code-blocks.ts";
 import { remarkStepNumbering } from "../remark/step-numbering.ts";
+import {
+	collectDeckOptimizeDepsInclude,
+	HONEYDECK_DEPENDENCY_POLICY_PLUGIN_NAME,
+} from "./dep-optimizer.ts";
 import { tokenManifestPlugin } from "./token-manifest.ts";
 import { virtualModulesPlugin } from "./virtual-modules.ts";
 
@@ -135,7 +139,11 @@ export function honeydeckPlugin(
 	return [
 		// ── Layer 0: Vite-native dependency policy ───────────────────────
 		{
-			name: "honeydeck:dependency-policy",
+			// The plugin name carries the Honeydeck version on purpose: Vite hashes
+			// plugin names into the dependency optimizer cache key, so upgrading
+			// Honeydeck always re-optimizes dependencies instead of mixing chunks
+			// from two Honeydeck versions in node_modules/.vite/deps.
+			name: HONEYDECK_DEPENDENCY_POLICY_PLUGIN_NAME,
 			config() {
 				return {
 					resolve: {
@@ -144,6 +152,12 @@ export function honeydeckPlugin(
 						dedupe: [...HONEYDECK_REACT_DEDUPE_DEPENDENCIES],
 					},
 					optimizeDeps: {
+						// Pre-bundle the Honeydeck runtime dependencies and every bare
+						// package the deck imports in the first optimizer run. Without
+						// this, deck-only packages are discovered after the browser
+						// already loaded shared dependency chunks, and the re-optimized
+						// chunks no longer match the loaded ones.
+						include: collectDeckOptimizeDepsInclude(entryPath),
 						// Keep Honeydeck source imports in one module graph. If Vite
 						// pre-bundles the published package separately, context-backed
 						// components such as <Reveal> can read a duplicate TimelineContext.
