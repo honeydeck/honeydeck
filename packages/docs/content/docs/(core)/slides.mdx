@@ -160,6 +160,26 @@ alt: Product detail
 Short supporting copy beside the image.
 ```
 
+## Custom Components in Titles
+
+The first `# heading` of a slide is extracted as the `title` prop passed to layouts. Titles are not limited to plain text — inline Markdown and custom React components are preserved:
+
+```mdx
+import SparkleButton from './SparkleButton'
+
+# Introducing <SparkleButton />
+
+Body content follows the title.
+```
+
+Components used in the title must be imported at the top of the slide. They resolve with the same rules as components used in the body. Inline Markdown emphasis, code, and links work as usual:
+
+```mdx
+# Honeydeck `v1.0` is **here**
+```
+
+Timeline-consuming components such as `<Reveal>` are not assigned steps when used in a title.
+
 ## Assets
 
 Static files live in `public/` and are served from the web root. Reference them without the `public/` prefix:

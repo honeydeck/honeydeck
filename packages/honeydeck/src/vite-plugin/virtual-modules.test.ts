@@ -115,12 +115,26 @@ export const demo = {
 				"\0virtual:honeydeck/layout-demo/0.mdx",
 			);
 			assert.match(String(demoModule), /export const stepCount = 0;/);
-			assert.match(String(demoModule), /export const slideTitle = "Hero Demo"/);
+			assert.match(
+				String(demoModule),
+				/import _Title0 from 'virtual:honeydeck\/layout-demo-title\/0\.mdx'/,
+			);
+			assert.match(
+				String(demoModule),
+				/export const slideTitle = _jsxHd\(_Title0, \{\}\)/,
+			);
 			assert.match(
 				String(demoModule),
 				/export const slideFrontmatter = \{"layout":"Hero"\}/,
 			);
 			assert.match(String(demoModule), /export const slideLayout = "Hero"/);
+
+			const demoTitleModule = await load.call(
+				context,
+				"\0virtual:honeydeck/layout-demo-title/0.mdx",
+			);
+			assert.match(String(demoTitleModule), /Hero Demo/);
+			assert.match(String(demoTitleModule), /_createMdxContent/);
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}
@@ -176,7 +190,9 @@ export const demo = {
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layouts",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
+					"\0virtual:honeydeck/layout-demo-title/0.mdx",
 					"\0virtual:honeydeck/slide/0.mdx",
+					"\0virtual:honeydeck/slide-title/0.mdx",
 				].map((id) => [id, { id }]),
 			);
 			const handleHotUpdate = plugin.handleHotUpdate as unknown as (
@@ -211,8 +227,10 @@ export const demo = {
 				[
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
+					"\0virtual:honeydeck/layout-demo-title/0.mdx",
 					"\0virtual:honeydeck/layouts",
 					"\0virtual:honeydeck/slide/0.mdx",
+					"\0virtual:honeydeck/slide-title/0.mdx",
 				].sort(),
 			);
 			assert.deepEqual(
@@ -220,8 +238,10 @@ export const demo = {
 				[
 					"\0virtual:honeydeck/config",
 					"\0virtual:honeydeck/layout-demo/0.mdx",
+					"\0virtual:honeydeck/layout-demo-title/0.mdx",
 					"\0virtual:honeydeck/layouts",
 					"\0virtual:honeydeck/slide/0.mdx",
+					"\0virtual:honeydeck/slide-title/0.mdx",
 				].sort(),
 			);
 		} finally {
@@ -282,6 +302,90 @@ export function RouteIcon() { return null }
 				assert.match(module, /from "\.\/icons"/);
 				assert.match(module, /export const stepCount = 0;/);
 			}
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it("generates a companion title module for slides with rich h1 content", async () => {
+		const root = mkdtempSync(join(tmpdir(), "honeydeck-slide-title-"));
+
+		try {
+			writeFileSync(
+				join(root, "deck.mdx"),
+				[
+					'import SparkleButton from "./SparkleButton"',
+					"",
+					"# Hello **world** <SparkleButton />",
+					"",
+					"Body.",
+				].join("\n"),
+			);
+
+			const plugin = virtualModulesPlugin({
+				entryPath: join(root, "deck.mdx"),
+			});
+			const context = {
+				addWatchFile() {},
+				error(message: string): never {
+					throw new Error(message);
+				},
+			};
+			const load = plugin.load as unknown as (
+				this: typeof context,
+				id: string,
+			) => Promise<string> | string | null;
+
+			const slideModule = String(
+				await load.call(context, "\0virtual:honeydeck/slide/0.mdx"),
+			);
+			assert.match(
+				slideModule,
+				/import _Title0 from 'virtual:honeydeck\/slide-title\/0\.mdx'/,
+			);
+			assert.match(
+				slideModule,
+				/export const slideTitle = _jsxHd\(_Title0, \{\}\)/,
+			);
+
+			const titleModule = String(
+				await load.call(context, "\0virtual:honeydeck/slide-title/0.mdx"),
+			);
+			assert.match(
+				titleModule,
+				/import SparkleButton from "\.\/SparkleButton"/,
+			);
+			assert.match(titleModule, /Hello[\s\S]*world/);
+			assert.match(titleModule, /_createMdxContent/);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it("exports slideTitle = null for slides without an h1", async () => {
+		const root = mkdtempSync(join(tmpdir(), "honeydeck-slide-no-title-"));
+
+		try {
+			writeFileSync(join(root, "deck.mdx"), "Just body content.\n");
+
+			const plugin = virtualModulesPlugin({
+				entryPath: join(root, "deck.mdx"),
+			});
+			const context = {
+				addWatchFile() {},
+				error(message: string): never {
+					throw new Error(message);
+				},
+			};
+			const load = plugin.load as unknown as (
+				this: typeof context,
+				id: string,
+			) => Promise<string> | string | null;
+
+			const slideModule = String(
+				await load.call(context, "\0virtual:honeydeck/slide/0.mdx"),
+			);
+			assert.match(slideModule, /export const slideTitle = null;/);
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}

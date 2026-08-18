@@ -129,8 +129,8 @@ export type CompiledLayoutDemo = LayoutDemo & {
 	Component: ComponentType;
 	/** Number of timeline steps discovered in the demo MDX. */
 	stepCount: number;
-	/** Plain-text content of the first h1 in the demo MDX. */
-	title: string;
+	/** Rendered content of the first h1 in the demo MDX. */
+	title: ReactNode;
 	/** Parsed YAML frontmatter from the demo MDX. */
 	frontmatter: Record<string, unknown>;
 	/** Layout selected by demo frontmatter, or an empty string for the card layout. */

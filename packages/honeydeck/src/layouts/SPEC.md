@@ -134,14 +134,14 @@ Layouts receive parsed content:
 
 ```ts
 type LayoutProps<F extends Record<string, unknown> = Record<string, unknown>> = {
-  title: ReactNode | null      // currently plain text from the first h1, or null
+  title: ReactNode | null      // rendered content of the first h1, or null
   children: ReactNode          // remaining content (first h1 removed; later h1s remain)
   rawChildren: ReactNode       // currently same compiled content as children
   frontmatter: F               // slide frontmatter fields
 }
 ```
 
-The first `h1` is extracted as plain text and provided as `title`. This enables layouts to position titles independently from body content. Titles stay in the same position at all times — revealed body content must not shift the title.
+The first `h1` is extracted and provided as `title`. The title is a React node that preserves inline Markdown (emphasis, code, links) and any custom React components used in the heading. This enables layouts to position titles independently from body content. Titles stay in the same position at all times — revealed body content must not shift the title.
 
 Built-in layouts share a `SlideFrame` wrapper that provides full-canvas sizing, `--honeydeck-slide-padding`, `bg-background`, `text-foreground`, `font-body`, and overflow clipping. `Blank` renders an empty `SlideFrame` without title and display children. `Default` owns the common headline/body structure. `TwoCol` and `Image` compose with `Default`; `ImageLeft` and `ImageRight` use a shared side-image helper with matching title styling.
 

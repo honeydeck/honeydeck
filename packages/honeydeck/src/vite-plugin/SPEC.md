@@ -178,7 +178,22 @@ During development, changes to deck-level frontmatter invalidate the virtual con
 
 ## Compilation Error Reporting
 
-Generated slide and layout demo modules have no source file on disk, so MDX compilation failures are reported with enough context to locate the problem:
+## Slide Title Modules
+
+Each slide is accompanied by a generated `virtual:honeydeck/slide-title/<N>.mdx` module that compiles the rich content of the slide's first `h1`.
+
+Behavior:
+
+- The title module reuses the slide's import and export declarations so custom components referenced in the title resolve identically to the slide body.
+- Relative imports in the title module resolve against the deck entry file's directory, the same as slide modules.
+- The compiled title module exports a default React component. The slide module imports this component and re-exports the rendered element as `slideTitle`.
+- Slides without an `h1` export `slideTitle = null` and do not generate a title module.
+- Title modules do not run timeline step annotation; timeline-consuming components in titles are not assigned steps.
+- Title modules participate in the same HMR invalidation as their slide: editing the deck source invalidates both the slide module and its title module.
+
+## Compilation Error Reporting
+
+Generated slide, title, and layout demo modules have no source file on disk, so MDX compilation failures are reported with enough context to locate the problem:
 
 - The message names the failing module, either `slide <index> of <deck file>` or `layout demo <index> (<LayoutName>)`
 - The underlying MDX/acorn reason is included, with the generated line and column when the error carries a position
