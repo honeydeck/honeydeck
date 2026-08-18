@@ -60,6 +60,7 @@ describe("CLI argument parsing", () => {
 			{
 				port: 4300,
 				open: true,
+				force: false,
 				deck: resolve(process.cwd(), "demo/custom.mdx"),
 				root: resolve(process.cwd(), "demo"),
 				entry: "custom.mdx",
@@ -71,10 +72,16 @@ describe("CLI argument parsing", () => {
 		assert.deepEqual(parseDevArgs([]), {
 			port: 4200,
 			open: false,
+			force: false,
 			deck: resolve(process.cwd(), "deck.mdx"),
 			root: process.cwd(),
 			entry: "deck.mdx",
 		});
+	});
+
+	it("parses the dev force flag and its alias", () => {
+		assert.equal(parseDevArgs(["--force"]).force, true);
+		assert.equal(parseDevArgs(["-f"]).force, true);
 	});
 
 	it("configures dev server for local network access", () => {

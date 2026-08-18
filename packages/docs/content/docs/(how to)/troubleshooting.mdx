@@ -1,0 +1,129 @@
+---
+title: "Troubleshooting"
+description: "Fix common Honeydeck dev server and dependency cache problems."
+slug: "troubleshooting"
+---
+
+# Troubleshooting
+
+## Browser error: module doesn't provide an export named
+
+```text
+Uncaught SyntaxError: The requested module
+'http://localhost:4200/node_modules/.vite/deps/react_jsx-runtime.js?v=33ac2d14'
+doesn't provide an export named: 't'
+```
+
+This means Vite's dependency cache holds pre-bundled chunks from two different bundling runs. Vite mangles export names inside `node_modules/.vite/deps`, so a chunk from one run cannot import from a chunk of another run.
+
+Recover with a forced dependency re-bundle:
+
+```bash
+honeydeck dev --force
+```
+
+`--force` deletes the Vite cache directory for the deck root and pre-bundles dependencies from scratch. A hard reload in the browser afterwards is not required, but it does no harm.
+
+Honeydeck avoids the two common causes of a mixed cache by itself:
+
+- The dependency cache key includes the installed Honeydeck version, so upgrading or relinking Honeydeck always triggers a fresh pre-bundle — even when the lockfile stays unchanged, as with `file:` and workspace links.
+- Bare package imports in the deck entry file and its imported MDX files are pre-bundled at start-up, so a package used only from MDX does not trigger a mid-session re-bundle while the browser already holds the previous chunks.
+
+If the error keeps returning, check that the same package is not installed twice in the project (for example a nested `node_modules` copy of `react`), and reinstall dependencies:
+
+```bash
+rm -rf node_modules
+npm install
+honeydeck dev --force
+```
+
+## A newly installed package triggers a page reload
+
+Vite reloads the page when it discovers a dependency after the deck was already loaded. Import the package in the deck entry file (or in an imported MDX file) and restart the dev server; Honeydeck then pre-bundles it before the first request.
+
+## Changed Honeydeck version behaves like the old one
+
+Restart the dev server. Honeydeck reads its version at start-up to build the dependency cache key, so a running server keeps its previous cache generation.
+
+## The dev server runs on a different port than 4200
+
+When the requested port is taken, Vite picks the next free one and Honeydeck prints the port it ended up with:
+
+```text
+  🚀 Local:   http://localhost:4201/
+```
+
+Open the printed URL, or pick a free port explicitly with `honeydeck dev --port 8080`.
+
+## Images work in the dev server but 404 in the build
+
+Files in `public/` are served from the web root, and the build copies them to the root of `dist/`. Reference them without the `public/` prefix:
+
+```mdx
+<img src="/cover.jpg" />
+```
+
+`/public/cover.jpg` resolves in the dev server because Vite also serves real paths below the deck directory, but `dist/` contains `cover.jpg` at its root, so the same path 404s in production.
+
+## `honeydeck pdf` fails to launch Chromium
+
+PDF export renders slides in Playwright's Chromium. Install the browser once per machine:
+
+```bash
+npx playwright install chromium
+```
+
+## `Layout "X" not found in layout map`
+
+Honeydeck resolves `layout:` keys against the layout map module from deck-level `layouts:` frontmatter, and falls back to the default layout with a browser console warning. Check that the key matches an export of the layout map (`Cover`, not `cover`) and that `layouts:` points at the intended module.
+
+## A slide does not split where expected
+
+Slide separators must be a line that is exactly `---`. `---` inside a fenced code block or an HTML comment stays content, and a block that contains only frontmatter applies to the following slide instead of becoming its own slide.
+
+## Build fails on a timeline component
+
+Timeline steps are counted while compiling MDX, so the relevant props must be literal values:
+
+- `<Reveal name="...">` names must be literal, non-empty, and unique per slide
+- `<RevealWith>` takes exactly one of `target="name"` or `at={n}`, both literal
+- `<TimelineSteps steps={3}>` needs a literal positive integer
+
+The error message names the failing slide and prints the generated MDX with line numbers.
+
+## `useHoneydeck must be used inside a Honeydeck presentation runtime`
+
+This appears when Honeydeck runtime code is loaded twice, so a component reads a second, empty context. Import Honeydeck only through its public entries (`@honeydeck/honeydeck`, `@honeydeck/honeydeck/components`) instead of deep source paths, and make sure the project resolves a single copy of `react`, `react-dom`, and `@honeydeck/honeydeck`:
+
+```bash
+npm ls react react-dom @honeydeck/honeydeck
+```
+
+## Tailwind utility classes have no effect
+
+The deck stylesheet must import Tailwind, and the deck directory is scanned automatically. Files outside the deck directory need an explicit source:
+
+```css
+@import "tailwindcss";
+@import "@honeydeck/honeydeck/theme.css";
+
+@source "../shared-components";
+```
+
+## CLI rejects a deck path or `--root`
+
+The deck entry must be an `.mdx` file, and the deck's directory becomes the project root:
+
+```bash
+honeydeck dev --deck talks/kickoff.mdx
+```
+
+There is no `--root` option; point `--deck` at the file instead.
+
+## Honeydeck fails to start on an old Node version
+
+Honeydeck requires Node 22.18 or newer:
+
+```bash
+node --version
+```

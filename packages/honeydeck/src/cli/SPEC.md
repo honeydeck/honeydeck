@@ -78,6 +78,7 @@ honeydeck dev -p 8080        # custom port alias
 honeydeck dev --open         # auto-open browser
 honeydeck dev -o             # auto-open alias
 honeydeck dev --deck talk.mdx # use a different deck entry file
+honeydeck dev --force        # delete the Vite cache directory and re-bundle dependencies
 ```
 
 Behavior:
@@ -85,6 +86,9 @@ Behavior:
 - Binds the dev server to all local network interfaces so other devices on the same LAN can open the printed Network URL
 - HMR enabled for MDX/components/styles
 - Does not auto-open browser unless `--open` flag is used
+- Serves the Honeydeck app shell HTML with `Cache-Control: no-cache` so browsers always request the current shell instead of replaying a cached one
+- `--force` (alias `-f`) removes the Vite cache directory for the deck root before start-up and forces dependency pre-bundling, which recovers from a stale or mixed-generation dependency cache
+- `--force` prints the removed cache directory so it is clear what was cleaned
 
 Terminal output:
 
