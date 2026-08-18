@@ -162,7 +162,7 @@ export function parseDevArgs(args: string[]): DevOptions {
  *     app-shell entry, and lets Vite's `transformIndexHtml` pipeline apply any
  *     further HTML transforms (e.g. inject the HMR client).
  */
-function appShellPlugin(projectRoot: string): Plugin {
+export function appShellPlugin(projectRoot: string): Plugin {
 	return {
 		name: "honeydeck:app-shell",
 
@@ -249,6 +249,11 @@ export async function runDev(args: string[]): Promise<void> {
 
 		// Dependency pre-bundling policy (include/exclude lists and the
 		// version-scoped optimizer cache key) lives in honeydeckPlugin().
+		//
+		// `--force` intentionally does two things: deleting the cache directory
+		// above also removes stray sibling generations Vite would keep on disk,
+		// while `optimizeDeps.force` makes Vite ignore any cached optimizer
+		// metadata it may already hold for this run.
 		optimizeDeps: {
 			force,
 		},

@@ -116,8 +116,11 @@ Vite pre-bundles bare dependencies into its cache directory and reuses that cach
 - Bare package specifiers imported by the deck entry file and its imported MDX files are pre-bundled up front, so packages used only from MDX do not trigger a mid-session re-optimization that invalidates already-loaded dependency chunks.
 - Relative and absolute specifiers, `node:`/`http(s):` specifiers, non-JavaScript specifiers (for example `.css`, `.svg`, `.png` subpaths), and `@honeydeck/honeydeck*` entries are never added to the pre-bundle include list.
 - An unreadable or unparsable deck entry never breaks server start-up: pre-bundling falls back to the React runtime dependencies alone.
+- A scanned specifier that cannot be resolved (for example a misspelled or uninstalled package) never breaks server start-up either. Vite reports it as a warning and the dev server keeps running so the import error surfaces in the browser.
 
 Deck import scanning affects the optimizer cache key too, so adding a package import to a deck also re-optimizes dependencies on the next server start.
+
+The dependency policy plugin name is an internal implementation detail, not a stable API. It changes with every Honeydeck version, so nothing may match it as a literal string.
 
 ### Markdown Features
 

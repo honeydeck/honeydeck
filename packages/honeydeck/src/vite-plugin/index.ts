@@ -156,7 +156,8 @@ export function honeydeckPlugin(
 						// package the deck imports in the first optimizer run. Without
 						// this, deck-only packages are discovered after the browser
 						// already loaded shared dependency chunks, and the re-optimized
-						// chunks no longer match the loaded ones.
+						// chunks no longer match the loaded ones. Deck scanning happens
+						// in the config hook, so each server start sees the current deck.
 						include: collectDeckOptimizeDepsInclude(entryPath),
 						// Keep Honeydeck source imports in one module graph. If Vite
 						// pre-bundles the published package separately, context-backed
