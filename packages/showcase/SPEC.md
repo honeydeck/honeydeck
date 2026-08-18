@@ -22,6 +22,7 @@
 - `deck.mdx` includes a Magic Code slide using `md magic-code` with inner TypeScript fences, line-highlight states, and an explicit duration override.
 - `deck.mdx` demonstrates `<RevealGroup listRevealMode="nested">` with nested Markdown list items so the opt-in nested-list reveal mode is covered by the showcase deck.
 - `deck.mdx` demonstrates named slide transitions, including built-in `slide-left`, runtime `magic` transitions for explicit `data-magic-id` move/fade behavior, and a custom CSS transition named `honey-spin` defined in `styles.css`.
+- `deck.mdx` includes a slide whose first `h1` contains a custom React component (`<SparklesIcon />`) to demonstrate that titles preserve JSX and inline Markdown.
 
 ## Scripts
 

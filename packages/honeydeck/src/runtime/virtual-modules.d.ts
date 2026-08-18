@@ -17,7 +17,7 @@ declare module "virtual:honeydeck/slides" {
 	// Access them via a cast:
 	//   import * as slideModules from 'virtual:honeydeck/slides';
 	//   const C = (slideModules as Record<string, unknown>)[`Slide${i}`] as ComponentType;
-	//   const title = (slideModules as Record<string, unknown>)[`slideTitle${i}`] as string;
+	//   const title = (slideModules as Record<string, unknown>)[`slideTitle${i}`] as ReactNode;
 }
 
 /**
@@ -78,7 +78,7 @@ declare module "virtual:honeydeck/config" {
  * Each slide exports its component as default, plus metadata named exports.
  */
 declare module "virtual:honeydeck/slide/*.mdx" {
-	import type { ComponentType } from "react";
+	import type { ComponentType, ReactNode } from "react";
 
 	/** Compiled slide React component */
 	const Component: ComponentType;
@@ -87,8 +87,8 @@ declare module "virtual:honeydeck/slide/*.mdx" {
 	/** Number of timeline steps on this slide (from remarkStepNumbering) */
 	export const stepCount: number;
 
-	/** Plain-text content of the first h1 (from remarkH1Extract) */
-	export const slideTitle: string;
+	/** Rendered content of the first h1 (from remarkH1Extract) */
+	export const slideTitle: ReactNode;
 
 	/** Parsed YAML frontmatter for this slide (from remarkH1Extract) */
 	export const slideFrontmatter: Record<string, unknown>;

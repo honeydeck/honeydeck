@@ -43,16 +43,21 @@ import {
 
 /** Public import specifier prefix used in user/generated code. */
 const VIRTUAL_SLIDE_PREFIX = "virtual:honeydeck/slide/";
+const VIRTUAL_SLIDE_TITLE_PREFIX = "virtual:honeydeck/slide-title/";
 const VIRTUAL_SLIDES_ID = "virtual:honeydeck/slides";
 const VIRTUAL_CONFIG_ID = "virtual:honeydeck/config";
 const VIRTUAL_LAYOUTS_ID = "virtual:honeydeck/layouts";
 const VIRTUAL_LAYOUT_DEMO_PREFIX = "virtual:honeydeck/layout-demo/";
+const VIRTUAL_LAYOUT_DEMO_TITLE_PREFIX = "virtual:honeydeck/layout-demo-title/";
 const VIRTUAL_COMPONENTS_ID = "virtual:honeydeck/components";
 const VIRTUAL_COMPONENT_DOC_PREFIX = "virtual:honeydeck/component-doc/";
 
 /** Resolved (internal) IDs — \0 prefix prevents accidental file-system hits. */
 const RESOLVED_SLIDE_PREFIX = "\0virtual:honeydeck/slide/";
+const RESOLVED_SLIDE_TITLE_PREFIX = "\0virtual:honeydeck/slide-title/";
 const RESOLVED_SLIDES_ID = "\0virtual:honeydeck/slides";
+const RESOLVED_LAYOUT_DEMO_TITLE_PREFIX =
+	"\0virtual:honeydeck/layout-demo-title/";
 const RESOLVED_CONFIG_ID = "\0virtual:honeydeck/config";
 const RESOLVED_LAYOUTS_ID = "\0virtual:honeydeck/layouts";
 const RESOLVED_LAYOUT_DEMO_PREFIX = "\0virtual:honeydeck/layout-demo/";
@@ -149,6 +154,72 @@ export function resolveRelativeImport(baseDir: string, id: string): string {
 	return absolute;
 }
 
+/**
+ * Build the MDX source for a slide/demo title module.
+ *
+ * The title module reuses the original module's import/export declarations so
+ * custom components in the title resolve the same way as in the body.
+ */
+function buildTitleModuleSource(
+	titleMdx: string | undefined,
+	titleImports: string[] | undefined,
+): string | null {
+	if (!titleMdx) return null;
+	const parts = [...(titleImports ?? [])];
+	if (parts.length > 0) parts.push("");
+	parts.push(titleMdx);
+	return parts.join("\n");
+}
+
+/**
+ * Append the slideTitle export to compiled slide/demo JS.
+ *
+ * When a rich title exists, this imports the companion title module and
+ * exports the rendered element. Otherwise it exports `null`.
+ */
+function appendTitleExport(
+	js: string,
+	index: number,
+	titleMdx: string | undefined,
+	prefix: string,
+): string {
+	if (!titleMdx) {
+		return `${js}\nexport const slideTitle = null;\n`;
+	}
+	return (
+		js +
+		`\nimport _Title${index} from '${prefix}${index}.mdx';` +
+		`\nimport { jsx as _jsxHd } from "react/jsx-runtime";` +
+		`\nexport const slideTitle = _jsxHd(_Title${index}, {});\n`
+	);
+}
+
+/**
+ * Generate a title module source from raw MDX when the cache is empty.
+ *
+ * This is a fallback for direct title module requests that happen before
+ * the parent slide/demo module has been loaded.
+ */
+async function generateTitleModuleSource(
+	rawMdx: string,
+	magicCodeDuration: number | undefined,
+): Promise<string | null> {
+	const vfile = await compile(rawMdx, {
+		remarkPlugins: [
+			remarkFrontmatter,
+			remarkGfm,
+			remarkH1Extract,
+			[remarkShikiCodeBlocks, { magicCodeDuration }],
+		],
+		jsxImportSource: "react",
+		outputFormat: "program",
+	});
+	return buildTitleModuleSource(
+		vfile.data.titleMdx as string | undefined,
+		vfile.data.titleImports as string[] | undefined,
+	);
+}
+
 export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 	const { entryPath } = options;
 	const entryFileName = basename(entryPath);
@@ -161,6 +232,11 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 	const watchedComponentFiles = new Set<string>();
 	let layoutDemoSources: LayoutDemoSource[] = [];
 	const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+	/** Cache of generated title module source keyed by slide index. */
+	const slideTitleModuleCache = new Map<number, string>();
+	/** Cache of generated layout demo title module source keyed by demo index. */
+	const demoTitleModuleCache = new Map<number, string>();
 
 	// ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -216,6 +292,15 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				return resolveRelativeImport(dirname(entryPath), id);
 			}
 
+			// Title modules share the same filesystem anchor as slide modules so
+			// relative imports in titles resolve identically to the slide body.
+			if (
+				importer?.startsWith(RESOLVED_SLIDE_TITLE_PREFIX) &&
+				(id.startsWith("./") || id.startsWith("../"))
+			) {
+				return resolveRelativeImport(dirname(entryPath), id);
+			}
+
 			if (
 				importer === RESOLVED_LAYOUTS_ID &&
 				(id.startsWith("./") || id.startsWith("../"))
@@ -233,13 +318,27 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				if (demo) return resolveRelativeImport(dirname(demo.modulePath), id);
 			}
 
+			// Layout demo title modules share the demo module's filesystem anchor.
+			if (
+				importer?.startsWith(RESOLVED_LAYOUT_DEMO_TITLE_PREFIX) &&
+				(id.startsWith("./") || id.startsWith("../"))
+			) {
+				const suffix = importer.slice(RESOLVED_LAYOUT_DEMO_TITLE_PREFIX.length);
+				const index = parseInt(suffix.replace(".mdx", ""), 10);
+				const demo = layoutDemoSources[index];
+				if (demo) return resolveRelativeImport(dirname(demo.modulePath), id);
+			}
+
 			if (id === VIRTUAL_SLIDES_ID) return RESOLVED_SLIDES_ID;
 			if (id === VIRTUAL_CONFIG_ID) return RESOLVED_CONFIG_ID;
 			if (id === VIRTUAL_LAYOUTS_ID) return RESOLVED_LAYOUTS_ID;
 			if (id === VIRTUAL_COMPONENTS_ID) return RESOLVED_COMPONENTS_ID;
 			// Matches `virtual:honeydeck/slide/0.mdx`, `virtual:honeydeck/slide/1.mdx`, …
 			if (id.startsWith(VIRTUAL_SLIDE_PREFIX)) return `\0${id}`;
+			// Matches `virtual:honeydeck/slide-title/0.mdx`, …
+			if (id.startsWith(VIRTUAL_SLIDE_TITLE_PREFIX)) return `\0${id}`;
 			if (id.startsWith(VIRTUAL_LAYOUT_DEMO_PREFIX)) return `\0${id}`;
+			if (id.startsWith(VIRTUAL_LAYOUT_DEMO_TITLE_PREFIX)) return `\0${id}`;
 			if (id.startsWith(VIRTUAL_COMPONENT_DOC_PREFIX)) return `\0${id}`;
 			return null;
 		},
@@ -432,19 +531,73 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				// extra dynamic import.
 				const stepCount: number =
 					(vfile.data.stepCount as number | undefined) ?? 0;
-				const title: string = (vfile.data.title as string | undefined) ?? "";
 				const frontmatter: Record<string, unknown> =
 					(vfile.data.frontmatter as Record<string, unknown> | undefined) ?? {};
 				const layout: string = (frontmatter.layout as string | undefined) ?? "";
+				const titleMdx = vfile.data.titleMdx as string | undefined;
+				const titleImports = vfile.data.titleImports as string[] | undefined;
 
-				const js =
+				slideTitleModuleCache.set(
+					index,
+					buildTitleModuleSource(titleMdx, titleImports) ?? "",
+				);
+
+				let js =
 					String(vfile) +
 					`\nexport const stepCount = ${stepCount};` +
-					`\nexport const slideTitle = ${JSON.stringify(title)};` +
 					`\nexport const slideFrontmatter = ${JSON.stringify(frontmatter)};` +
-					`\nexport const slideLayout = ${JSON.stringify(layout)};\n`;
+					`\nexport const slideLayout = ${JSON.stringify(layout)};`;
+				js = appendTitleExport(js, index, titleMdx, VIRTUAL_SLIDE_TITLE_PREFIX);
 
 				return js;
+			}
+
+			// ── virtual:honeydeck/slide-title/N.mdx ───────────────────────────────────
+			if (id.startsWith(RESOLVED_SLIDE_TITLE_PREFIX)) {
+				const suffix = id.slice(RESOLVED_SLIDE_TITLE_PREFIX.length);
+				const index = parseInt(suffix.replace(".mdx", ""), 10);
+				let source = slideTitleModuleCache.get(index);
+
+				if (!source) {
+					const { deckFrontmatter, slides } = getResult();
+					const slide = slides[index];
+					if (!slide) {
+						this.error(
+							`Honeydeck: slide title ${index} not found — deck has ${slides.length} slide(s).`,
+						);
+					}
+
+					const generated = await generateTitleModuleSource(
+						slide.rawMdx,
+						deckFrontmatter.magicCodeDuration as number | undefined,
+					);
+					if (!generated) {
+						this.error(
+							`Honeydeck: slide ${index} has no title to compile into a title module.`,
+						);
+					}
+					slideTitleModuleCache.set(index, generated);
+					source = generated;
+				}
+
+				let vfile: Awaited<ReturnType<typeof compile>>;
+				try {
+					vfile = await compile(source, {
+						remarkPlugins: [
+							remarkFrontmatter,
+							remarkGfm,
+							remarkShikiCodeBlocks,
+						],
+						jsxImportSource: "react",
+						outputFormat: "program",
+					});
+				} catch (error) {
+					this.error(
+						describeMdxCompileError(`slide title ${index}`, source, error),
+					);
+				}
+
+				return String(vfile);
 			}
 
 			// ── virtual:honeydeck/layout-demo/N.mdx ─────────────────────────────────
@@ -482,18 +635,79 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 
 				const stepCount: number =
 					(vfile.data.stepCount as number | undefined) ?? 0;
-				const title: string = (vfile.data.title as string | undefined) ?? "";
 				const frontmatter: Record<string, unknown> =
 					(vfile.data.frontmatter as Record<string, unknown> | undefined) ?? {};
 				const layout: string = (frontmatter.layout as string | undefined) ?? "";
+				const titleMdx = vfile.data.titleMdx as string | undefined;
+				const titleImports = vfile.data.titleImports as string[] | undefined;
 
-				return (
+				demoTitleModuleCache.set(
+					index,
+					buildTitleModuleSource(titleMdx, titleImports) ?? "",
+				);
+
+				let js =
 					String(vfile) +
 					`\nexport const stepCount = ${stepCount};` +
-					`\nexport const slideTitle = ${JSON.stringify(title)};` +
 					`\nexport const slideFrontmatter = ${JSON.stringify(frontmatter)};` +
-					`\nexport const slideLayout = ${JSON.stringify(layout)};\n`
+					`\nexport const slideLayout = ${JSON.stringify(layout)};`;
+				js = appendTitleExport(
+					js,
+					index,
+					titleMdx,
+					VIRTUAL_LAYOUT_DEMO_TITLE_PREFIX,
 				);
+
+				return js;
+			}
+
+			// ── virtual:honeydeck/layout-demo-title/N.mdx ───────────────────────────
+			if (id.startsWith(RESOLVED_LAYOUT_DEMO_TITLE_PREFIX)) {
+				const suffix = id.slice(RESOLVED_LAYOUT_DEMO_TITLE_PREFIX.length);
+				const index = parseInt(suffix.replace(".mdx", ""), 10);
+				let source = demoTitleModuleCache.get(index);
+
+				if (!source) {
+					const demo = layoutDemoSources[index];
+					if (!demo) {
+						this.error(`Honeydeck: layout demo title ${index} not found.`);
+					}
+
+					const generated = await generateTitleModuleSource(
+						demo.source,
+						undefined,
+					);
+					if (!generated) {
+						this.error(
+							`Honeydeck: layout demo ${index} has no title to compile into a title module.`,
+						);
+					}
+					demoTitleModuleCache.set(index, generated);
+					source = generated;
+				}
+
+				let vfile: Awaited<ReturnType<typeof compile>>;
+				try {
+					vfile = await compile(source, {
+						remarkPlugins: [
+							remarkFrontmatter,
+							remarkGfm,
+							remarkShikiCodeBlocks,
+						],
+						jsxImportSource: "react",
+						outputFormat: "program",
+					});
+				} catch (error) {
+					this.error(
+						describeMdxCompileError(
+							`layout demo title ${index}`,
+							source,
+							error,
+						),
+					);
+				}
+
+				return String(vfile);
 			}
 
 			// ── virtual:honeydeck/component-doc/ComponentName.mdx ───────────────────
@@ -556,6 +770,7 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 
 				for (let i = 0; i < layoutDemoSources.length; i++) {
 					invalidate(`${RESOLVED_LAYOUT_DEMO_PREFIX}${i}.mdx`);
+					invalidate(`${RESOLVED_LAYOUT_DEMO_TITLE_PREFIX}${i}.mdx`);
 				}
 				const mod = ctx.server.moduleGraph.getModuleById(RESOLVED_LAYOUTS_ID);
 				if (mod) {
@@ -616,9 +831,11 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				invalidate(RESOLVED_LAYOUTS_ID);
 				for (let i = 0; i < layoutDemoSources.length; i++) {
 					invalidate(`${RESOLVED_LAYOUT_DEMO_PREFIX}${i}.mdx`);
+					invalidate(`${RESOLVED_LAYOUT_DEMO_TITLE_PREFIX}${i}.mdx`);
 				}
 				for (let i = 0; i < newResult.slides.length; i++) {
 					invalidate(`${RESOLVED_SLIDE_PREFIX}${i}.mdx`);
+					invalidate(`${RESOLVED_SLIDE_TITLE_PREFIX}${i}.mdx`);
 				}
 			}
 
@@ -629,6 +846,7 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				const newSlide = newResult.slides[i];
 				if (!oldSlide || !newSlide || oldSlide.rawMdx !== newSlide.rawMdx) {
 					invalidate(`${RESOLVED_SLIDE_PREFIX}${i}.mdx`);
+					invalidate(`${RESOLVED_SLIDE_TITLE_PREFIX}${i}.mdx`);
 				}
 			}
 
@@ -649,10 +867,12 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 // without duplicating the magic strings.
 export const VIRTUAL_IDS = {
 	SLIDE_PREFIX: VIRTUAL_SLIDE_PREFIX,
+	SLIDE_TITLE_PREFIX: VIRTUAL_SLIDE_TITLE_PREFIX,
 	SLIDES: VIRTUAL_SLIDES_ID,
 	CONFIG: VIRTUAL_CONFIG_ID,
 	LAYOUTS: VIRTUAL_LAYOUTS_ID,
 	LAYOUT_DEMO_PREFIX: VIRTUAL_LAYOUT_DEMO_PREFIX,
+	LAYOUT_DEMO_TITLE_PREFIX: VIRTUAL_LAYOUT_DEMO_TITLE_PREFIX,
 	COMPONENTS: VIRTUAL_COMPONENTS_ID,
 	COMPONENT_DOC_PREFIX: VIRTUAL_COMPONENT_DOC_PREFIX,
 } as const;

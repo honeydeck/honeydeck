@@ -12,7 +12,7 @@
 import { config } from "virtual:honeydeck/config";
 import { layoutMap } from "virtual:honeydeck/layouts";
 import * as slideModules from "virtual:honeydeck/slides";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 import type { LayoutProps } from "../types.ts";
 import { parseAspectRatio } from "./aspectRatio.ts";
 
@@ -35,8 +35,8 @@ export type SlideData = {
 	Component: ComponentType;
 	/** Number of timeline steps on this slide. */
 	stepCount: number;
-	/** Plain-text content of the extracted h1. */
-	title: string;
+	/** Rendered content of the extracted h1 (Markdown and custom components preserved). */
+	title: ReactNode;
 	/** Parsed YAML frontmatter. */
 	frontmatter: Record<string, unknown>;
 	/** Layout name from frontmatter.layout, or 'Default' when absent. */
@@ -64,7 +64,7 @@ function buildSlideData(): SlideData[] {
 			id: `Slide${i}`,
 			Component,
 			stepCount: (_allExports[`stepCount${i}`] as number | undefined) ?? 0,
-			title: (_allExports[`slideTitle${i}`] as string | undefined) ?? "",
+			title: (_allExports[`slideTitle${i}`] as ReactNode | undefined) ?? null,
 			frontmatter:
 				(_allExports[`slideFrontmatter${i}`] as
 					| Record<string, unknown>

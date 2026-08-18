@@ -1,6 +1,21 @@
 # Honeydeck Remark Transform Specification
 
-> Observable behavior for timeline annotation and code highlighting transforms.
+> Observable behavior for title extraction, timeline annotation, and code highlighting transforms.
+
+## H1 Extraction
+
+Honeydeck extracts the first `h1` from each slide so layouts can position the title independently from body content.
+
+Behavior:
+
+- The first `h1` is removed from the slide body and is not rendered as part of `children`.
+- The plain-text content of the `h1` (ignoring inline Markdown syntax) is stored as `vfile.data.title` for runtime metadata.
+- The full rich content of the `h1` — including inline Markdown emphasis, links, code, and custom React components — is preserved so layouts can render it as a React node.
+- Custom components used in the title are resolved with the same imports available to the slide body.
+- Timeline-consuming components (for example `<Reveal>`) in the title are not assigned slide timeline steps; titles should not participate in the step timeline.
+- Slides without an `h1` produce an empty title.
+
+
 
 ## Timeline Step Annotation
 

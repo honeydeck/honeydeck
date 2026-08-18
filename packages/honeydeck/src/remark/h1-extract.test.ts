@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { compile } from "@mdx-js/mdx";
 import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
 import { remarkH1Extract } from "../remark/h1-extract.ts";
 
 // ---------------------------------------------------------------------------
@@ -19,7 +20,7 @@ import { remarkH1Extract } from "../remark/h1-extract.ts";
 
 async function compileMdx(source: string) {
 	const vfile = await compile(source, {
-		remarkPlugins: [remarkFrontmatter, remarkH1Extract],
+		remarkPlugins: [remarkFrontmatter, remarkGfm, remarkH1Extract],
 		jsxImportSource: "react",
 		outputFormat: "program",
 	});
@@ -200,6 +201,69 @@ Body text.
 		assert.equal(data.title, "Section Title");
 		const fm = data.frontmatter as Record<string, unknown>;
 		assert.equal(fm.layout, "Section");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Rich title preservation
+// ---------------------------------------------------------------------------
+
+describe("remarkH1Extract — rich title preservation", () => {
+	it("serializes inline Markdown emphasis into titleMdx", async () => {
+		const { data } = await compileMdx(`# **Bold** and _italic_\n\nBody.`);
+
+		assert.equal(
+			data.titleMdx,
+			"<span>**Bold** and *italic*</span>",
+			"titleMdx preserves inline Markdown emphasis",
+		);
+	});
+
+	it("serializes inline code into titleMdx", async () => {
+		const { data } = await compileMdx(`# Use \`npm install\`\n\nBody.`);
+
+		assert.ok(
+			(data.titleMdx as string).includes("`npm install`"),
+			"titleMdx preserves inline code",
+		);
+	});
+
+	it("serializes custom JSX components into titleMdx", async () => {
+		const { data } = await compileMdx(
+			`import SparkleButton from './SparkleButton'\n\n# Hello <SparkleButton /> world\n\nBody.`,
+		);
+
+		assert.equal(
+			data.titleMdx,
+			"<span>Hello <SparkleButton /> world</span>",
+			"titleMdx preserves custom JSX components",
+		);
+		assert.deepEqual(data.titleImports, [
+			"import SparkleButton from './SparkleButton'",
+		]);
+	});
+
+	it("does not include export declarations in titleImports", async () => {
+		const { data } = await compileMdx(
+			`import SparkleButton from './SparkleButton'\n\nexport const meta = { version: 1 }\n\n# Hello <SparkleButton />\n\nBody.`,
+		);
+
+		assert.deepEqual(data.titleImports, [
+			"import SparkleButton from './SparkleButton'",
+		]);
+	});
+
+	it("does not set titleMdx or titleImports when there is no h1", async () => {
+		const { data } = await compileMdx(`Just body content.`);
+
+		assert.equal(data.titleMdx, undefined);
+		assert.equal(data.titleImports, undefined);
+	});
+
+	it("does not set titleMdx for an empty h1", async () => {
+		const { data } = await compileMdx(`# \n\nBody.`);
+
+		assert.equal(data.titleMdx, undefined);
 	});
 });
 
