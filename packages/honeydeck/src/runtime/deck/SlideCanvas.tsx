@@ -4,10 +4,11 @@
  * Used by Deck (full-size, scale from viewport), PresenterView (medium
  * previews), and OverviewView (thumbnail grid).
  *
- * The canvas is always 1920 × 1080 px internally, then scaled down via
- * `transform: scale()` with `transformOrigin: 'top left'`.  The wrapper
- * div shrinks to the visual size (`BASE_WIDTH * scale × BASE_HEIGHT * scale`)
- * so that surrounding layout can measure and position it correctly.
+ * The canvas is always 1920 × 1080 px internally, then scaled down via CSS
+ * `zoom`, which lays the slide out at its rendered size so text and OS emoji
+ * glyphs rasterize at the size they are displayed at.  The wrapper div is sized
+ * to the visual size (`BASE_WIDTH * scale × BASE_HEIGHT * scale`) so that
+ * surrounding layout can measure and position it correctly.
  */
 
 import { TimelineProvider } from "../timeline/TimelineContext.tsx";
@@ -79,8 +80,7 @@ export function SlideCanvas({
 						style={{
 							width: BASE_WIDTH,
 							height: BASE_HEIGHT,
-							transform: `scale(${scale})`,
-							transformOrigin: "top left",
+							zoom: scale,
 						}}
 					>
 						<LayoutComponent

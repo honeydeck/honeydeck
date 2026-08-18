@@ -6,7 +6,7 @@
 
 `@honeydeck/honeydeck` exports `useHoneydeck()` for deck authors using custom components and custom layouts. Calling it outside a Honeydeck presentation runtime throws `useHoneydeck must be used inside a Honeydeck presentation runtime.`
 
-`@honeydeck/honeydeck` also exports `useSlideScale()` for components and layouts that need the current rendered slide scale. It returns the scale factor applied to the logical slide canvas in the current render surface.
+`@honeydeck/honeydeck` also exports `useSlideScale()` for components and layouts that need the current rendered slide scale. It returns the CSS `zoom` factor applied to the logical slide canvas in the current render surface, multiplied by any Honeydeck-controlled slide zoom.
 
 The hook returns a nested object:
 
@@ -53,6 +53,18 @@ Participating slide layers receive CSS variables: `--honeydeck-transition-durati
 Slides render at a fixed 1920px logical width. Height is derived from deck-level `aspectRatio` when it is a string ratio matching `N:N` (default `16:9` → `1080`, `4:3` → `1440`, etc.). Invalid or missing ratios fall back to `16:9`.
 
 The slide canvas scales uniformly to fit the available stage. There is no viewport inset token: slides fill the viewport as much as their aspect ratio allows. Any remaining letterbox/pillarbox area is black.
+
+### Slide canvas scaling
+
+Every surface that renders a slide at a size other than the logical canvas — the deck stage, presenter previews, overview thumbnails, and layout reference previews — scales the slide-sized element with CSS `zoom`. The zoom factor is `min(available width / slide width, available height / slide height)`, so slides keep their aspect ratio and fill the available area.
+
+Scaling with `zoom` lays slide content out at its rendered size, so glyphs rasterize at the size they are displayed at on every browser engine. Emoji render as text from the reader's operating system emoji font at the correct size and without cropping.
+
+`useSlideScale()` returns that zoom factor. Slide-local CSS pixel values stay in logical canvas units while DOM geometry APIs report scaled viewport pixels, so components that map between the two multiply or divide by `useSlideScale()`.
+
+Honeydeck-controlled slide zoom and pan apply a `transform` on top of the scaled canvas, so magnifying a slide does not re-run slide layout.
+
+The audience deck keeps every slide mounted, and only slides that can be seen keep rendering: the current slide, both participants of a running transition, and the direct neighbours of the current slide. Remaining slides skip layout and paint through `content-visibility: hidden`, so resizing the window stays responsive regardless of deck length. Slide content therefore has no layout while its slide is off screen, and components that measure themselves measure once their slide renders.
 
 PDF pages use the same 1920px-wide dimensions derived from deck-level `aspectRatio`, so exported pages match the deck ratio without stretching or letterbox/pillarbox space. During crossfades, Honeydeck paints a themed `bg-background` backdrop at the scaled slide size behind the slides to avoid flicker.
 

@@ -246,8 +246,7 @@ function LayoutPreview({ entry }: { entry: LayoutEntry }) {
 					style={{
 						width: BASE_WIDTH,
 						height: BASE_HEIGHT,
-						transform: `scale(${scale})`,
-						transformOrigin: "top left",
+						zoom: scale,
 					}}
 				>
 					<TimelineProvider

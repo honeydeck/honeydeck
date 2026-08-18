@@ -23,6 +23,9 @@
  * pipeline uniform for all slides.
  */
 
+import { getOpeningCodeFenceMarker, isClosingFence } from "./code-fences.ts";
+import { partitionImportStatements } from "./import-statements.ts";
+
 export type SlideSegment = {
 	/** 0-based position in the deck */
 	index: number;
@@ -34,7 +37,7 @@ export type SplitResult = {
 	slides: SlideSegment[];
 	/** Parsed deck-level frontmatter (first block only) */
 	deckFrontmatter: Record<string, unknown>;
-	/** Import lines found in the preamble, prepended to every slide */
+	/** Import statements found in the preamble, prepended to every slide */
 	sharedImports: string;
 };
 
@@ -130,30 +133,6 @@ function firstSlideFrontmatterFromDeckYaml(yamlLines: string[]): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Fence tracking
-// ---------------------------------------------------------------------------
-
-/**
- * Return the opening fence marker for Markdown fenced code blocks.
- * Supports backtick and tilde fences indented by up to three spaces.
- */
-function getOpeningCodeFenceMarker(line: string): string | null {
-	const match = line.match(/^ {0,3}(`{3,}|~{3,})/);
-	return match?.[1] ?? null;
-}
-
-function isClosingFence(line: string, openingFence: string): boolean {
-	const openingChar = openingFence[0];
-	if (!openingChar) return false;
-
-	const escapedChar = openingChar === "`" ? "`" : "~";
-	const pattern = new RegExp(
-		`^ {0,3}(${escapedChar}{${openingFence.length},})\\s*$`,
-	);
-	return pattern.test(line);
-}
-
-// ---------------------------------------------------------------------------
 // Frontmatter-only block detection
 // ---------------------------------------------------------------------------
 
@@ -182,7 +161,8 @@ function isFrontmatterOnlyBlock(lines: string[]): boolean {
  * 2. The remaining content is split on separator lines (lines that are
  *    exactly `---`), except inside fenced code blocks.
  * 3. The **first block** (before the first separator) is the preamble:
- *    - Lines matching `/^import\s/` become `sharedImports`.
+ *    - Complete `import` statements — including statements spanning multiple
+ *      lines — become `sharedImports`.
  *    - All other non-empty lines become the first slide's body.
  * 4. `sharedImports` is prepended to every slide's `rawMdx` so that
  *    components imported in the preamble are available everywhere.
@@ -277,19 +257,10 @@ export function splitSlides(
 
 	// ── Step 3: extract shared imports from the first block ─────────────────
 	const firstBlock = blocks[0] ?? [];
-	const importLines: string[] = [];
-	const slideContentLines: string[] = [];
-
-	for (const line of firstBlock) {
-		if (/^import\s/.test(line)) {
-			importLines.push(line);
-		} else {
-			slideContentLines.push(line);
-		}
-	}
+	const { importLines, contentLines } = partitionImportStatements(firstBlock);
 
 	const sharedImports = importLines.join("\n").trim();
-	const firstSlideContentBody = slideContentLines.join("\n").trim();
+	const firstSlideContentBody = contentLines.join("\n").trim();
 
 	// ── Step 4: build slide segments ────────────────────────────────────────
 	const slides: SlideSegment[] = [];

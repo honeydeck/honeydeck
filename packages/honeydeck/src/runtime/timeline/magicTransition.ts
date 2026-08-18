@@ -218,6 +218,10 @@ function createMagicClone(
 	wrapper.style.left = "0px";
 	wrapper.style.top = "0px";
 	wrapper.style.margin = "0";
+	// Clones live in an unscaled fixed overlay, so the wrapper scales itself with
+	// CSS `zoom` exactly like the slide canvas does. Slide-local sizes stay in
+	// logical canvas pixels; measured viewport rects are divided by the scale.
+	wrapper.style.zoom = `${scale}`;
 	wrapper.style.width = `${rect.width / scale}px`;
 	wrapper.style.height = `${rect.height / scale}px`;
 	wrapper.style.pointerEvents = "none";
@@ -357,11 +361,18 @@ function animateClone({
 	}
 }
 
+/**
+ * Positions a clone wrapper on a measured viewport rect. The wrapper carries
+ * `zoom: scale`, so its own translation lengths are scaled too and the measured
+ * viewport offsets are divided by the scale.
+ */
 function transformForRect(
 	rect: DOMRect,
 	scale: number,
 	offsetX: number,
 	offsetY: number,
 ): string {
-	return `translate(${rect.left - offsetX}px, ${rect.top - offsetY}px) scale(${scale})`;
+	const x = (rect.left - offsetX) / scale;
+	const y = (rect.top - offsetY) / scale;
+	return `translate(${x}px, ${y}px)`;
 }

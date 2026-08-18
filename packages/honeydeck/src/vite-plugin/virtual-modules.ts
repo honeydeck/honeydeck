@@ -84,6 +84,45 @@ const EXTENSIONLESS_IMPORT_EXTENSIONS = [
 	".css",
 ];
 
+/** Render source with 1-based line numbers so errors can be located quickly. */
+function formatSourceWithLineNumbers(source: string): string {
+	const lines = source.split("\n");
+	const width = String(lines.length).length;
+	return lines
+		.map((line, index) => `${String(index + 1).padStart(width, " ")} | ${line}`)
+		.join("\n");
+}
+
+/**
+ * Build a diagnostic for a failed MDX compilation.
+ *
+ * MDX parse failures such as `Could not parse import/exports with acorn` carry
+ * no file or stack information for generated virtual modules, so the message
+ * names the affected module and prints the exact source that was compiled.
+ */
+function describeMdxCompileError(
+	label: string,
+	source: string,
+	error: unknown,
+): string {
+	const reason = error instanceof Error ? error.message : String(error);
+	const place = error as { line?: number | null; column?: number | null };
+	const position =
+		typeof place?.line === "number"
+			? ` (generated line ${place.line}${
+					typeof place.column === "number" ? `, column ${place.column}` : ""
+				})`
+			: "";
+
+	return [
+		`Honeydeck: failed to compile ${label}.`,
+		`  ${reason}${position}`,
+		"",
+		"Generated MDX source:",
+		formatSourceWithLineNumbers(source),
+	].join("\n");
+}
+
 export function resolveRelativeImport(baseDir: string, id: string): string {
 	const absolute = resolve(baseDir, id);
 
@@ -362,20 +401,31 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 				// Compile MDX → JS here so @mdx-js/rollup's transform is bypassed.
 				// createFilter() from @rollup/pluginutils excludes \0-prefixed virtual
 				// IDs by default, so the rollup plugin would never transform these.
-				const vfile = await compile(slide.rawMdx, {
-					remarkPlugins: [
-						remarkFrontmatter,
-						remarkGfm,
-						remarkH1Extract,
-						remarkStepNumbering,
-						[
-							remarkShikiCodeBlocks,
-							{ magicCodeDuration: deckFrontmatter.magicCodeDuration },
+				let vfile: Awaited<ReturnType<typeof compile>>;
+				try {
+					vfile = await compile(slide.rawMdx, {
+						remarkPlugins: [
+							remarkFrontmatter,
+							remarkGfm,
+							remarkH1Extract,
+							remarkStepNumbering,
+							[
+								remarkShikiCodeBlocks,
+								{ magicCodeDuration: deckFrontmatter.magicCodeDuration },
+							],
 						],
-					],
-					jsxImportSource: "react",
-					outputFormat: "program",
-				});
+						jsxImportSource: "react",
+						outputFormat: "program",
+					});
+				} catch (error) {
+					this.error(
+						describeMdxCompileError(
+							`slide ${index} of ${entryFileName}`,
+							slide.rawMdx,
+							error,
+						),
+					);
+				}
 
 				// Append slide metadata as named exports so the Deck runtime can
 				// read title, frontmatter, layout name, and step count without an
@@ -407,17 +457,28 @@ export function virtualModulesPlugin(options: VirtualModulesOptions): Plugin {
 					this.error(`Honeydeck: layout demo ${index} not found.`);
 				}
 
-				const vfile = await compile(demo.source, {
-					remarkPlugins: [
-						remarkFrontmatter,
-						remarkGfm,
-						remarkH1Extract,
-						remarkStepNumbering,
-						remarkShikiCodeBlocks,
-					],
-					jsxImportSource: "react",
-					outputFormat: "program",
-				});
+				let vfile: Awaited<ReturnType<typeof compile>>;
+				try {
+					vfile = await compile(demo.source, {
+						remarkPlugins: [
+							remarkFrontmatter,
+							remarkGfm,
+							remarkH1Extract,
+							remarkStepNumbering,
+							remarkShikiCodeBlocks,
+						],
+						jsxImportSource: "react",
+						outputFormat: "program",
+					});
+				} catch (error) {
+					this.error(
+						describeMdxCompileError(
+							`layout demo ${index} (${demo.layoutName})`,
+							demo.source,
+							error,
+						),
+					);
+				}
 
 				const stepCount: number =
 					(vfile.data.stepCount as number | undefined) ?? 0;

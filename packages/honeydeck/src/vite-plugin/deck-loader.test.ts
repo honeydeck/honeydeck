@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { describe, it } from "node:test";
@@ -62,6 +62,91 @@ describe("loadDeck", () => {
 				),
 				1,
 			);
+		}
+	});
+
+	it("anchors multi-line relative imports of nested MDX files to their own directory", () => {
+		const tempDir = mkdtempSync(resolve(tmpdir(), "deck-loader-"));
+		try {
+			const entry = resolve(tempDir, "entry.mdx");
+			const nestedDir = resolve(tempDir, "slides");
+			const nested = resolve(nestedDir, "nested.mdx");
+			mkdirSync(nestedDir);
+
+			writeFileSync(
+				entry,
+				"import Nested from './slides/nested.mdx'\n\n<Nested />\n",
+			);
+			writeFileSync(
+				nested,
+				[
+					"import {",
+					"  MapIcon,",
+					"} from './icons'",
+					"",
+					"# Nested Slide",
+					"",
+					"<MapIcon />",
+					"",
+				].join("\n"),
+			);
+
+			const nestedResult = loadDeck(entry);
+			const expected = [
+				"import {",
+				"  MapIcon,",
+				`} from '/@fs/${resolve(nestedDir, "icons").replace(/\\/g, "/")}'`,
+			].join("\n");
+
+			assert.ok(nestedResult.slides[0]?.rawMdx.includes(expected));
+		} finally {
+			rmSync(tempDir, { recursive: true, force: true });
+		}
+	});
+
+	it("strips HTML comments from root and imported MDX files", () => {
+		const tempDir = mkdtempSync(resolve(tmpdir(), "deck-loader-"));
+		try {
+			const entry = resolve(tempDir, "entry.mdx");
+			const nested = resolve(tempDir, "nested.mdx");
+
+			writeFileSync(
+				entry,
+				[
+					"---",
+					"title: Commented Deck",
+					"---",
+					"",
+					"import Nested from './nested.mdx'",
+					"",
+					"<!-- a root note -->",
+					"# Root Slide <!-- inline note -->",
+					"",
+					"<Nested />",
+					"",
+					"---",
+					"",
+					"<!--",
+					"multi-line note with a --- separator inside",
+					"-->",
+					"# Last Slide",
+					"",
+				].join("\n"),
+			);
+			writeFileSync(nested, "<!-- nested note -->\n# Nested Slide\n");
+
+			const commentedResult = loadDeck(entry);
+
+			assert.equal(commentedResult.slides.length, 3);
+			for (const slide of commentedResult.slides) {
+				assert.ok(!slide.rawMdx.includes("<!--"));
+				assert.ok(!slide.rawMdx.includes("-->"));
+			}
+			assert.ok(commentedResult.slides[0]?.rawMdx.includes("# Root Slide"));
+			assert.ok(commentedResult.slides[1]?.rawMdx.includes("# Nested Slide"));
+			assert.ok(commentedResult.slides[2]?.rawMdx.includes("# Last Slide"));
+		} finally {
+			rmSync(tempDir, { recursive: true, force: true });
 		}
 	});
 

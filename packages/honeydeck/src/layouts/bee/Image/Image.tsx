@@ -128,7 +128,7 @@ export default function ImageLayout({
 
 				{/* ── Caption ─────────────────────────────────────────────────── */}
 				{hasCaption && (
-					<figcaption className="flex-shrink-0 border-l-4 border-accent pl-11 text-small text-surface-foreground italic leading-snug">
+					<figcaption className="shrink-0 border-l-4 border-accent pl-11 text-small text-surface-foreground italic leading-snug">
 						{children}
 					</figcaption>
 				)}

@@ -30,6 +30,19 @@ Content here.
 More content.
 ```
 
+### Comments
+
+HTML comments (`<!-- ... -->`) are valid deck syntax in the deck entry file and in imported MDX files. They are removed from the raw source before slide splitting and MDX compilation, so they never affect slide boundaries, frontmatter, imports, or rendered output.
+
+Rules:
+
+- Single-line, inline, and multi-line comments are removed
+- A line whose content is only a comment is dropped entirely, so a comment between two paragraph lines does not split the paragraph
+- Text before and after a comment on the same line is preserved
+- `---` lines inside a comment are comment text and never create a slide boundary
+- Comments inside fenced code blocks stay literal code text
+- An unterminated comment removes the rest of that file
+
 ### Multiple MDX Files
 
 Additional MDX files can be imported explicitly as slide groups:
@@ -55,7 +68,11 @@ Rules:
 - Imported `.mdx` files may contain multiple slides separated by `---`; those separators become Honeydeck slide boundaries in the parent timeline
 - Frontmatter in imported `.mdx` files is slide-level only and cannot define deck-level settings
 - Components imported from `.tsx`/`.ts`/`.jsx`/`.js` or packages are normal inline components
-- Single-line imports at the top of the first content block are extracted as shared imports and prepended to generated slide modules
+- Imports at the top of the first content block are extracted as shared imports and prepended to generated slide modules
+- Shared import extraction reads complete `import` statements, so statements spanning several lines (for example a named import list with one specifier per line) are captured as a whole and stay valid on every generated slide
+- Import statements inside fenced code blocks are literal code text and never become shared imports
+- Text that starts with the word `import` but is not a complete import statement stays slide body content
+- Relative imports in imported MDX files are anchored to the importing file's directory, including multi-line import statements
 
 ### Assets
 
@@ -143,3 +160,11 @@ Slide-level frontmatter is a frontmatter-only block after a slide separator and 
 Invalid `aspectRatio`, `colorMode`, and `pdfSteps` values fall back to defaults. Invalid `pdfColorMode` is ignored as unset, allowing the pinned `colorMode` fallback. `showSlideNumbers` is enabled only by literal `true`; slide transition values normalize at runtime, with non-empty strings treated as named built-ins or custom CSS hooks. `transition: magic` uses only runtime `data-magic-id` matching and does not add build-time DOM diffing. Invalid explicit Magic Code block `duration` values are compile errors; invalid deck-level `magicCodeDuration` falls back to the default Magic Code duration.
 
 During development, changes to deck-level frontmatter invalidate the virtual config and every compiled virtual slide module, because slide compilation can depend on deck settings such as `magicCodeDuration`. Layout-related virtual modules are invalidated as before so layout map and demo previews stay current.
+
+## Compilation Error Reporting
+
+Generated slide and layout demo modules have no source file on disk, so MDX compilation failures are reported with enough context to locate the problem:
+
+- The message names the failing module, either `slide <index> of <deck file>` or `layout demo <index> (<LayoutName>)`
+- The underlying MDX/acorn reason is included, with the generated line and column when the error carries a position
+- The full generated MDX source of that module is printed with 1-based line numbers, including the prepended shared imports

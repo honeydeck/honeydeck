@@ -62,6 +62,7 @@ Behavior:
 - Hidden content **reserves layout space** by default (`visibility: hidden` + `opacity: 0`, not `display: none`)
 - With `ephemeral`, hidden content renders `null` and does not reserve layout space; future-step previews still render a muted ghost
 - Runtime wrapper matches MDX context: flow/block reveals render a block-level `div`, text/inline reveals render an inline `span`
+- Runtime wrapper carries Honeydeck visibility styles and the author-provided `className` when present
 - Nested reveals are supported; inline nested reveals inside paragraphs must not create invalid `div`-inside-`p` HTML
 - Default effect: fade in
 - Reveals are **cumulative** (once visible, stays visible)
@@ -103,6 +104,7 @@ Behavior:
 - `RevealWith` visibility is cumulative, matching `<Reveal>`: once visible, it stays visible
 - Hidden content reserves layout space by default; with `ephemeral`, hidden content renders `null` and does not reserve layout space
 - Runtime wrapper matches MDX context: flow/block usages render a block-level `div`, text/inline usages render an inline `span`
+- Runtime wrapper carries Honeydeck visibility styles and the author-provided `className` when present
 - When string `target` is used, the wrapper renders `data-honeydeck-reveal-with="target"` for debugging/inspection
 - `RevealWith` must not contain nested timeline producers
 

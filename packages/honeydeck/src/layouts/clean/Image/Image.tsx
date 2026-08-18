@@ -80,7 +80,7 @@ export default function CleanImageLayout({
 				</div>
 
 				{hasCaption && (
-					<figcaption className="flex-shrink-0 pt-5 text-small leading-snug text-surface-foreground">
+					<figcaption className="shrink-0 pt-5 text-small leading-snug text-surface-foreground">
 						{children}
 					</figcaption>
 				)}

@@ -17,8 +17,21 @@
  * - Manual color mode override (system / light / dark) via NavBar
  *
  * ### Viewport scaling
- * The base canvas is 1920 × 1080 px; `transform: scale()` shrinks it
- * uniformly to fit any screen size without distorting content.
+ * The base canvas is 1920 × 1080 px; CSS `zoom` shrinks it uniformly to fit
+ * any screen size without distorting content. `zoom` (instead of
+ * `transform: scale()`) makes the browser lay slide content out at its
+ * rendered size, so text and OS emoji glyphs rasterize at the size they are
+ * displayed at. Gecko rasterizes glyphs inside a scaled transform at the
+ * unscaled font size and then clips them to the correctly sized glyph box,
+ * which crops bitmap color emoji; `zoom` avoids that entirely.
+ *
+ * Honeydeck-controlled slide zoom and pan stay a `transform` on the slide
+ * canvas so magnifying a slide does not re-run slide layout.
+ *
+ * Because `zoom` participates in layout, only slides that can be seen keep
+ * rendering: the current slide, transition participants, and direct
+ * neighbours. Every other slide gets `content-visibility: hidden`, so resizing
+ * the window re-runs layout for a couple of slides instead of the whole deck.
  *
  * ### Architecture note
  * Slide data (metadata, components, layout resolution) is now imported from
@@ -503,7 +516,8 @@ export function Deck() {
 			: route;
 	const activeSlideScale = scale * slideZoom;
 	const viewportScale = scale || 1;
-	const slideTransform = `translate(${slidePan.x}px, ${slidePan.y}px) scale(${activeSlideScale})`;
+	// Pan is measured in viewport pixels. Inside the zoomed canvas one CSS pixel
+	// covers `scale` viewport pixels, so the pan offset is divided by the scale.
 	const zoomedSlideTransform = `translate(${slidePan.x / viewportScale}px, ${slidePan.y / viewportScale}px) scale(${slideZoom})`;
 	const showSlideNumbers = config.showSlideNumbers === true;
 	const disableSlideTextSelection =
@@ -533,8 +547,7 @@ export function Deck() {
 								style={{
 									width: BASE_WIDTH,
 									height: BASE_HEIGHT,
-									transform: `scale(${scale})`,
-									transformOrigin: "center center",
+									zoom: scale,
 								}}
 							/>
 						</div>
@@ -551,6 +564,11 @@ export function Deck() {
 										? "exit"
 										: null;
 							const isVisible = isCurrent || transitionRole !== null;
+							// Off-screen slides skip layout and paint entirely. Direct
+							// neighbours keep rendering so navigating into them does not pay
+							// a first-layout cost during the transition.
+							const skipsRendering =
+								!isVisible && Math.abs(slideNumber - currentSlide) > 1;
 							const slideStepIndex =
 								transitionRole === "exit" && activeTransition
 									? activeTransition.fromStep
@@ -601,8 +619,8 @@ export function Deck() {
 										style={{
 											width: BASE_WIDTH,
 											height: BASE_HEIGHT,
-											transform: `scale(${scale})`,
-											transformOrigin: "center center",
+											zoom: scale,
+											contentVisibility: skipsRendering ? "hidden" : "visible",
 										}}
 									>
 										<div
@@ -657,7 +675,8 @@ export function Deck() {
 									style={{
 										width: BASE_WIDTH,
 										height: BASE_HEIGHT,
-										transform: slideTransform,
+										zoom: scale,
+										transform: zoomedSlideTransform,
 										transformOrigin: "center center",
 									}}
 								>

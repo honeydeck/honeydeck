@@ -65,7 +65,7 @@ function CleanSideContent({
 			}`}
 		>
 			{hasTitle(title) && (
-				<header className="mb-8 flex-shrink-0">
+				<header className="mb-8 shrink-0">
 					<h1 className="font-heading text-h2 font-semibold leading-tight text-foreground">
 						{title}
 					</h1>

@@ -23,7 +23,7 @@ export default function CleanCoverLayout({
 	return (
 		<SlideFrame className="items-center justify-center text-center">
 			{hasTitle(title) && (
-				<h1 className="mb-10 font-heading text-h1 font-semibold leading-tight text-foreground">
+				<h1 className="mb-10 font-heading font-semibold leading-tight text-foreground">
 					{title}
 				</h1>
 			)}

@@ -27,7 +27,7 @@ export default function CoverLayout({
 		<SlideFrame className="items-center justify-center text-center">
 			{/* Large centered title */}
 			{hasTitle(title) && (
-				<h1 className="font-heading font-bold text-h1 leading-tight text-primary mb-14">
+				<h1 className="font-heading font-bold leading-tight text-primary mb-14">
 					{title}
 				</h1>
 			)}
