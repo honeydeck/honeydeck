@@ -350,6 +350,10 @@
 	font-size: var(--honeydeck-font-size-body);
 }
 
+.honeydeck-slide-canvas blockquote p {
+	margin: 0;
+}
+
 .honeydeck-slide-canvas table {
 	width: 100%;
 	margin: 0 0 0.75em;
