@@ -6,6 +6,10 @@
 
 `@honeydeck/honeydeck` exports `useHoneydeck()` for deck authors using custom components and custom layouts. Calling it outside a Honeydeck presentation runtime throws `useHoneydeck must be used inside a Honeydeck presentation runtime.`
 
+## Document title
+
+When a deck sets `title` in deck-level frontmatter, the runtime updates the browser document title from that value using `useHoneydeck()`. An empty or missing `title` leaves the default app-shell title unchanged.
+
 `@honeydeck/honeydeck` also exports `useSlideScale()` for components and layouts that need the current rendered slide scale. It returns the CSS `zoom` factor applied to the logical slide canvas in the current render surface, multiplied by any Honeydeck-controlled slide zoom.
 
 The hook returns a nested object:
