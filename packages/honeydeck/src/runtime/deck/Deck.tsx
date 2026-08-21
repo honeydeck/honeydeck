@@ -79,6 +79,7 @@ import { SlideNumberBadge } from "./chrome/SlideNumberBadge.tsx";
 import {
 	HoneydeckProvider,
 	resolveHoneydeckConfig,
+	useHoneydeck,
 } from "./HoneydeckContext.tsx";
 import { SlideScaleProvider } from "./SlideScaleContext.tsx";
 import {
@@ -481,6 +482,7 @@ export function Deck() {
 		return (
 			<EffectiveColorModeProvider mode={effectiveColorMode}>
 				<HoneydeckProvider value={honeydeckContextValue}>
+					<DocumentTitle />
 					<DocsView
 						tab={route.kitTab}
 						colorMode={colorMode}
@@ -531,6 +533,7 @@ export function Deck() {
 	return (
 		<EffectiveColorModeProvider mode={effectiveColorMode}>
 			<HoneydeckProvider value={honeydeckContextValue}>
+				<DocumentTitle />
 				<div className="fixed inset-0 overflow-hidden bg-black">
 					{/* ── Sizing container: fills viewport for scale calc ──────── */}
 					<div
@@ -734,6 +737,19 @@ export function Deck() {
 			</HoneydeckProvider>
 		</EffectiveColorModeProvider>
 	);
+}
+
+function DocumentTitle() {
+	const { config } = useHoneydeck();
+
+	useEffect(() => {
+		const title = typeof config.title === "string" ? config.title.trim() : "";
+		if (title) {
+			document.title = title;
+		}
+	}, [config.title]);
+
+	return null;
 }
 
 function usePointerLayout() {
